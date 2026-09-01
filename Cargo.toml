@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/toktok-core", "crates/toktok-py"]
+members = ["crates/toktok", "crates/toktok-py"]
 resolver = "2"
 
 [workspace.package]

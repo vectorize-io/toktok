@@ -30,7 +30,9 @@ manifest-path = "crates/toktok-py/Cargo.toml"
 module-name = "toktok._toktok"
 python-source = "python"
 features = ["pyo3/extension-module"]
-include = [{ path = "python/toktok/data/*", format = "sdist" }]
+# the vocab tables are compiled into the extension module; the sdist needs
+# them as sources so it can rebuild
+include = [{ path = "crates/toktok/data/*", format = "sdist" }]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

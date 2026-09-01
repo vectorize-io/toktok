@@ -12,8 +12,7 @@ fn main() {
     let reps: usize = args.next().and_then(|s| s.parse().ok()).unwrap_or(3);
 
     let t0 = Instant::now();
-    let tok = toktok_core::Tokenizer::load_dir("python/toktok/data", &enc)
-        .unwrap_or_else(|e| panic!("{e}"));
+    let tok = toktok::Tokenizer::builtin(&enc).unwrap_or_else(|e| panic!("{e}"));
     let load = t0.elapsed();
 
     let text = std::fs::read(&path).unwrap_or_else(|e| panic!("cannot read {path}: {e}"));

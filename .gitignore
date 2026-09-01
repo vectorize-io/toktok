@@ -1,6 +1,10 @@
-/target
+# build artifacts — any target/ dir, not just the workspace root (bench/rust is
+# its own cargo workspace and was slipping through a root-anchored rule)
+target/
+dist/
 __pycache__/
 *.so
 .venv/
+
+# benchmark corpora: 3 x 25 MB, fetched with bench/fetch_corpus.py
 bench/corpus/
-/dist

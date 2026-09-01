@@ -1,25 +1,33 @@
 """toktok — a fast, exact BPE tokenizer (Rust core).
 
-Bundled encodings: cl100k_base, o200k_base, o200k_harmony.
-Drop-in-shaped for tiktoken:
+The public API is one function: `batch_count`. Give it your texts and an
+encoding, get back a token count per text. Ids are never materialized.
 
     import toktok
-    enc = toktok.get_encoding("cl100k_base")
-    ids = enc.encode("hello world")          # == tiktoken.encode
-    text = enc.decode(ids)
+
+    counts = toktok.batch_count(["hello world", "how many tokens?"], "cl100k_base")
+    # [2, 4]
+
+`encoding` takes an encoding name (cl100k_base, o200k_base, o200k_harmony) or a
+model name (gpt-4o, gpt-4, openai/gpt-oss-20b, text-embedding-3-small).
+
+Encodings are loaded once and cached, and counting releases the GIL and runs
+across threads, so calling this per request is fine.
 """
 
-import os as _os
+from typing import Iterable, List
 
-from ._toktok import BUILTIN_ENCODINGS, Tokenizer, __version__, _set_datadir
+from ._toktok import BUILTIN_ENCODINGS as _BUILTIN
+from ._toktok import Tokenizer as _Tokenizer
+from ._toktok import __version__
 
-_set_datadir(_os.path.join(_os.path.dirname(__file__), "data"))
-
+# The vocabularies are compiled into the extension module, so there are no data
+# files to find, ship or download.
 _CACHE = {}
 
-# model name -> encoding (the common ones). encoding_for_model lowercases and
-# strips an org prefix, so HF-style ids like "openai/gpt-oss-20b" resolve.
-MODEL_TO_ENCODING = {
+# model name -> encoding. Lookup lowercases and strips an org prefix, so HF-style
+# ids like "openai/gpt-oss-20b" resolve too.
+_MODEL_TO_ENCODING = {
     "gpt-5": "o200k_base",
     "gpt-4.1": "o200k_base",
     "gpt-4o": "o200k_base",
@@ -37,61 +45,55 @@ MODEL_TO_ENCODING = {
 }
 
 
-def get_encoding(name: str, data_dir: str = "") -> Tokenizer:
-    """Load (and cache) a tokenizer by encoding name.
-
-    Bundled: 'cl100k_base', 'o200k_base', 'o200k_harmony' (GPT-OSS)."""
-    key = (name, data_dir)
-    if key not in _CACHE:
-        _CACHE[key] = Tokenizer(name, data_dir)
-    return _CACHE[key]
-
-
-def encoding_for_model(model: str) -> Tokenizer:
-    """tiktoken-style: resolve a model name to its encoding."""
-    m = model.lower().rsplit("/", 1)[-1]
-    for prefix, enc in sorted(MODEL_TO_ENCODING.items(), key=lambda kv: -len(kv[0])):
+def _resolve(name: str) -> str:
+    """Encoding name, or the encoding a model name maps to."""
+    if name in _BUILTIN:
+        return name
+    m = name.lower().rsplit("/", 1)[-1]  # "openai/gpt-oss-20b" -> "gpt-oss-20b"
+    for prefix, enc in sorted(_MODEL_TO_ENCODING.items(), key=lambda kv: -len(kv[0])):
         if m == prefix or m.startswith(prefix + "-") or m.startswith(prefix + "."):
-            return get_encoding(enc)
+            return enc
     raise KeyError(
-        f"unknown model {model!r}; pass an encoding name to get_encoding() instead"
+        f"unknown encoding or model {name!r}; bundled encodings are "
+        f"{', '.join(_BUILTIN)}"
     )
 
 
-def encode_to_numpy(enc: Tokenizer, text: str, **kw):
-    """Encode to a uint32 numpy array — the fastest single-encode path from
-    Python (no per-token Python int objects)."""
-    import numpy as _np
+def _encoding(name: str, data_dir: str = "") -> _Tokenizer:
+    """The loaded (and cached) tokenizer behind an encoding or model name.
 
-    return _np.frombuffer(enc.encode_to_buffer(text, **kw), dtype=_np.uint32)
-
-
-def encode_batch_to_numpy(enc: Tokenizer, texts, threads: int = 0, with_special: bool = False):
-    """Encode many texts in parallel. Returns (flat uint32 ids, int64 offsets)
-    where text i occupies ids[offsets[i]:offsets[i + 1]]."""
-    import numpy as _np
-
-    flat, offsets = enc.encode_batch(list(texts), threads, with_special)
-    return _np.frombuffer(flat, dtype=_np.uint32), _np.frombuffer(offsets, dtype=_np.int64)
+    Private: the supported API is `batch_count`. This is here for tests and for
+    anyone who knowingly wants the full encode/decode surface."""
+    key = (name, data_dir)
+    if key not in _CACHE:
+        _CACHE[key] = _Tokenizer(_resolve(name), data_dir)
+    return _CACHE[key]
 
 
-def count_batch(enc: Tokenizer, texts, threads: int = 0, with_special: bool = False):
-    """Token counts for many texts, in parallel — a plain list[int].
+def batch_count(
+    texts: Iterable[str],
+    encoding: str = "cl100k_base",
+    threads: int = 0,
+    with_special: bool = False,
+) -> List[int]:
+    """Count the tokens in each of `texts`. Returns one int per text, in order.
 
-    Much cheaper than len(encode(t)) per text: the ids are never materialized,
-    so the whole batch allocates one scratch buffer per thread. This is
-    `Tokenizer.count_batch`; call that directly if you don't want the alias."""
-    return enc.count_batch(list(texts), threads, with_special)
+    Args:
+        texts: the strings to count.
+        encoding: encoding name ('cl100k_base', 'o200k_base', 'o200k_harmony')
+            or a model name ('gpt-4o', 'openai/gpt-oss-20b').
+        threads: worker threads; 0 (default) uses every core. Counting releases
+            the GIL, so this scales.
+        with_special: if True, a special-token string such as '<|endoftext|>'
+            counts as the single token it is, instead of as ordinary text.
+
+    Counting never builds the token ids: one scratch buffer per thread is reused
+    across texts, so a batch of any size allocates O(threads), not O(tokens).
+
+        >>> toktok.batch_count(["hello world"], "gpt-4o")
+        [2]
+    """
+    return _encoding(encoding).count_batch(list(texts), threads, with_special)
 
 
-__all__ = [
-    "Tokenizer",
-    "get_encoding",
-    "encoding_for_model",
-    "encode_to_numpy",
-    "encode_batch_to_numpy",
-    "count_batch",
-    "BUILTIN_ENCODINGS",
-    "MODEL_TO_ENCODING",
-    "__version__",
-]
+__all__ = ["batch_count"]

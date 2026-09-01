@@ -5,11 +5,8 @@ use pyo3::exceptions::{PyKeyError, PyRuntimeError, PyValueError};
 use pyo3::prelude::*;
 use pyo3::types::{PyBytes, PyList, PySet, PyString, PyTuple};
 use std::collections::BTreeSet;
-use std::sync::Mutex;
 
-use toktok_core::Tokenizer as Core;
-
-static DATADIR: Mutex<String> = Mutex::new(String::new());
+use toktok::Tokenizer as Core;
 
 #[pyclass(name = "Tokenizer", module = "toktok._toktok", frozen)]
 struct PyTokenizer {
@@ -60,12 +57,14 @@ impl PyTokenizer {
     #[new]
     #[pyo3(signature = (encoding, datadir = ""))]
     fn new(encoding: &str, datadir: &str) -> PyResult<Self> {
-        let dir = if datadir.is_empty() {
-            DATADIR.lock().unwrap().clone()
+        // The bundled encodings are compiled into the extension module, so the
+        // wheel ships no data files; a datadir is only for encodings you supply.
+        let loaded = if datadir.is_empty() {
+            Core::builtin(encoding)
         } else {
-            datadir.to_string()
+            Core::load_dir(datadir, encoding)
         };
-        Core::load_dir(dir, encoding)
+        loaded
             .map(|inner| PyTokenizer { inner })
             .map_err(|e| PyRuntimeError::new_err(e.0))
     }
@@ -135,6 +134,37 @@ impl PyTokenizer {
     ) -> PyResult<Py<PyBytes>> {
         let ids = self.encode(py, text, allowed_special, disallowed_special)?;
         Ok(u32s_to_bytes(py, &ids))
+    }
+
+    /// Same as `encode`, but returns a numpy `uint32` array — the fastest path
+    /// from Python: no per-token Python int objects, just one buffer.
+    #[pyo3(signature = (text, allowed_special = None, disallowed_special = None))]
+    fn encode_to_numpy<'py>(
+        &self,
+        py: Python<'py>,
+        text: &str,
+        allowed_special: Option<&Bound<'py, PyAny>>,
+        disallowed_special: Option<&Bound<'py, PyAny>>,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let buf = self.encode_to_buffer(py, text, allowed_special, disallowed_special)?;
+        frombuffer(py, buf.bind(py), "uint32")
+    }
+
+    /// Encode many texts in parallel into numpy arrays: `(ids, offsets)`, where
+    /// text `i` occupies `ids[offsets[i]:offsets[i + 1]]`.
+    #[pyo3(signature = (texts, threads = 0, with_special = false))]
+    fn encode_batch_to_numpy<'py>(
+        &self,
+        py: Python<'py>,
+        texts: Vec<String>,
+        threads: usize,
+        with_special: bool,
+    ) -> PyResult<(Bound<'py, PyAny>, Bound<'py, PyAny>)> {
+        let (flat, offsets) = self.encode_batch(py, texts, threads, with_special);
+        Ok((
+            frombuffer(py, flat.bind(py), "uint32")?,
+            frombuffer(py, offsets.bind(py), "int64")?,
+        ))
     }
 
     /// Ordinary ids + per-token spans. `unit="byte"` gives exact UTF-8 byte
@@ -348,19 +378,24 @@ impl PyTokenizer {
     }
 }
 
-#[pyfunction]
-fn _set_datadir(d: &str) {
-    *DATADIR.lock().unwrap() = d.to_string();
+/// numpy.frombuffer over a bytes object — a read-only zero-copy view.
+fn frombuffer<'py>(
+    py: Python<'py>,
+    buf: &Bound<'py, PyBytes>,
+    dtype: &str,
+) -> PyResult<Bound<'py, PyAny>> {
+    let np = py.import("numpy").map_err(|_| {
+        PyRuntimeError::new_err(
+            "the numpy methods need numpy installed: pip install 'toktok-rs[numpy]'",
+        )
+    })?;
+    np.call_method1("frombuffer", (buf, dtype))
 }
 
 #[pymodule]
 fn _toktok(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyTokenizer>()?;
-    m.add_function(wrap_pyfunction!(_set_datadir, m)?)?;
     m.add("__version__", env!("CARGO_PKG_VERSION"))?;
-    m.add(
-        "BUILTIN_ENCODINGS",
-        toktok_core::BUILTIN_ENCODINGS.to_vec(),
-    )?;
+    m.add("BUILTIN_ENCODINGS", toktok::BUILTIN_ENCODINGS.to_vec())?;
     Ok(())
 }

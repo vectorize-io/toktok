@@ -30,7 +30,7 @@ ALPHABET = "abcXYZ 0123\n\t\r.,!?'-/_:;()[]{}éü中日あ한\U0001F600́A"
 @pytest.fixture(scope="module", params=ENCODINGS)
 def pair(request):
     name = request.param
-    return name, toktok.get_encoding(name), tiktoken.get_encoding(name)
+    return name, toktok._encoding(name), tiktoken.get_encoding(name)
 
 
 def test_fixed_cases(pair):

@@ -1,6 +1,7 @@
 [package]
 name = "toktok-py"
 description = "Python bindings for toktok"
+publish = false
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -15,4 +16,4 @@ path = "src/lib.rs"
 
 [dependencies]
 pyo3 = { version = "0.29.2", features = ["extension-module", "abi3-py39"] }
-toktok-core = { path = "../toktok-core" }
+toktok-rs = { path = "../toktok" }

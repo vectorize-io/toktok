@@ -1,0 +1,26 @@
+[package]
+name = "toktok-rs"
+description = "Fast, exact BPE tokenizer for OpenAI encodings (cl100k_base, o200k_base, o200k_harmony) — tiktoken-identical ids, no dependencies"
+documentation = "https://docs.rs/toktok-rs"
+keywords = ["tokenizer", "bpe", "tiktoken", "gpt", "llm"]
+categories = ["text-processing", "algorithms"]
+readme = "README.md"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+# the exactness tests need fixtures generated from tiktoken (tools/gen_vectors.py
+# in the repo), so they are not part of the published package
+exclude = ["tests/*"]
+rust-version = "1.70"
+homepage = "https://github.com/vectorize-io/toktok"
+
+[lib]
+name = "toktok"
+path = "src/lib.rs"
+
+[features]
+default = ["embedded-data"]
+# Embed the bundled vocabularies in the binary (~4 MB of .rodata). Turn off to
+# load them from a directory with `Tokenizer::load_dir` instead.
+embedded-data = []

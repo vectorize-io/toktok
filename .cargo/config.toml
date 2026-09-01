@@ -1,0 +1,8 @@
+# pyo3 extension modules link against the interpreter at load time, not build
+# time. maturin passes these itself; this makes a plain `cargo build` at the
+# workspace root work too.
+[target.x86_64-apple-darwin]
+rustflags = ["-C", "link-arg=-undefined", "-C", "link-arg=dynamic_lookup"]
+
+[target.aarch64-apple-darwin]
+rustflags = ["-C", "link-arg=-undefined", "-C", "link-arg=dynamic_lookup"]

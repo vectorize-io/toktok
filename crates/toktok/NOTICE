@@ -1,0 +1,16 @@
+toktok is a Rust port of quicktok (https://github.com/dmatth1/quicktok), which is
+MIT-licensed. The engine's algorithm, data-structure layouts, bit packings and
+hand-compiled pretokenizers are derived from that project's C++ sources; the
+corpus fetcher in bench/fetch_corpus.py is taken from it as well. A copy of the
+upstream license is in LICENSE-quicktok-upstream.
+
+toktok bundles tokenizer vocabulary data in python/toktok/data/, copied from
+quicktok's data/ directory:
+
+- cl100k.vocab, o200k.vocab, the cl100k/o200k/o200k_harmony special-token files
+  and the Unicode class tables (uniclass.bin, uniclass_o200k.bin) are derived
+  from OpenAI's tiktoken (https://github.com/openai/tiktoken, MIT).
+  o200k_harmony shares o200k_base's merge ranks — only its specials differ, so
+  it reuses o200k.vocab.
+
+The toktok source code is MIT-licensed (see LICENSE).

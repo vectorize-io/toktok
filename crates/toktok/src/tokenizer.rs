@@ -31,7 +31,11 @@ fn load_specials(path: &Path) -> Result<Vec<(String, u32)>, VocabError> {
         Ok(r) => r,
         Err(_) => return Ok(Vec::new()), // specials file is optional
     };
-    let bad = || VocabError(format!("toktok: bad special-tokens file: {}", path.display()));
+    specials_from_bytes(&raw, &path.display().to_string())
+}
+
+fn specials_from_bytes(raw: &[u8], what: &str) -> Result<Vec<(String, u32)>, VocabError> {
+    let bad = || VocabError(format!("toktok: bad special-tokens file: {what}"));
     if raw.len() < 4 {
         return Err(bad());
     }
@@ -59,6 +63,51 @@ fn load_specials(path: &Path) -> Result<Vec<(String, u32)>, VocabError> {
 }
 
 impl Tokenizer {
+    /// Construct a bundled encoding from the tables embedded in the binary — no
+    /// data directory, no download, no network.
+    ///
+    /// Names: `cl100k_base` (GPT-3.5/GPT-4), `o200k_base` (GPT-4o), and
+    /// `o200k_harmony` (GPT-OSS). Requires the default `embedded-data` feature.
+    ///
+    /// ```
+    /// let tok = toktok::Tokenizer::builtin("cl100k_base").unwrap();
+    /// assert_eq!(tok.encode(b"hello world"), [15339, 1917]);
+    /// ```
+    #[cfg(feature = "embedded-data")]
+    pub fn builtin(encoding: &str) -> Result<Tokenizer, VocabError> {
+        use crate::builtin::data;
+        let (vocab, specials, scanner) = match encoding {
+            "cl100k_base" => (data::CL100K_VOCAB, data::CL100K_SPECIAL, Scanner::Cl100k),
+            "o200k_base" => (data::O200K_VOCAB, data::O200K_SPECIAL, Scanner::O200k),
+            // GPT-OSS harmony: identical pattern AND merge ranks to o200k_base, so
+            // it reuses o200k's vocab and scanner — only the specials differ.
+            "o200k_harmony" => (
+                data::O200K_VOCAB,
+                data::O200K_HARMONY_SPECIAL,
+                Scanner::O200k,
+            ),
+            _ => return Err(unknown_encoding(encoding)),
+        };
+        let (u, uo) = match scanner {
+            Scanner::Cl100k => (
+                UClass::from_bytes(data::UNICLASS, "uniclass.bin")?,
+                UClassO::empty(),
+            ),
+            Scanner::O200k => (
+                UClass::empty(),
+                UClassO::from_bytes(data::UNICLASS_O200K, "uniclass_o200k.bin")?,
+            ),
+        };
+        Ok(Tokenizer {
+            v: Vocab::from_bytes(vocab, encoding)?,
+            name: encoding.to_string(),
+            scanner,
+            u,
+            uo,
+            specials: specials_from_bytes(specials, encoding)?,
+        })
+    }
+
     /// Load a bundled encoding from a data directory.
     ///
     /// Built-in: `cl100k_base`, `o200k_base`, `o200k_harmony`.
@@ -70,11 +119,7 @@ impl Tokenizer {
             // GPT-OSS harmony: identical pattern AND merge ranks to o200k_base (so it
             // reuses o200k.vocab and the o200k scanner) — only the specials differ.
             "o200k_harmony" => ("o200k.vocab", true, "o200k_harmony.special", Scanner::O200k),
-            _ => {
-                return Err(VocabError(format!(
-                    "toktok: unknown encoding: {encoding} (built-in: cl100k_base, o200k_base, o200k_harmony)"
-                )))
-            }
+            _ => return Err(unknown_encoding(encoding)),
         };
         let v = Vocab::load(&dir.join(vocab_file))?;
         let (u, uo) = if uni_o200k {
@@ -584,6 +629,13 @@ impl Tokenizer {
 fn at(t: &[u8], i: usize) -> u8 {
     debug_assert!(i < t.len());
     unsafe { *t.get_unchecked(i) }
+}
+
+fn unknown_encoding(encoding: &str) -> VocabError {
+    VocabError(format!(
+        "toktok: unknown encoding: {encoding} (built-in: {})",
+        crate::BUILTIN_ENCODINGS.join(", ")
+    ))
 }
 
 // ASCII class predicates for the product machines. a_pun deliberately includes

@@ -1,4 +1,8 @@
-"""The Python surface: decode, offsets, batch, numpy helpers, model lookup."""
+"""The Python surface.
+
+`batch_count` is the whole public API; the rest of this file exercises the
+Tokenizer behind it (reached through the private `toktok._encoding`), because
+that engine surface is what `batch_count` and the Rust crate are built on."""
 
 import pytest
 
@@ -9,7 +13,7 @@ TEXT = "Hello, 日本語 world! 123\n\n  indented\ttext 🚀"
 
 @pytest.fixture(scope="module")
 def enc():
-    return toktok.get_encoding("cl100k_base")
+    return toktok._encoding("cl100k_base")
 
 
 def test_roundtrip(enc):
@@ -22,7 +26,7 @@ def test_count_matches_encode(enc):
 
 
 def test_encoding_is_cached(enc):
-    assert toktok.get_encoding("cl100k_base") is enc
+    assert toktok._encoding("cl100k_base") is enc
     assert enc.name == "cl100k_base"
     assert repr(enc) == "<toktok.Tokenizer 'cl100k_base'>"
 
@@ -69,25 +73,25 @@ def test_encode_with_special(enc):
 
 def test_batch_matches_sequential(enc):
     docs = [f"doc {i}: hello 日本語 {i}" for i in range(200)]
-    flat, offsets = toktok.encode_batch_to_numpy(enc, docs, threads=4)
+    flat, offsets = enc.encode_batch_to_numpy(docs, threads=4)
     assert len(offsets) == len(docs) + 1
     for i, d in enumerate(docs):
         assert list(flat[offsets[i] : offsets[i + 1]]) == enc.encode_ordinary(d)
 
 
-def test_count_batch(enc):
+def test_count_and_count_batch(enc):
     docs = ["one two three", "", "日本語のテキスト", "x" * 100]
-    want = [enc.count(d) for d in docs]
-    assert list(toktok.count_batch(enc, docs)) == want
-    assert list(enc.count_batch(docs, 4)) == want          # native, multi-threaded
-    assert list(enc.count_batch([], 4)) == []
+    want = [len(enc.encode_ordinary(d)) for d in docs]
+    assert [enc.count(d) for d in docs] == want             # counting, no ids returned
+    assert enc.count_batch(docs, 4) == want                 # parallel, still no ids
+    assert enc.count_batch([]) == []
     assert enc.count_batch(["a<|endoftext|>b"], 1, True) == [
         len(enc.encode_with_special("a<|endoftext|>b"))
     ]
 
 
 def test_encode_to_numpy(enc):
-    arr = toktok.encode_to_numpy(enc, TEXT)
+    arr = enc.encode_to_numpy(TEXT)
     assert arr.dtype.name == "uint32"
     assert list(arr) == enc.encode_ordinary(TEXT)
 
@@ -106,23 +110,47 @@ def test_encode_bytes_invalid_utf8(enc):
 def test_memory_bytes(enc):
     # exact live table footprint: a few MiB, stable, and bigger for a bigger vocab
     assert 8 * 2**20 < enc.memory_bytes < 32 * 2**20
-    assert toktok.get_encoding("o200k_base").memory_bytes > enc.memory_bytes
+    assert toktok._encoding("o200k_base").memory_bytes > enc.memory_bytes
 
 
-def test_encoding_for_model():
-    assert toktok.encoding_for_model("gpt-4").name == "cl100k_base"
-    assert toktok.encoding_for_model("gpt-4o-mini").name == "o200k_base"
-    assert toktok.encoding_for_model("openai/gpt-oss-20b").name == "o200k_harmony"
-    with pytest.raises(KeyError):
-        toktok.encoding_for_model("not-a-model")
+def test_batch_count_is_the_public_api():
+    assert toktok.__all__ == ["batch_count"]
+    # texts and an encoding in, one count per text out — no ids
+    assert toktok.batch_count(["hello world", "", "how many tokens?"]) == [2, 0, 4]
+    assert toktok.batch_count([]) == []
+
+
+def test_batch_count_accepts_encoding_or_model_names():
+    texts = ["hello world", "日本語のテキストです"]
+    cl = toktok.batch_count(texts, "cl100k_base")
+    o2 = toktok.batch_count(texts, "o200k_base")
+    assert toktok.batch_count(texts, "gpt-4") == cl
+    assert toktok.batch_count(texts, "text-embedding-3-small") == cl
+    assert toktok.batch_count(texts, "gpt-4o") == o2
+    assert toktok.batch_count(texts, "openai/gpt-oss-20b") == o2
+    with pytest.raises(KeyError, match="unknown encoding or model"):
+        toktok.batch_count(texts, "not-a-model")
+
+
+def test_batch_count_options(enc):
+    docs = [f"doc {i}: hello 日本語 world" for i in range(500)]
+    want = [len(enc.encode_ordinary(d)) for d in docs]
+    assert toktok.batch_count(docs) == want                     # every core
+    assert toktok.batch_count(docs, threads=1) == want          # single thread
+    assert toktok.batch_count(iter(docs)) == want               # any iterable
+    special = "a<|endoftext|>b"
+    assert toktok.batch_count([special], with_special=True) == [
+        len(enc.encode_with_special(special))
+    ]
+    assert toktok.batch_count([special]) == [len(enc.encode_ordinary(special))]
 
 
 def test_unknown_encoding_raises():
-    with pytest.raises(RuntimeError, match="unknown encoding"):
-        toktok.get_encoding("does_not_exist")
+    with pytest.raises(KeyError, match="unknown encoding or model"):
+        toktok._encoding("does_not_exist")
 
 
 def test_harmony_specials():
-    h = toktok.get_encoding("o200k_harmony")
+    h = toktok._encoding("o200k_harmony")
     assert "<|message|>" in h.special_tokens_set
-    assert h.encode_ordinary("hello") == toktok.get_encoding("o200k_base").encode_ordinary("hello")
+    assert h.encode_ordinary("hello") == toktok._encoding("o200k_base").encode_ordinary("hello")

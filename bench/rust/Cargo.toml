@@ -1,0 +1,18 @@
+# Standalone (own workspace) so the published crates' lockfile stays clean.
+[workspace]
+
+[package]
+name = "toktok-bench"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+toktok-rs = { path = "../../crates/toktok" }
+tiktoken-rs = "0.7"
+bpe-openai = "0.2"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1

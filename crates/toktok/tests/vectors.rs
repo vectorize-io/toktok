@@ -12,8 +12,8 @@ fn root() -> PathBuf {
         .to_path_buf()
 }
 
-fn load(encoding: &str) -> toktok_core::Tokenizer {
-    toktok_core::Tokenizer::load_dir(root().join("python/toktok/data"), encoding).unwrap()
+fn load(encoding: &str) -> toktok::Tokenizer {
+    toktok::Tokenizer::builtin(encoding).unwrap()
 }
 
 fn rd_u32(b: &[u8], p: &mut usize) -> u32 {
@@ -145,5 +145,8 @@ fn memory_accounting_is_consistent() {
 
 #[test]
 fn unknown_encoding_errors() {
-    assert!(toktok_core::Tokenizer::load_dir(root().join("python/toktok/data"), "nope").is_err());
+    assert!(toktok::Tokenizer::builtin("nope").is_err());
+    // the directory loader agrees, and still works for supplying your own data
+    assert!(toktok::Tokenizer::load_dir(root().join("crates/toktok/data"), "nope").is_err());
+    assert!(toktok::Tokenizer::load_dir(root().join("crates/toktok/data"), "cl100k_base").is_ok());
 }
