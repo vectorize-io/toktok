@@ -8,9 +8,23 @@ scripts/release.sh patch        # or: minor | major | 0.4.2
 ```
 
 That bumps the version, runs the tests, dry-runs the crate package, commits,
-tags and pushes — the tag is what triggers the workflow. Add `--dry-run` to
-rehearse it locally without committing anything. Doing it by hand is the same
-thing: bump `[workspace.package] version` in `Cargo.toml`, then
+tags and pushes — the tag is what triggers the workflow.
+
+| argument | what it does |
+|---|---|
+| `patch` / `minor` / `major` | bump that part of the current version (`0.1.0` → `0.1.1` / `0.2.0` / `1.0.0`) |
+| `X.Y.Z` | set an exact version, e.g. `0.4.2` or `1.0.0-rc.1` |
+| `--dry-run` | do everything — bump, verify, test, package — then revert and print what it *would* have run. Commits nothing, tags nothing, pushes nothing. |
+| `--skip-tests` | skip `cargo test`, `pytest` and the `cargo publish` dry run. The release workflow still runs them before it publishes, so this trades local certainty for a faster tag. |
+| `-h` / `--help` | usage |
+
+Before touching anything it checks that you are on `main`, the tree is clean,
+local and `origin/main` agree, and the tag does not already exist locally or on
+the remote. If a later step fails, the version bump is rolled back so you are
+never left with a half-bumped checkout.
+
+Doing it by hand is the same thing: bump `[workspace.package] version` in
+`Cargo.toml`, then
 
 ```sh
 git tag v0.1.0 && git push origin v0.1.0

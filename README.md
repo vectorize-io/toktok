@@ -37,15 +37,22 @@ toktok.batch_count(docs, "cl100k_base", threads=4)    # 0 = every core (default)
 toktok.batch_count(["a<|endoftext|>b"], with_special=True)   # [3]
 ```
 
-`batch_count(texts, encoding="cl100k_base", threads=0, with_special=False) -> list[int]`
+### `batch_count(texts, encoding="cl100k_base", threads=0, with_special=False)`
 
-- `encoding` — an encoding name or a model name (`gpt-4o`, `gpt-4`,
-  `openai/gpt-oss-20b`, `text-embedding-3-small`). Unknown names raise `KeyError`.
-- Ids are never built: one scratch buffer per thread is reused, so a batch of any
-  size allocates O(threads), not O(tokens).
-- Counting releases the GIL, so it scales across threads. Wheels cover CPython
-  **3.11–3.14** plus free-threaded **3.14t**, on Linux (x86_64, aarch64), macOS
-  and Windows.
+Returns `list[int]` — one count per text, in the order given.
+
+| parameter | default | what it does |
+|---|---|---|
+| `texts` | — | any iterable of `str`. An empty iterable returns `[]`; an empty string counts as `0`. |
+| `encoding` | `"cl100k_base"` | which tokenizer to count with. Takes an **encoding name** — `cl100k_base`, `o200k_base`, `o200k_harmony` — or a **model name**, which resolves to that model's encoding: `gpt-4o`, `gpt-4`, `gpt-3.5-turbo`, `o1`, `o3`, `text-embedding-3-small`, `openai/gpt-oss-20b`. An org prefix is stripped, so HF-style ids work. Anything unrecognized raises `KeyError`. |
+| `threads` | `0` | worker threads. `0` uses every core; `1` counts on the calling thread; any other number caps the pool. Counting releases the GIL, so this scales — including on free-threaded builds. Threads are only worth it for large batches; for a handful of short strings the pool costs more than it saves. |
+| `with_special` | `False` | how to treat special-token strings. `False` counts `<\|endoftext\|>` as the ordinary text it looks like (7 tokens); `True` counts it as the single special token it is (1). Use `True` when your text already contains rendered chat/control markup and you want the count the model will see. |
+
+Ids are never built: one scratch buffer per thread is reused across texts, so a
+batch of any size allocates O(threads), not O(tokens).
+
+Wheels cover CPython **3.11–3.14** plus free-threaded **3.14t**, on Linux
+(x86_64, aarch64), macOS and Windows.
 
 Need ids, decoding or offsets? `toktok._encoding(name)` returns the full
 tokenizer — see [docs/PYTHON.md](docs/PYTHON.md).
@@ -71,15 +78,28 @@ let batches = tok.encode_batch(&docs, 0, false);
 let (ids, spans) = tok.encode_with_offsets(b"per-token byte spans");
 ```
 
+Every batch method takes the same two knobs as the Python API:
+
+| argument | meaning |
+|---|---|
+| `threads: usize` | `0` uses every core; `1` runs on the calling thread; anything else caps the pool. |
+| `with_special: bool` | `false` counts/encodes special strings as ordinary text; `true` maps them to their single special id. |
+
 `Tokenizer` is `Send + Sync` — load it once and share it. Full API on
 [docs.rs/toktok-rs](https://docs.rs/toktok-rs).
+
+**Cargo features**
+
+| feature | default | what it does |
+|---|---|---|
+| `embedded-data` | on | compiles the vocabularies into the binary (~4 MB of `.rodata`), so `Tokenizer::builtin()` needs no files at runtime. Turn it off (`default-features = false`) to drop them and load from a directory with `Tokenizer::load_dir(dir, name)` instead. |
 
 ## More
 
 - [docs/BENCHMARKS.md](docs/BENCHMARKS.md) — full results, memory and latency profile, how to reproduce
 - [docs/PYTHON.md](docs/PYTHON.md) — the tokenizer behind `batch_count`
 - [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) — layout, tests, how it's fast
-- [RELEASING.md](RELEASING.md) — cutting a release
+- [RELEASING.md](RELEASING.md) — `scripts/release.sh patch|minor|major|X.Y.Z`, and the registry setup
 
 ## License
 
