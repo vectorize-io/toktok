@@ -87,6 +87,19 @@ fi
 note "on main, clean, in sync with origin, $TAG is free"
 
 # -------------------------------------------------------------------- the bump
+# From here on the tree carries an uncommitted bump. Undo it on any failure so a
+# botched release never leaves a half-bumped checkout behind.
+BUMP_APPLIED=0
+restore_on_failure() {
+  local code=$?
+  if [ "$code" != 0 ] && [ "$BUMP_APPLIED" = 1 ]; then
+    echo "${YELLOW}reverting the version bump${OFF}" >&2
+    git checkout -- Cargo.toml Cargo.lock
+  fi
+  exit "$code"
+}
+trap restore_on_failure EXIT
+
 step "Bumping [workspace.package] version in Cargo.toml"
 python3 - "$CURRENT" "$NEW" <<'PY'
 import pathlib, re, sys
@@ -104,6 +117,7 @@ if n != 1:
     sys.exit(f"expected exactly one [workspace.package] version = \"{current}\", found {n}")
 p.write_text(new_text)
 PY
+BUMP_APPLIED=1
 cargo update -q -w  # refresh Cargo.lock with the new version
 note "Cargo.toml + Cargo.lock updated"
 
@@ -126,13 +140,16 @@ else
   uv sync -q --no-editable
   uv run -q pytest -q
   step "Dry-running the crate package"
-  cargo publish --dry-run -q -p toktok-rs
+  # --allow-dirty: the working tree was verified clean above, so the only
+  # uncommitted change is the version bump this script just made
+  cargo publish --dry-run -q --allow-dirty -p toktok-rs
 fi
 
 # ------------------------------------------------------------ commit, tag, push
 if [ "$DRY_RUN" = 1 ]; then
   step "Dry run complete — reverting the version bump"
   git checkout -- Cargo.toml Cargo.lock
+  BUMP_APPLIED=0
   echo
   echo "Would have run:"
   echo "  git commit -am 'Release $NEW' && git tag -a $TAG && git push origin main $TAG"
@@ -141,6 +158,7 @@ fi
 
 step "Committing and tagging"
 git commit -q -am "Release $NEW"
+BUMP_APPLIED=0   # committed: nothing left to revert
 git tag -a "$TAG" -m "toktok $NEW"
 
 step "Pushing to origin"
