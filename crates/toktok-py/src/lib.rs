@@ -229,6 +229,22 @@ impl PyTokenizer {
         (u32s_to_bytes(py, &flat), PyBytes::new(py, off_raw).unbind())
     }
 
+    /// Token counts for many texts, in parallel — no ids are materialized, so a
+    /// counting workload allocates O(threads) instead of O(total tokens).
+    #[pyo3(signature = (texts, threads = 0, with_special = false))]
+    fn count_batch(
+        &self,
+        py: Python<'_>,
+        texts: Vec<String>,
+        threads: usize,
+        with_special: bool,
+    ) -> Vec<u32> {
+        py.detach(|| {
+            let refs: Vec<&[u8]> = texts.iter().map(|s| s.as_bytes()).collect();
+            self.inner.count_batch(&refs, threads, with_special)
+        })
+    }
+
     #[pyo3(signature = (ids, errors = "replace"))]
     fn decode(&self, py: Python<'_>, ids: Vec<u32>, errors: &str) -> PyResult<String> {
         let bytes = py.detach(|| self.inner.decode(&ids));
@@ -284,6 +300,12 @@ impl PyTokenizer {
     #[getter]
     fn name(&self) -> &str {
         self.inner.encoding()
+    }
+
+    /// Exact heap footprint of the loaded encoding, in bytes.
+    #[getter]
+    fn memory_bytes(&self) -> usize {
+        self.inner.memory_bytes()
     }
 
     #[getter]

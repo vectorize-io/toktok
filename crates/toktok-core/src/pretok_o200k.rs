@@ -68,6 +68,14 @@ impl UClassO {
         self.cls(4, cp)
     }
 
+    /// Exact heap footprint of the class tables, in bytes.
+    pub fn memory_bytes(&self) -> usize {
+        (0..5)
+            .map(|c| std::mem::size_of_val(&self.lo[c][..]) + std::mem::size_of_val(&self.hi[c][..]))
+            .sum::<usize>()
+            + self.bmp.len()
+    }
+
     pub fn empty() -> UClassO {
         UClassO {
             lo: Default::default(),

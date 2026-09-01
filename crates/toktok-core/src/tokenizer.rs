@@ -95,6 +95,11 @@ impl Tokenizer {
         })
     }
 
+    /// The underlying vocab tables (for `memory_breakdown` and diagnostics).
+    pub fn vocab(&self) -> &Vocab {
+        &self.v
+    }
+
     pub fn encoding(&self) -> &str {
         &self.name
     }
@@ -114,6 +119,19 @@ impl Tokenizer {
             }
         }
         hi
+    }
+
+    /// Exact heap footprint of this loaded encoding, in bytes (vocab tables plus
+    /// the Unicode class tables and specials).
+    pub fn memory_bytes(&self) -> usize {
+        self.v.memory_bytes()
+            + self.u.memory_bytes()
+            + self.uo.memory_bytes()
+            + self
+                .specials
+                .iter()
+                .map(|(s, _)| s.len() + std::mem::size_of::<(String, u32)>())
+                .sum::<usize>()
     }
 
     pub fn known_id(&self, id: u32) -> bool {
@@ -604,6 +622,70 @@ fn find_from(hay: &[u8], needle: &[u8], from: usize) -> Option<usize> {
 }
 
 impl Tokenizer {
+    /// Token counts for many texts, in parallel — the counting counterpart of
+    /// `encode_batch`. Nothing is materialized: one scratch buffer per thread is
+    /// reused across documents, so a counting workload allocates O(threads)
+    /// instead of O(total tokens).
+    pub fn count_batch(&self, texts: &[&[u8]], threads: usize, with_special: bool) -> Vec<u32> {
+        use std::sync::atomic::{AtomicUsize, Ordering};
+        let mut out = vec![0u32; texts.len()];
+        if texts.is_empty() {
+            return out;
+        }
+        let count1 = |s: &[u8], buf: &mut Vec<u32>| -> u32 {
+            buf.clear();
+            if with_special {
+                match std::str::from_utf8(s) {
+                    // encode_allowed builds its own vector; counting still beats
+                    // encode_batch because nothing is kept after the count
+                    Ok(st) => return self.encode_with_special(st).len() as u32,
+                    Err(_) => {}
+                }
+            }
+            self.encode_into(s, buf);
+            buf.len() as u32
+        };
+        let n = self.threads_for(threads, texts.len());
+        if n <= 1 {
+            let mut buf = Vec::with_capacity(4096);
+            for (i, t) in texts.iter().enumerate() {
+                out[i] = count1(t, &mut buf);
+            }
+            return out;
+        }
+        struct Slots(*mut u32);
+        unsafe impl Sync for Slots {}
+        let slots = Slots(out.as_mut_ptr());
+        let next = AtomicUsize::new(0);
+        std::thread::scope(|scope| {
+            let (slots, next) = (&slots, &next);
+            for _ in 0..n {
+                scope.spawn(move || {
+                    let mut buf = Vec::with_capacity(4096);
+                    loop {
+                        let i = next.fetch_add(1, Ordering::Relaxed);
+                        if i >= texts.len() {
+                            break;
+                        }
+                        let c = count1(texts[i], &mut buf);
+                        unsafe { *slots.0.add(i) = c };
+                    }
+                });
+            }
+        });
+        out
+    }
+
+    /// Thread count for a batch call: `threads == 0` means hardware concurrency,
+    /// and never more threads than there are documents.
+    fn threads_for(&self, threads: usize, ndocs: usize) -> usize {
+        let hw = std::thread::available_parallelism()
+            .map(|n| n.get())
+            .unwrap_or(4);
+        let n = if threads != 0 { threads } else { hw };
+        n.min(ndocs)
+    }
+
     /// Encode many texts in parallel (work-stealing over an atomic cursor, like
     /// the C++ `encode_batch`). `threads == 0` picks the hardware concurrency.
     pub fn encode_batch(&self, texts: &[&[u8]], threads: usize, with_special: bool) -> Vec<Vec<u32>> {
@@ -623,11 +705,7 @@ impl Tokenizer {
                 self.encode(s)
             }
         };
-        let hw = std::thread::available_parallelism().map(|n| n.get()).unwrap_or(4);
-        let mut n = if threads != 0 { threads } else { hw };
-        if n > texts.len() {
-            n = texts.len();
-        }
+        let n = self.threads_for(threads, texts.len());
         if n <= 1 {
             for (i, t) in texts.iter().enumerate() {
                 out[i] = enc1(t);

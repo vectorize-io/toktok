@@ -111,6 +111,39 @@ fn batch_matches_sequential() {
 }
 
 #[test]
+fn count_batch_matches_encode() {
+    let tok = load("cl100k_base");
+    let texts: Vec<String> = (0..300)
+        .map(|i| format!("doc {i}: hello 日本語 world {i}\n"))
+        .collect();
+    let refs: Vec<&[u8]> = texts.iter().map(|s| s.as_bytes()).collect();
+    for threads in [1, 8] {
+        let counts = tok.count_batch(&refs, threads, false);
+        for (i, r) in refs.iter().enumerate() {
+            assert_eq!(counts[i] as usize, tok.encode(r).len());
+        }
+    }
+    // with_special: the special string collapses to one id
+    let with_sp: Vec<&[u8]> = vec![b"a<|endoftext|>b"];
+    assert_eq!(
+        tok.count_batch(&with_sp, 1, true)[0] as usize,
+        tok.encode_with_special("a<|endoftext|>b").len()
+    );
+    assert!(tok.count_batch(&[], 4, false).is_empty());
+}
+
+#[test]
+fn memory_accounting_is_consistent() {
+    let tok = load("cl100k_base");
+    let total = tok.memory_bytes();
+    let parts: usize = tok.vocab().memory_breakdown().iter().map(|&(_, n)| n).sum();
+    // the breakdown covers the vocab tables; the tokenizer adds class tables
+    assert!(parts <= total && parts > total / 2, "{parts} vs {total}");
+    assert!(total > 8 << 20 && total < 32 << 20, "{total}");
+    assert!(load("o200k_base").memory_bytes() > total);
+}
+
+#[test]
 fn unknown_encoding_errors() {
     assert!(toktok_core::Tokenizer::load_dir(root().join("python/toktok/data"), "nope").is_err());
 }

@@ -69,6 +69,7 @@ pub struct Vocab {
     // trie edges: open-addressing, slot = (key+1)<<32 | child; key = node<<8|byte
     etab: Vec<u64>,
     emask: u32,
+    enodes: u32, // occupied etab slots, for the growth check during construction
     pub root_child: [u32; 256], // direct edges from root (hottest: next_match restarts here)
     pub r2node: Vec<u32>,
     pub r2best: Vec<u32>, // 65536: node after 2 bytes / deepest token in first <=2 bytes
@@ -150,9 +151,10 @@ impl Vocab {
         self.plk[i as usize] = want | val as u64;
     }
 
-    // ---- byte trie (construction + len==1; cold during encode) ----
+    // ---- byte trie: construction only. The runtime walk uses e2/otab/r2/r3, so
+    // etab is dropped at the end of `load` and this must not be called after it.
     #[inline]
-    pub fn edge(&self, node: u32, b: u8) -> u32 {
+    fn edge(&self, node: u32, b: u8) -> u32 {
         if node == 0 {
             return self.root_child[b as usize];
         }
@@ -431,6 +433,63 @@ impl Vocab {
         }
     }
 
+    /// Per-table breakdown of `memory_bytes`, largest first — answers "why is
+    /// this encoding N MiB" without a profiler.
+    pub fn memory_breakdown(&self) -> Vec<(&'static str, usize)> {
+        fn v<T>(x: &[T]) -> usize {
+            std::mem::size_of_val(x)
+        }
+        let b2id: usize = self
+            .b2id
+            .keys()
+            .map(|k| k.len() + std::mem::size_of::<(Box<[u8]>, u32)>())
+            .sum();
+        let mut out = vec![
+            ("e2 (2-byte trie)", v(&self.e2)),
+            ("b2id", b2id),
+            ("ivm/ivmw (memo)", v(&self.ivm) + v(&self.ivmw)),
+            ("plk (pair lookup)", v(&self.plk)),
+            ("r2node/r2best", v(&self.r2node) + v(&self.r2best)),
+            ("r3node/r3best", v(&self.r3node) + v(&self.r3best)),
+            ("tnode_tok", v(&self.tnode_tok)),
+            ("otab (odd tokens)", v(&self.otab)),
+            ("split", v(&self.split)),
+            ("npm", v(&self.npm)),
+            ("token bytes", v(&self.all) + v(&self.tstart) + v(&self.tlen)),
+        ];
+        out.sort_by_key(|&(_, n)| std::cmp::Reverse(n));
+        out
+    }
+
+    /// Exact heap footprint of the built tables, in bytes — deterministic, unlike
+    /// an RSS delta (which depends on what the allocator hands back to the OS).
+    pub fn memory_bytes(&self) -> usize {
+        fn v<T>(x: &[T]) -> usize {
+            std::mem::size_of_val(x)
+        }
+        let b2id: usize = self
+            .b2id
+            .keys()
+            .map(|k| k.len() + std::mem::size_of::<(Box<[u8]>, u32)>())
+            .sum();
+        v(&self.all)
+            + v(&self.tstart)
+            + v(&self.tlen)
+            + b2id
+            + v(&self.r2node)
+            + v(&self.r2best)
+            + v(&self.tnode_tok)
+            + v(&self.npm)
+            + v(&self.split)
+            + v(&self.plk)
+            + v(&self.ivm)
+            + v(&self.ivmw)
+            + v(&self.e2)
+            + v(&self.otab)
+            + v(&self.r3node)
+            + v(&self.r3best)
+    }
+
     pub fn find_id(&self, b: &[u8]) -> u32 {
         self.b2id.get(b).copied().unwrap_or(RANK_MAX)
     }
@@ -467,7 +526,33 @@ impl Vocab {
         let child = self.tnode_tok.len() as u32;
         self.tnode_tok.push(RANK_MAX);
         self.etab[i as usize] = ((key as u64) << 32) | child as u64;
+        // Grow at the target load factor instead of allocating a worst-case table
+        // up front: sizing it `all.len() * 2` costs 32 MiB of transient RSS for
+        // cl100k (the allocator keeps it), against ~4 MiB for the table we end up
+        // needing. Doubling peaks at 1.5x the final size instead.
+        self.enodes += 1;
+        if self.enodes as f64 > (self.emask as f64 + 1.0) * EDGE_LOAD {
+            self.grow_etab();
+        }
         child
+    }
+
+    fn grow_etab(&mut self) {
+        let want = (self.emask as usize + 1) * 2;
+        let nm = (want - 1) as u32;
+        let mut ne = vec![0u64; want];
+        for &s in self.etab.iter() {
+            if s != 0 {
+                let k = (s >> 32) - 1;
+                let mut j = (k.wrapping_mul(HMUL) >> 40) as u32 & nm;
+                while ne[j as usize] != 0 {
+                    j = (j + 1) & nm;
+                }
+                ne[j as usize] = s;
+            }
+        }
+        self.etab = ne;
+        self.emask = nm;
     }
 
     pub fn load(path: &std::path::Path) -> Result<Vocab, VocabError> {
@@ -531,6 +616,7 @@ impl Vocab {
             b2id: HashMap::with_capacity(n_us * 2),
             etab: Vec::new(),
             emask: 0,
+            enodes: 0,
             root_child: [0; 256],
             r2node: Vec::new(),
             r2best: Vec::new(),
@@ -563,14 +649,8 @@ impl Vocab {
             .map(|id| (v.tstart[id + 1] - v.tstart[id]) as u8)
             .collect();
 
-        // byte trie
-        let mut ecap = 1usize;
-        while ecap < v.all.len() * 2 {
-            ecap <<= 1;
-        }
-        if ecap < 1024 {
-            ecap = 1024;
-        }
+        // byte trie — starts small and doubles (see `grow_etab`)
+        let ecap = 1024usize;
         v.etab = vec![0u64; ecap];
         v.emask = (ecap - 1) as u32;
         v.tnode_tok = vec![RANK_MAX]; // root = node 0
@@ -580,30 +660,6 @@ impl Vocab {
                 node = v.edge_build(node, b);
             }
             v.tnode_tok[node as usize] = id as u32;
-        }
-        // rehash the (oversized, sparse) edge table to a cache-tight size
-        {
-            let mut want = 1024usize;
-            while v.tnode_tok.len() as f64 / want as f64 > EDGE_LOAD {
-                want <<= 1;
-            }
-            if want < v.emask as usize + 1 {
-                let mut ne = vec![0u64; want];
-                let nm = (want - 1) as u32;
-                for i in 0..=v.emask as usize {
-                    let s = v.etab[i];
-                    if s != 0 {
-                        let k = (s >> 32) - 1;
-                        let mut j = (k.wrapping_mul(HMUL) >> 40) as u32 & nm;
-                        while ne[j as usize] != 0 {
-                            j = (j + 1) & nm;
-                        }
-                        ne[j as usize] = s;
-                    }
-                }
-                v.etab = ne;
-                v.emask = nm;
-            }
         }
         // 2-level direct table: node + deepest-token after the first <=2 bytes
         v.r2node = vec![0u32; 65536];
@@ -874,6 +930,11 @@ impl Vocab {
                 }
             }
         }
+        // The byte trie has done its job (it seeded r2/r3/e2/otab/npm); nothing
+        // reads it during encode, and it is the single largest table — 4 MiB for
+        // cl100k, 8 MiB for o200k. Drop it.
+        v.etab = Vec::new();
+        v.emask = 0;
         Ok(v)
     }
 }

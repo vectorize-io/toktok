@@ -300,6 +300,15 @@ impl UClass {
         }
     }
 
+    /// Exact heap footprint of the class tables, in bytes.
+    pub fn memory_bytes(&self) -> usize {
+        [&self.llo, &self.lhi, &self.nlo, &self.nhi, &self.slo, &self.shi]
+            .iter()
+            .map(|v| std::mem::size_of_val(&v[..]))
+            .sum::<usize>()
+            + self.bmp.len()
+    }
+
     pub fn empty() -> UClass {
         UClass {
             llo: vec![],

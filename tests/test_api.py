@@ -77,8 +77,13 @@ def test_batch_matches_sequential(enc):
 
 def test_count_batch(enc):
     docs = ["one two three", "", "日本語のテキスト", "x" * 100]
-    counts = toktok.count_batch(enc, docs)
-    assert list(counts) == [enc.count(d) for d in docs]
+    want = [enc.count(d) for d in docs]
+    assert list(toktok.count_batch(enc, docs)) == want
+    assert list(enc.count_batch(docs, 4)) == want          # native, multi-threaded
+    assert list(enc.count_batch([], 4)) == []
+    assert enc.count_batch(["a<|endoftext|>b"], 1, True) == [
+        len(enc.encode_with_special("a<|endoftext|>b"))
+    ]
 
 
 def test_encode_to_numpy(enc):
@@ -96,6 +101,12 @@ def test_decode_batch(enc):
 def test_encode_bytes_invalid_utf8(enc):
     for bad in [b"\xe4\xb8", b"\x80\x80", b"abc\xf0\x9f\x9a"]:
         assert enc.decode_bytes(enc.encode_bytes(bad)) == bad
+
+
+def test_memory_bytes(enc):
+    # exact live table footprint: a few MiB, stable, and bigger for a bigger vocab
+    assert 8 * 2**20 < enc.memory_bytes < 32 * 2**20
+    assert toktok.get_encoding("o200k_base").memory_bytes > enc.memory_bytes
 
 
 def test_encoding_for_model():

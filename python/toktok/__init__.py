@@ -76,12 +76,12 @@ def encode_batch_to_numpy(enc: Tokenizer, texts, threads: int = 0, with_special:
 
 
 def count_batch(enc: Tokenizer, texts, threads: int = 0, with_special: bool = False):
-    """Token counts for many texts, in parallel. Returns a numpy int64 array.
-    Faster than len(encode(t)) per text — no Python list of ids is ever built."""
-    import numpy as _np
+    """Token counts for many texts, in parallel — a plain list[int].
 
-    _flat, offsets = encode_batch_to_numpy(enc, texts, threads, with_special)
-    return _np.diff(offsets)
+    Much cheaper than len(encode(t)) per text: the ids are never materialized,
+    so the whole batch allocates one scratch buffer per thread. This is
+    `Tokenizer.count_batch`; call that directly if you don't want the alias."""
+    return enc.count_batch(list(texts), threads, with_special)
 
 
 __all__ = [

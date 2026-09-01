@@ -13,7 +13,8 @@ same algorithm, same data-structure engineering, same throughput (see
 - **Exact** — ids match tiktoken byte-for-byte; every benchmark is exactness-checked before timing.
 - **Drop-in** — tiktoken-style Python API (`get_encoding`, `encode`, `decode`, `encode_ordinary`, …).
 - **Self-contained** — no runtime dependencies; cl100k_base, o200k_base and o200k_harmony ship in the wheel.
-- **Thread-safe** — load once, call `encode()` from as many threads as you like; `encode_batch()` scales across cores.
+- **Thread-safe** — load once, call `encode()` from as many threads as you like; `encode_batch()` and `count_batch()` scale across cores.
+- **Cheap** — smaller tables than tiktoken, ~4× less CPU per MB, and a p99 per-document latency ~4× lower (see [Resource profile](#resource-profile)).
 
 ## Install
 
@@ -40,9 +41,10 @@ n = enc.count("how many tokens is this?")
 
 arr = toktok.encode_to_numpy(enc, big_text)          # uint32 array — fastest single-encode path
 ids, offsets = toktok.encode_batch_to_numpy(enc, docs, threads=8)   # parallel
-counts = toktok.count_batch(enc, docs)               # int64 array of per-doc token counts
+counts = enc.count_batch(docs, threads=8)            # counts only — ids never materialized
 
 enc = toktok.encoding_for_model("gpt-4o")            # -> o200k_base
+enc.memory_bytes                                     # exact RAM the tables cost
 ```
 
 Rust:
@@ -51,6 +53,8 @@ Rust:
 let tok = toktok_core::Tokenizer::load_dir("python/toktok/data", "cl100k_base")?;
 let ids = tok.encode("Hello, toktok! 日本語 🚀".as_bytes());
 let text = tok.decode(&ids);               // lossless round-trip, even on invalid UTF-8
+let counts = tok.count_batch(&docs, 8, false);        // parallel, allocates O(threads)
+let (bytes, by_table) = (tok.memory_bytes(), tok.vocab().memory_breakdown());
 ```
 
 ## Benchmarks
@@ -91,7 +95,69 @@ Reproduce:
 ```sh
 python bench/fetch_corpus.py     # streams 3 × 25 MB from their real sources
 python bench/compare.py          # toktok vs quicktok vs tiktoken, exactness-checked
+python bench/profile.py --threads 8   # memory, CPU and latency percentiles
 cargo run --release --example bench -- bench/corpus/pile.txt cl100k_base
+```
+
+## Resource profile
+
+Throughput is only part of the story: what a tokenizer costs you in production is
+RAM per process, CPU per MB, and tail latency per request. `bench/profile.py`
+measures all three, running **each encoder in its own subprocess** so RSS is
+attributable to that encoder alone, and checking ids agree before measuring
+anything. Numbers below: The Pile, 8-core Apple M-series, `--threads 8`.
+
+**Memory** — RSS growth of a bare process that only loads the encoding:
+
+| encoder | cl100k_base | o200k_base | ids for 3 255 Common-Crawl docs |
+|---|---:|---:|---:|
+| **toktok** | **37.5 MiB** (14.0 live) | **72.4 MiB** (27.2 live) | 25.4 MiB |
+| tiktoken | 48.3 MiB | 86.5 MiB | 212.6 MiB |
+| quicktok (C++) | 50.4 MiB | 99.7 MiB | 20.3 MiB |
+
+`enc.memory_bytes` reports the exact live table bytes (14.0 / 27.2 MiB — the rest
+of RSS is construction scratch the allocator hasn't returned);
+`vocab().memory_breakdown()` breaks it down per table. tiktoken's ids cost ~8×
+more because a `list[int]` is 8 bytes of pointer plus a 28-byte object per token,
+where `encode_to_numpy` / `encode_batch` hand back one `uint32` buffer.
+
+**CPU** — CPU-seconds per MB encoded (single thread; lower is better):
+
+| encoder | cl100k_base | o200k_base |
+|---|---:|---:|
+| **toktok (numpy)** | **0.0117** | **0.0123** |
+| quicktok (C++) | 0.0118 | 0.0132 |
+| toktok (`list[int]`) | 0.0136 | 0.0156 |
+| tiktoken | 0.0598 | 0.0395 |
+
+That is **3–5× less CPU for the same bytes** — the number that sets how many
+cores an ingestion pipeline burns on tokenization.
+
+**Latency** — per-document encode, 4 000 Pile documents (mean 0.3 KiB), µs:
+
+| encoder | p50 | p90 | p99 | p99.9 | max |
+|---|---:|---:|---:|---:|---:|
+| **toktok** | **1.8** | **10.0** | **32.5** | **103.6** | **167.9** |
+| quicktok (C++) | 1.9 | 10.3 | 36.2 | 108.6 | 150.8 |
+| tiktoken | 7.2 | 41.8 | 156.3 | 565.2 | 905.9 |
+
+**p99 is ~4.8× lower than tiktoken**, and the tail is tighter still at p99.9
+(5.5×) — worth more than mean throughput if tokenization sits in a request path.
+On larger documents (Common Crawl, mean 7.5 KiB) the same ordering holds:
+p99 1.97 ms vs tiktoken's 6.31 ms.
+
+**Counting without ids** — `count_batch()` never materializes token ids:
+
+| operation (4 000 Pile docs, 8 threads) | throughput | RSS growth |
+|---|---:|---:|
+| `count_batch()` | 426 MB/s | **0.2 MiB** |
+| `encode_batch()` | 432 MB/s | 4.4 MiB |
+| tiktoken `encode_ordinary_batch()` | 12.7 MB/s | 11.5 MiB |
+
+Reproduce the whole table set, including the other corpora:
+
+```sh
+python bench/profile.py --threads 8
 ```
 
 ## Encodings
@@ -122,7 +188,8 @@ quicktok:
 crates/toktok-core   the engine (zero dependencies)
 crates/toktok-py     PyO3 bindings -> toktok._toktok
 python/toktok        the Python package + bundled vocab data
-bench/               corpus fetcher + cross-encoder benchmark
+bench/               corpus fetcher, throughput benchmark (compare.py),
+                     memory/CPU/latency profile (profile.py)
 tools/gen_vectors.py regenerates the exactness fixtures from tiktoken
 ```
 
