@@ -392,7 +392,11 @@ fn frombuffer<'py>(
     np.call_method1("frombuffer", (buf, dtype))
 }
 
-#[pymodule]
+// `gil_used = false` tells a free-threaded interpreter it does not need to
+// re-enable the GIL for this module. Sound here: `Tokenizer` is a frozen pyclass
+// wrapping a `Sync` engine whose only mutable state is its relaxed-atomic memos,
+// and every method takes `&self`.
+#[pymodule(gil_used = false)]
 fn _toktok(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyTokenizer>()?;
     m.add("__version__", env!("CARGO_PKG_VERSION"))?;

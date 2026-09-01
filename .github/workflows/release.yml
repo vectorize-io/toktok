@@ -1,0 +1,163 @@
+name: Release
+
+# Tag-driven release: builds every wheel, then publishes to PyPI and crates.io.
+#
+# Neither registry needs a long-lived personal token. Both support Trusted
+# Publishing, where the registry trusts *this repository's workflow* over OIDC
+# and hands back a short-lived token — so publishing rights belong to
+# vectorize-io/toktok rather than to whoever's account created the crate.
+# See RELEASING.md for the one-time setup on each registry.
+#
+#   git tag v0.1.0 && git push origin v0.1.0
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Build and check everything, but publish nothing"
+        type: boolean
+        default: true
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false # never interrupt a publish
+
+env:
+  DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+
+jobs:
+  check:
+    name: verify the tag and the tree
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: astral-sh/setup-uv@v5
+      - id: version
+        name: The tag, the crate and the wheel must agree on the version
+        run: |
+          crate=$(cargo metadata --format-version 1 --no-deps \
+            | python3 -c "import json,sys;print(next(p['version'] for p in json.load(sys.stdin)['packages'] if p['name']=='toktok-rs'))")
+          echo "version=$crate" >> "$GITHUB_OUTPUT"
+          echo "crate version: $crate"
+          if [ "${GITHUB_REF_TYPE}" = "tag" ] && [ "refs/tags/v$crate" != "$GITHUB_REF" ]; then
+            echo "::error::tag $GITHUB_REF does not match crate version $crate"
+            exit 1
+          fi
+      - name: Tests must pass on the exact commit being released
+        run: |
+          cargo test --release
+          uv sync --no-editable
+          uv run pytest -q
+      - name: The crate must package cleanly
+        run: cargo publish --dry-run -p toktok-rs
+
+  wheels:
+    name: wheels ${{ matrix.target }}${{ matrix.freethreaded && ' (3.14t)' || '' }}
+    needs: check
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, target: x86_64 }
+          - { os: ubuntu-latest, target: aarch64 }
+          - { os: macos-latest, target: universal2-apple-darwin }
+          - { os: windows-latest, target: x64 }
+          - { os: ubuntu-latest, target: x86_64, freethreaded: true }
+          - { os: ubuntu-latest, target: aarch64, freethreaded: true }
+          - { os: macos-latest, target: universal2-apple-darwin, freethreaded: true }
+          - { os: windows-latest, target: x64, freethreaded: true }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        if: matrix.freethreaded
+        with:
+          python-version: "3.14t"
+      # abi3 covers CPython 3.11+; free-threaded has no stable ABI, so those
+      # wheels are version-specific (3.14t — pyo3 rejects free-threaded < 3.14)
+      - uses: PyO3/maturin-action@v1
+        with:
+          target: ${{ matrix.target }}
+          args: --release --out dist ${{ matrix.freethreaded && '--interpreter 3.14t' || '' }}
+          manylinux: ${{ matrix.freethreaded && '2_28' || 'auto' }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}-${{ matrix.target }}${{ matrix.freethreaded && '-ft' || '' }}
+          path: dist
+
+  sdist:
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: PyO3/maturin-action@v1
+        with:
+          command: sdist
+          args: --out dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sdist
+          path: dist
+
+  publish-pypi:
+    needs: [check, wheels, sdist]
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write # PyPI Trusted Publishing
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: What is about to be published
+        run: ls -la dist
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        if: env.DRY_RUN != 'true'
+
+  publish-crate:
+    needs: [check, wheels, sdist]
+    runs-on: ubuntu-latest
+    environment: crates-io
+    permissions:
+      id-token: write # crates.io Trusted Publishing
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      # Short-lived token from crates.io, scoped to this repo's workflow. Falls
+      # back to a CARGO_REGISTRY_TOKEN secret if trusted publishing is not set up
+      # yet (the first publish of a crate has to be done with a token).
+      - id: auth
+        uses: rust-lang/crates-io-auth-action@v1
+        continue-on-error: true
+      - name: Publish
+        if: env.DRY_RUN != 'true'
+        run: cargo publish -p toktok-rs
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token || secrets.CARGO_REGISTRY_TOKEN }}
+
+  github-release:
+    needs: [publish-pypi, publish-crate]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" dist/* \
+            --title "${GITHUB_REF_NAME}" \
+            --generate-notes \
+            --notes "\`pip install toktok-rs==${{ needs.check.outputs.version }}\` · \`cargo add toktok-rs@${{ needs.check.outputs.version }}\`"

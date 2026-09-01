@@ -6,24 +6,36 @@ build-backend = "maturin"
 name = "toktok-rs"
 description = "Fast, exact BPE tokenizer for OpenAI encodings — Rust core, tiktoken-identical ids"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 license = "MIT"
 license-files = ["LICENSE", "NOTICE", "LICENSE-quicktok-upstream"]
-authors = [{ name = "Nicolò Boschi", email = "boschi1997@gmail.com" }]
+authors = [{ name = "vectorize-io" }]
 keywords = ["tokenizer", "bpe", "tiktoken", "cl100k", "o200k", "gpt", "gpt-oss", "harmony"]
 classifiers = [
   "Programming Language :: Rust",
   "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: Free Threading :: 3 - Stable",
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 dynamic = ["version"]
 
 [project.urls]
-Homepage = "https://github.com/nicoloboschi/toktok"
+Homepage = "https://github.com/vectorize-io/toktok"
+Repository = "https://github.com/vectorize-io/toktok"
+Issues = "https://github.com/vectorize-io/toktok/issues"
 
 [project.optional-dependencies]
 numpy = ["numpy>=1.21"]
-test = ["pytest>=7", "tiktoken", "numpy>=1.21"]
+
+[dependency-groups]
+# `uv sync` installs these and builds the extension: one command to a working checkout
+dev = ["pytest>=7", "tiktoken", "numpy>=1.21", "maturin>=1.7,<2"]
+# benchmark-only extras: the corpus fetcher and the C++ tokenizer we compare against
+bench = ["datasets", "zstandard", "quicktok-v1"]
 
 [tool.maturin]
 manifest-path = "crates/toktok-py/Cargo.toml"

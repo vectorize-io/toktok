@@ -8,9 +8,15 @@ corpora — while encoding **3–7× faster**, using **3–5× less CPU per MB**
 a **p99 latency ~4× lower**.
 
 ```sh
-pip install toktok-rs          # Python — imports as `toktok`
+uv add toktok-rs               # Python — imports as `toktok`
 cargo add toktok-rs            # Rust   — the library is `toktok`
 ```
+
+Wheels for CPython **3.11 – 3.14** on Linux (x86_64, aarch64), macOS
+(universal2) and Windows, plus a **free-threaded `cp314t`** wheel: the extension
+declares `gil_used = false`, so a no-GIL interpreter keeps the GIL off and
+`batch_count` scales across threads without one. (3.13t is not supported — PyO3
+rejects the free-threaded build below 3.14.)
 
 - **Exact** — ids match tiktoken byte-for-byte; every benchmark verifies before it times.
 - **Self-contained** — vocabularies are compiled in. No data files, no downloads, no runtime dependencies.
@@ -127,13 +133,14 @@ absolute MB/s moves with machine load, the ratio holds:
 | [bpe-openai](https://crates.io/crates/bpe-openai) | **1.9–3.8× faster** | 1.3–20× lower |
 | [tiktoken-rs](https://crates.io/crates/tiktoken-rs) | **3.4–20× faster** | 3.8–27× lower |
 
-One representative run (The Pile, cl100k_base, MB/s and per-document latency):
+Measured by the **Benchmarks** workflow on a GitHub runner (The Pile,
+cl100k_base, single thread pinned with `taskset`):
 
 | encoder | MB/s | p50 | p99 | p99.9 |
 |---|---:|---:|---:|---:|
-| **toktok** | **82.4** | **0.5 µs** | **16.4 µs** | **74.5 µs** |
-| bpe-openai | 21.9 | 1.9 µs | 70.5 µs | 888.5 µs |
-| tiktoken-rs | 4.0 | 8.0 µs | 450.6 µs | 3833.7 µs |
+| **toktok** | **99.6** | **0.6 µs** | **11.7 µs** | **24.0 µs** |
+| bpe-openai | 30.2 | 2.0 µs | 42.6 µs | 90.5 µs |
+| tiktoken-rs | 7.4 | 7.7 µs | 164.3 µs | 347.8 µs |
 
 **From Python** (`bench/compare.py`), cl100k_base:
 
@@ -147,11 +154,15 @@ Absolute MB/s is machine- and thermal-dependent (this laptop swings ±15% run to
 run); the same-run ratios are the stable signal.
 
 ```sh
-python bench/fetch_corpus.py                          # 3 × 25 MB, streamed
+uv run python bench/fetch_corpus.py                   # 3 × 25 MB, streamed
 cargo run --release --manifest-path bench/rust/Cargo.toml -- bench/corpus/pile.txt cl100k_base
-python bench/compare.py                               # vs tiktoken / quicktok
-python bench/profile.py --threads 8                   # memory, CPU, latency
+uv run python bench/compare.py                        # vs tiktoken / quicktok
+uv run python bench/profile.py --threads 8            # memory, CPU, latency
 ```
+
+Or run the whole set on CI, where it is isolated from whatever else your laptop
+is doing: the **Benchmarks** workflow (manual dispatch, weekly, and on release
+tags) publishes the tables to its job summary.
 
 ## Resource profile
 
@@ -229,11 +240,32 @@ tools/gen_vectors.py regenerates the exactness fixtures from tiktoken
 ## Development
 
 ```sh
-uv venv && uv pip install maturin pytest tiktoken numpy
-maturin develop --release
+uv sync                       # venv + dev deps + builds the extension
+uv run pytest                 # parity vs tiktoken + the Python surface
 cargo test --release          # exactness fixtures, offsets, batch, invalid UTF-8
-pytest                        # parity vs tiktoken + the Python surface
+
+uv build                      # wheel + sdist into dist/
 ```
+
+The Rust extension is compiled by [maturin](https://www.maturin.rs), declared as
+the PEP 517 build backend in `pyproject.toml` — uv drives it, so `uv sync`,
+`uv run` and `uv build` are the only commands you need. To rebuild after a change
+to the Rust sources, `uv sync --reinstall-package toktok-rs`.
+
+Benchmarks need their own extras and the corpora:
+
+```sh
+uv sync --group bench
+uv run python bench/fetch_corpus.py     # 3 x 25 MB, streamed from source
+uv run python bench/compare.py
+```
+
+## Releasing
+
+Tag-driven: `git tag v0.1.0 && git push origin v0.1.0` builds every wheel and
+publishes to PyPI and crates.io. Both registries use Trusted Publishing, so
+publishing rights belong to this repository rather than to a personal token —
+setup and the first-publish bootstrap are in [RELEASING.md](RELEASING.md).
 
 ## License
 

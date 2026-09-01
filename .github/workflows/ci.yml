@@ -1,34 +1,45 @@
 name: CI
 
+# Tests and wheel builds. Publishing lives in release.yml (tag-driven).
 on:
   push:
     branches: [main]
-    tags: ["v*"]
   pull_request:
 
 jobs:
   test:
+    name: test ${{ matrix.os }} py${{ matrix.python }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ["3.12"]
+        include:
+          # every supported interpreter, including the free-threaded build
+          - { os: ubuntu-latest, python: "3.11" }
+          - { os: ubuntu-latest, python: "3.13" }
+          - { os: ubuntu-latest, python: "3.14" }
+          - { os: ubuntu-latest, python: "3.14t" }
+          - { os: macos-latest, python: "3.14t" }
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-      - uses: actions/setup-python@v5
+      - uses: astral-sh/setup-uv@v5
         with:
-          python-version: "3.12"
+          enable-cache: true
       - name: Rust tests (exactness fixtures, offsets, batch, invalid UTF-8)
         run: cargo test --release
       - name: Build and install the extension
-        run: |
-          pip install pytest tiktoken numpy
-          pip install .   # PEP 517 via the maturin backend (release build)
-      - name: Python tests (parity vs tiktoken)
-        run: pytest -q
+        # uv drives the maturin PEP 517 backend, which compiles the Rust cdylib.
+        # On 3.14t pyo3's abi3 feature falls back to a version-specific
+        # free-threaded build, which is what we want.
+        run: uv sync --no-editable --python ${{ matrix.python }}
+      - name: Python tests (parity vs tiktoken, free-threading)
+        run: uv run --python ${{ matrix.python }} pytest -q
 
   wheels:
+    name: wheels ${{ matrix.target }}
     needs: test
     strategy:
       fail-fast: false
@@ -41,6 +52,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+      # One abi3 wheel per platform covers CPython 3.11 through 3.14 (and later)
       - uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
@@ -48,7 +60,36 @@ jobs:
           manylinux: auto
       - uses: actions/upload-artifact@v4
         with:
-          name: wheels-${{ matrix.os }}-${{ matrix.target }}
+          name: wheels-abi3-${{ matrix.os }}-${{ matrix.target }}
+          path: dist
+
+  wheels-freethreaded:
+    # abi3 does not exist for free-threaded CPython, so these are version-specific.
+    # 3.14t is the floor: pyo3 rejects the free-threaded build below 3.14.
+    name: wheels free-threaded ${{ matrix.target }}
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, target: x86_64 }
+          - { os: ubuntu-latest, target: aarch64 }
+          - { os: macos-latest, target: universal2-apple-darwin }
+          - { os: windows-latest, target: x64 }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14t"
+      - uses: PyO3/maturin-action@v1
+        with:
+          target: ${{ matrix.target }}
+          args: --release --out dist --interpreter 3.14t
+          manylinux: 2_28 # the older images have no free-threaded interpreter
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-ft-${{ matrix.os }}-${{ matrix.target }}
           path: dist
 
   sdist:
@@ -64,38 +105,3 @@ jobs:
         with:
           name: sdist
           path: dist
-
-  publish-pypi:
-    # tags only; uses PyPI Trusted Publishing (no API token needed)
-    if: startsWith(github.ref, 'refs/tags/v')
-    needs: [wheels, sdist]
-    runs-on: ubuntu-latest
-    environment: pypi
-    permissions:
-      id-token: write
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          path: dist
-          merge-multiple: true
-      - uses: pypa/gh-action-pypi-publish@release/v1
-
-  publish-crate:
-    # tags only. Needs CARGO_REGISTRY_TOKEN in the `crates-io` environment.
-    # Note crates.io publishes are permanent — a version can be yanked, never
-    # replaced — so this runs only after the tests and the wheels are green.
-    if: startsWith(github.ref, 'refs/tags/v')
-    needs: [wheels, sdist]
-    runs-on: ubuntu-latest
-    environment: crates-io
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - name: Check the tag matches the crate version
-        run: |
-          v=$(cargo metadata --format-version 1 --no-deps \
-              | python3 -c "import json,sys;print(next(p['version'] for p in json.load(sys.stdin)['packages'] if p['name']=='toktok-rs'))")
-          [ "refs/tags/v$v" = "$GITHUB_REF" ] || { echo "tag $GITHUB_REF != crate version $v"; exit 1; }
-      - run: cargo publish -p toktok-rs
-        env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}

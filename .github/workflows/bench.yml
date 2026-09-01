@@ -38,6 +38,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
 
       - name: Record the machine
         run: |
@@ -67,20 +70,19 @@ jobs:
       - name: Fetch corpora
         if: steps.corpus-cache.outputs.cache-hit != 'true'
         run: |
-          pip install datasets zstandard
-          python bench/fetch_corpus.py
+          uv sync --group bench
+          uv run python bench/fetch_corpus.py
 
       - name: Build
         run: |
           cargo build --release --manifest-path bench/rust/Cargo.toml
-          pip install pytest tiktoken numpy
-          pip install quicktok-v1 || echo "no quicktok wheel for this platform — its rows will be skipped"
-          # PEP 517 build through the maturin backend: a release build installed
-          # into the runner's python, no virtualenv needed (maturin develop wants one)
-          pip install .
+          # uv drives the maturin PEP 517 backend (release build of the cdylib);
+          # the bench group adds the corpus fetcher and the C++ tokenizer we
+          # compare against, which has no wheel on every platform
+          uv sync --group bench --no-editable || uv sync --no-editable
 
       - name: Verify exactness before measuring anything
-        run: pytest tests/test_parity.py -q
+        run: uv run pytest tests/test_parity.py -q
 
       - name: Rust vs Rust (toktok, bpe-openai, tiktoken-rs)
         run: |
@@ -101,10 +103,10 @@ jobs:
           RUNS: ${{ github.event.inputs.runs || '2' }}
 
       - name: Python encoders (toktok, quicktok, tiktoken)
-        run: taskset -c 0 python bench/compare.py --repeats 5 | tee python-bench.txt
+        run: taskset -c 0 uv run python bench/compare.py --repeats 5 | tee python-bench.txt
 
       - name: Resource profile (memory, CPU, latency percentiles)
-        run: python bench/profile.py --threads "$(nproc)" | tee profile.txt
+        run: uv run python bench/profile.py --threads "$(nproc)" | tee profile.txt
 
       - name: Summarize
         if: always()
