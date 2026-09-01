@@ -1,0 +1,134 @@
+name: Benchmarks
+
+# Benchmarks on a dedicated runner instead of a developer laptop: a busy laptop
+# swung the same measurement by 5x, which makes absolute MB/s meaningless. A
+# runner is not a quiet lab machine either — it is a shared vCPU — so this job
+# still leans on same-run ratios, pins single-threaded work to one core, and
+# reports the spread across repeated runs so noise is visible rather than hidden.
+
+on:
+  workflow_dispatch:
+    inputs:
+      corpora:
+        description: "Corpora to run (comma separated: pile, code, commoncrawl)"
+        default: "pile,code,commoncrawl"
+      encodings:
+        description: "Encodings (comma separated)"
+        default: "cl100k_base,o200k_base"
+      runs:
+        description: "Repeat the whole matrix N times to show run-to-run spread"
+        default: "2"
+  schedule:
+    - cron: "0 4 * * 1" # Mondays, to catch regressions
+  push:
+    tags: ["v*"] # the numbers that ship with a release
+
+concurrency:
+  # never let two benchmark jobs share a runner
+  group: bench-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  bench:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Record the machine
+        run: |
+          {
+            echo "## Benchmark run"
+            echo
+            echo "| | |"
+            echo "|---|---|"
+            echo "| commit | \`${GITHUB_SHA:0:9}\` |"
+            echo "| runner | $(uname -sm), $(nproc) vCPU |"
+            echo "| cpu | $(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2- | xargs) |"
+            echo "| memory | $(free -h | awk '/^Mem:/{print $2}') |"
+            echo "| load at start | $(cut -d' ' -f1-3 /proc/loadavg) |"
+            echo
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # 75 MB of corpora, fetched once and reused. The fetch is deterministic
+      # (fixed streaming order, cut at 25 MB), so a cached corpus is byte-identical
+      # to a fresh one and results stay comparable across runs.
+      - name: Cache corpora
+        id: corpus-cache
+        uses: actions/cache@v4
+        with:
+          path: bench/corpus
+          key: corpus-v1-${{ hashFiles('bench/fetch_corpus.py') }}
+
+      - name: Fetch corpora
+        if: steps.corpus-cache.outputs.cache-hit != 'true'
+        run: |
+          pip install datasets zstandard
+          python bench/fetch_corpus.py
+
+      - name: Build
+        run: |
+          cargo build --release --manifest-path bench/rust/Cargo.toml
+          pip install pytest tiktoken numpy
+          pip install quicktok-v1 || echo "no quicktok wheel for this platform — its rows will be skipped"
+          # PEP 517 build through the maturin backend: a release build installed
+          # into the runner's python, no virtualenv needed (maturin develop wants one)
+          pip install .
+
+      - name: Verify exactness before measuring anything
+        run: pytest tests/test_parity.py -q
+
+      - name: Rust vs Rust (toktok, bpe-openai, tiktoken-rs)
+        run: |
+          # taskset pins the single-threaded measurement to one core so the
+          # scheduler cannot move it between vCPUs mid-run
+          for run in $(seq 1 "${RUNS:-2}"); do
+            echo "### run $run"
+            for c in ${CORPORA//,/ }; do
+              for e in ${ENCODINGS//,/ }; do
+                taskset -c 0 ./bench/rust/target/release/toktok-bench \
+                  "bench/corpus/$c.txt" "$e" || true
+              done
+            done
+          done | tee rust-bench.txt
+        env:
+          CORPORA: ${{ github.event.inputs.corpora || 'pile,code,commoncrawl' }}
+          ENCODINGS: ${{ github.event.inputs.encodings || 'cl100k_base,o200k_base' }}
+          RUNS: ${{ github.event.inputs.runs || '2' }}
+
+      - name: Python encoders (toktok, quicktok, tiktoken)
+        run: taskset -c 0 python bench/compare.py --repeats 5 | tee python-bench.txt
+
+      - name: Resource profile (memory, CPU, latency percentiles)
+        run: python bench/profile.py --threads "$(nproc)" | tee profile.txt
+
+      - name: Summarize
+        if: always()
+        run: |
+          for f in rust-bench.txt python-bench.txt profile.txt; do
+            [ -s "$f" ] || continue
+            {
+              echo "<details><summary>$f</summary>"
+              echo
+              echo '```'
+              cat "$f"
+              echo '```'
+              echo
+              echo "</details>"
+              echo
+            } >> "$GITHUB_STEP_SUMMARY"
+          done
+          echo "| load at end | $(cut -d' ' -f1-3 /proc/loadavg) |" >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: benchmark-results
+          path: |
+            rust-bench.txt
+            python-bench.txt
+            profile.txt

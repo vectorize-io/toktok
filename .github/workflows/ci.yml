@@ -21,10 +21,10 @@ jobs:
           python-version: "3.12"
       - name: Rust tests (exactness fixtures, offsets, batch, invalid UTF-8)
         run: cargo test --release
-      - name: Build the extension
+      - name: Build and install the extension
         run: |
-          pip install maturin pytest tiktoken numpy
-          maturin develop --release
+          pip install pytest tiktoken numpy
+          pip install .   # PEP 517 via the maturin backend (release build)
       - name: Python tests (parity vs tiktoken)
         run: pytest -q
 
