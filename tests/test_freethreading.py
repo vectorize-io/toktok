@@ -9,6 +9,7 @@ On a GIL build they still exercise concurrent counting, which is worth having
 either way: the Tokenizer is shared across threads by design.
 """
 
+import os
 import sys
 import threading
 
@@ -76,24 +77,37 @@ def test_concurrent_mixed_encodings():
         assert all(r == want[enc] for r in runs), enc
 
 
-@pytest.mark.skipif(not FREE_THREADED, reason="needs a free-threaded interpreter")
-def test_scales_without_the_gil():
-    """Counting releases the GIL, so 4 threads should beat 1 on a no-GIL build.
+@pytest.mark.skipif(os.cpu_count() < 2, reason="needs more than one core")
+def test_counting_actually_runs_in_parallel():
+    """Prove the worker threads run *concurrently*, not that they are faster.
 
-    Deliberately loose (>1.3x): CI runners are shared and this is a smoke test
-    for 'the work actually runs in parallel', not a benchmark.
+    Comparing two wall-clock timings is hopeless on a shared runner (the first
+    attempt compared 9 ms against 9 ms and failed). Instead compare CPU time to
+    wall time: process_time() sums every thread's CPU, so burning more CPU
+    seconds than wall seconds is only possible if several threads ran at once.
+
+    This holds on a GIL build too — counting releases the GIL — and it is
+    exactly the property the cp314t wheel promises.
     """
     import time
 
-    big = [d * 20 for d in DOCS]
+    # ~14 MB of text. Sizing this is awkward precisely because the tokenizer is
+    # fast — it clears that in well under a tenth of a second — so the check
+    # below only needs the window to be long enough to time, not to be long.
+    docs = [d * 40 for d in DOCS] * 4
+    threads = min(4, os.cpu_count())
 
-    def timed(threads):
-        best = float("inf")
-        for _ in range(3):
-            t0 = time.perf_counter()
-            toktok.batch_count(big, threads=threads)
-            best = min(best, time.perf_counter() - t0)
-        return best
+    toktok.batch_count(docs[:50], threads=threads)  # warm
 
-    one, four = timed(1), timed(4)
-    assert one / four > 1.3, f"no speedup from 4 threads: {one:.3f}s vs {four:.3f}s"
+    ratio = 0.0
+    for _ in range(3):  # best of 3: a busy runner can starve one attempt
+        w0, c0 = time.perf_counter(), time.process_time()
+        toktok.batch_count(docs, threads=threads)
+        wall, cpu = time.perf_counter() - w0, time.process_time() - c0
+        assert wall > 0.003, f"workload too small to measure ({wall:.4f}s)"
+        ratio = max(ratio, cpu / wall)
+
+    assert ratio > 1.3, (
+        f"only {ratio:.2f} CPU-seconds per wall-second with {threads} threads — "
+        "the work did not run in parallel"
+    )
