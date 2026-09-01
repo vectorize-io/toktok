@@ -1,0 +1,11 @@
+[package]
+name = "toktok-core"
+description = "Fast, exact BPE tokenizer core (cl100k_base, o200k_base, o200k_harmony)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[lib]
+name = "toktok_core"
+path = "src/lib.rs"

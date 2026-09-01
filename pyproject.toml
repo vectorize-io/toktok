@@ -1,0 +1,36 @@
+[build-system]
+requires = ["maturin>=1.7,<2"]
+build-backend = "maturin"
+
+[project]
+name = "toktok-rs"
+description = "Fast, exact BPE tokenizer for OpenAI encodings — Rust core, tiktoken-identical ids"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+license-files = ["LICENSE", "NOTICE", "LICENSE-quicktok-upstream"]
+authors = [{ name = "Nicolò Boschi", email = "boschi1997@gmail.com" }]
+keywords = ["tokenizer", "bpe", "tiktoken", "cl100k", "o200k", "gpt", "gpt-oss", "harmony"]
+classifiers = [
+  "Programming Language :: Rust",
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/nicoloboschi/toktok"
+
+[project.optional-dependencies]
+numpy = ["numpy>=1.21"]
+test = ["pytest>=7", "tiktoken", "numpy>=1.21"]
+
+[tool.maturin]
+manifest-path = "crates/toktok-py/Cargo.toml"
+module-name = "toktok._toktok"
+python-source = "python"
+features = ["pyo3/extension-module"]
+include = [{ path = "python/toktok/data/*", format = "sdist" }]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

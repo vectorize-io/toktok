@@ -1,0 +1,8 @@
+sha256: 6039f6f7bd056c0d211d02a907a8ed8f3317bb719fc495b9093f9cccca948809
+regex-module: 2026.5.9
+python: 3.14.5
+cpython-unicodedata-ucd: 16.0.0 (informative; regex bundles its own UCD)
+classes: L=\p{L} N=\p{N} S=\s over all codepoints 0..0x10FFFF excl. surrogates
+reference-chain: this engine's split == tiktoken cl100k ids, verified via the
+  byte-exact id oracle (unicode stress fixtures). Re-run `verify` after
+  any regex/tiktoken upgrade; review the range diff before re-exporting.
