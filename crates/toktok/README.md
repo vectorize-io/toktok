@@ -42,7 +42,7 @@ load, the ratio does not. Full harness:
 | [bpe-openai](https://crates.io/crates/bpe-openai) | **1.9–3.8× faster** | 1.3–20× lower |
 | [tiktoken-rs](https://crates.io/crates/tiktoken-rs) | **3.4–20× faster** | 3.8–27× lower |
 
-Reproduce (each row prints MB/s, RSS, and p50/p99/p99.9 latency):
+Full tables, memory and latency profile: [docs/BENCHMARKS.md](https://github.com/vectorize-io/toktok/blob/main/docs/BENCHMARKS.md). Reproduce:
 
 ```sh
 cargo run --release --manifest-path bench/rust/Cargo.toml -- bench/corpus/pile.txt cl100k_base

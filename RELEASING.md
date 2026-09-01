@@ -4,7 +4,15 @@ Releases are tag-driven: `.github/workflows/release.yml` builds every wheel and
 publishes to PyPI (`toktok-rs`) and crates.io (`toktok-rs`).
 
 ```sh
-# bump the version in Cargo.toml ([workspace.package] version), then
+scripts/release.sh patch        # or: minor | major | 0.4.2
+```
+
+That bumps the version, runs the tests, dry-runs the crate package, commits,
+tags and pushes — the tag is what triggers the workflow. Add `--dry-run` to
+rehearse it locally without committing anything. Doing it by hand is the same
+thing: bump `[workspace.package] version` in `Cargo.toml`, then
+
+```sh
 git tag v0.1.0 && git push origin v0.1.0
 ```
 
