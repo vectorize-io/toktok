@@ -32,6 +32,13 @@ unsafe fn neon_mask(v: std::arch::aarch64::uint8x16_t) -> u64 {
 
 #[inline(always)]
 pub fn ascii_letter_run(t: &[u8], q: usize, len: usize) -> usize {
+    // Empty-run pre-check, as in `ascii_case_run`. The Unicode alternative in
+    // `pretok_next_impl` calls this once per codepoint of a non-ASCII word, and
+    // without this each of those calls builds a vector compare only to fail on
+    // the first byte.
+    if q >= len || (unsafe { *t.get_unchecked(q) } | 0x20).wrapping_sub(b'a') > 25 {
+        return q;
+    }
     let mut q = q;
     #[cfg(target_arch = "x86_64")]
     unsafe {
