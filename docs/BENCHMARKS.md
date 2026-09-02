@@ -14,11 +14,11 @@ stable signal: measuring on a laptop at load average 44 swung the same benchmark
 `bench/rust`, no Python in the measurement. The Pile, 25 MB, cl100k_base, single
 thread pinned with `taskset`, on a GitHub runner:
 
-| encoder | MB/s | p50 | p99 | p99.9 |
-|---|---:|---:|---:|---:|
-| **toktok** | **99.6** | **0.6 µs** | **11.7 µs** | **24.0 µs** |
-| bpe-openai | 30.2 | 2.0 µs | 42.6 µs | 90.5 µs |
-| tiktoken-rs | 7.4 | 7.7 µs | 164.3 µs | 347.8 µs |
+| encoder | MB/s | CPU-s/MB | p50 | p99 | p99.9 |
+|---|---:|---:|---:|---:|---:|
+| **toktok** | **89.7** | **0.0111** | **0.6 µs** | **13.4 µs** | **26.7 µs** |
+| bpe-openai | 30.3 | 0.0330 | 1.9 µs | 38.4 µs | 82.0 µs |
+| tiktoken-rs | 7.3 | 0.1369 | 7.9 µs | 169.9 µs | 361.3 µs |
 
 Across both encodings and all three corpora, same-run ratios:
 
@@ -29,13 +29,33 @@ Across both encodings and all three corpora, same-run ratios:
 
 ## Against tiktoken, from Python
 
-`bench/compare.py`, cl100k_base, three 25 MB corpora (MB/s):
+Measured per interpreter, because they are not interchangeable — and because the
+answer to "do I need a new Python for this?" is no. The Pile, cl100k_base,
+single thread (MB/s):
 
-| encoder | The Pile | Code | Common Crawl |
-|---|---:|---:|---:|
-| **toktok (numpy path)** | **62.4** | **105.2** | 45.0 |
-| quicktok (C++, the original this is ported from) | 60.8 | 102.5 | **48.9** |
-| tiktoken | 16.2 | 15.4 | 13.5 |
+| interpreter | toktok (numpy) | toktok (list) | quicktok (C++) | tiktoken | speedup |
+|---|---:|---:|---:|---:|---:|
+| CPython 3.11 | **85.1** | 53.6 | 52.4 | 11.5 | **7.4×** |
+| CPython 3.14 | **68.6** | 46.9 | 47.0 | 12.0 | **5.7×** |
+| CPython 3.14t free-threaded | **94.5** | 83.6 | 77.7 | 14.0 | **6.8×** |
+
+Each row ran on its own runner, so compare within a row: tiktoken's own figure
+moves 11.5 → 14.0 across the three, which is machine variance rather than an
+interpreter effect. The ratio is what holds.
+
+Threaded, 4 vCPU (`--threads 4`), showing where free-threading does and does not
+matter:
+
+| interpreter | `batch_count` | `encode_batch` | cores used | tiktoken batch |
+|---|---:|---:|---:|---:|
+| CPython 3.11 | 220.3 MB/s | 188.9 | 3.58 | 6.1 |
+| CPython 3.14 | 191.3 MB/s | 149.9 | 3.28 | 6.3 |
+| CPython 3.14t free-threaded | 252.1 MB/s | 203.8 | 3.33 | 16.0 |
+
+toktok already scales on a GIL build — encoding releases the GIL, so ~3.3 of 4
+cores stay busy either way. The free-threaded build is not what unlocks the
+speed; it mainly helps callers whose *own* Python code around the tokenizer
+would otherwise serialize.
 
 ## Resource profile
 
