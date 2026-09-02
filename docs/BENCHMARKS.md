@@ -108,9 +108,6 @@ uv run python bench/compare.py
 
 # memory, CPU and latency percentiles
 uv run python bench/profile.py --threads 8
-
-# the core with no Python in the measurement
-cargo run --release --example bench -- bench/corpus/pile.txt cl100k_base
 ```
 
 The corpora are The Pile (diverse English), GitHub code, and Common Crawl

@@ -28,10 +28,6 @@ jobs:
           python-version: "3.12" # pyo3 needs an interpreter to build against
       - name: Tests (exactness fixtures, offsets, batch, invalid UTF-8, memory)
         run: cargo test --release
-      - name: Lints
-        run: |
-          cargo fmt --check
-          cargo clippy --release --all-targets -- -D warnings
 
   python:
     # Every interpreter we publish wheels for, on every platform we publish for.
@@ -54,6 +50,26 @@ jobs:
         run: uv sync --no-editable --python ${{ matrix.python }}
       - name: Tests (parity vs tiktoken, the Python API, free-threading)
         run: uv run --python ${{ matrix.python }} pytest -q
+
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Rust — format and lint
+        run: |
+          cargo fmt --check
+          cargo clippy --release --all-targets -- -D warnings
+      - name: Python — format and lint (ruff)
+        run: |
+          uvx ruff format --check .
+          uvx ruff check .
 
   wheels:
     name: wheels ${{ matrix.target }}${{ matrix.freethreaded && ' (3.14t)' || '' }}
@@ -86,11 +102,12 @@ jobs:
           name: wheels-${{ matrix.os }}-${{ matrix.target }}${{ matrix.freethreaded && '-ft' || '' }}
           path: dist
 
-  wheel-smoke:
-    # The matrix above builds from source. This installs the *shipped artifact*
-    # — one abi3 wheel serving 3.11-3.14, plus the cp314t wheel — and checks it
-    # loads and tokenizes on each interpreter, which is what users actually get.
-    name: wheel install ${{ matrix.os }}
+  wheel-tests:
+    # The matrix above builds from source. This runs the same test suite against
+    # the *shipped artifact* — one abi3 wheel serving 3.11-3.14, plus the cp314t
+    # wheel — on each interpreter it claims to support, which is what users
+    # actually install.
+    name: wheel tests ${{ matrix.os }}
     needs: wheels
     strategy:
       fail-fast: false
@@ -107,21 +124,27 @@ jobs:
         with: { name: "${{ matrix.abi3 }}", path: dist }
       - uses: actions/download-artifact@v4
         with: { name: "${{ matrix.ft }}", path: dist }
-      - name: Install the wheel on every interpreter it claims to support
+      - name: Run the test suite against the wheel, on every interpreter it claims
         shell: bash
         run: |
           set -euo pipefail
           abi3=$(ls dist/*abi3*.whl)
           ft=$(ls dist/*cp314t*.whl)
-          echo "abi3 wheel: $abi3"
-          echo "free-threaded wheel: $ft"
+          echo "abi3 wheel: $abi3 · free-threaded wheel: $ft"
+          # --no-project so the wheel is what gets imported, not a source build
           for v in 3.11 3.12 3.13 3.14; do
             echo "::group::abi3 wheel on python $v"
-            uv run --no-project --python "$v" --with "$abi3" python tools/smoke.py
+            uv run --no-project --python "$v" --with "$abi3" \
+              --with pytest --with numpy --with tiktoken \
+              pytest tests -q
             echo "::endgroup::"
           done
           echo "::group::free-threaded wheel on python 3.14t"
-          uv run --no-project --python 3.14t --with "$ft" python tools/smoke.py
+          # tiktoken has no free-threaded wheel yet; the parity tests skip
+          # themselves without it and the rest of the suite still runs
+          uv run --no-project --python 3.14t --with "$ft" \
+            --with pytest --with numpy \
+            pytest tests -q
           echo "::endgroup::"
 
   sdist:
@@ -133,8 +156,11 @@ jobs:
           command: sdist
           args: --out dist
       - uses: astral-sh/setup-uv@v5
-      - name: The sdist must build and work
-        run: uv run --no-project --with dist/*.tar.gz python tools/smoke.py
+      - name: The sdist must build from source and pass the tests
+        run: |
+          uv run --no-project --with dist/*.tar.gz \
+            --with pytest --with numpy --with tiktoken \
+            pytest tests -q
       - uses: actions/upload-artifact@v4
         with:
           name: sdist

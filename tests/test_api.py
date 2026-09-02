@@ -5,7 +5,6 @@ Tokenizer behind it (reached through the private `toktok._encoding`), because
 that engine surface is what `batch_count` and the Rust crate are built on."""
 
 import pytest
-
 import toktok
 
 TEXT = "Hello, 日本語 world! 123\n\n  indented\ttext 🚀"
@@ -52,7 +51,7 @@ def test_offsets_byte_and_char(enc):
     ids, spans = enc.encode_with_offsets(TEXT, "byte")
     raw = TEXT.encode()
     assert spans[0][0] == 0 and spans[-1][1] == len(raw)
-    for tid, (a, b) in zip(ids, spans):
+    for tid, (a, b) in zip(ids, spans, strict=True):
         assert enc.decode_single_token_bytes(tid) == raw[a:b]
 
     ids2, cspans = enc.encode_with_offsets(TEXT, "char")
@@ -82,8 +81,8 @@ def test_batch_matches_sequential(enc):
 def test_count_and_count_batch(enc):
     docs = ["one two three", "", "日本語のテキスト", "x" * 100]
     want = [len(enc.encode_ordinary(d)) for d in docs]
-    assert [enc.count(d) for d in docs] == want             # counting, no ids returned
-    assert enc.count_batch(docs, 4) == want                 # parallel, still no ids
+    assert [enc.count(d) for d in docs] == want  # counting, no ids returned
+    assert enc.count_batch(docs, 4) == want  # parallel, still no ids
     assert enc.count_batch([]) == []
     assert enc.count_batch(["a<|endoftext|>b"], 1, True) == [
         len(enc.encode_with_special("a<|endoftext|>b"))
@@ -135,9 +134,9 @@ def test_batch_count_accepts_encoding_or_model_names():
 def test_batch_count_options(enc):
     docs = [f"doc {i}: hello 日本語 world" for i in range(500)]
     want = [len(enc.encode_ordinary(d)) for d in docs]
-    assert toktok.batch_count(docs) == want                     # every core
-    assert toktok.batch_count(docs, threads=1) == want          # single thread
-    assert toktok.batch_count(iter(docs)) == want               # any iterable
+    assert toktok.batch_count(docs) == want  # every core
+    assert toktok.batch_count(docs, threads=1) == want  # single thread
+    assert toktok.batch_count(iter(docs)) == want  # any iterable
     special = "a<|endoftext|>b"
     assert toktok.batch_count([special], with_special=True) == [
         len(enc.encode_with_special(special))

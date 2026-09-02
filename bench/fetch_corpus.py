@@ -15,7 +15,12 @@ Documents are joined with blank lines; the resulting text blob is what gets
 benchmarked (see bench/compare.py). Streaming order is deterministic, so two
 fetches produce the same bytes.
 """
-import gzip, os, sys, time, urllib.request
+
+import gzip
+import os
+import sys
+import time
+import urllib.request
 
 OUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "corpus")
 MAX_MB = 25.0
@@ -24,6 +29,7 @@ CC_CRAWL = "CC-MAIN-2024-10"
 
 def stream_hf(repo, name=None):
     from datasets import load_dataset
+
     ds = load_dataset(repo, name=name, split="train", streaming=True)
     for ex in ds:
         t = ex.get("text") or ex.get("content") or ""
@@ -62,8 +68,8 @@ def stream_commoncrawl(crawl=CC_CRAWL):
 
 
 SOURCES = {
-    "pile":        lambda: stream_hf("monology/pile-uncopyrighted"),
-    "code":        lambda: stream_hf("codeparrot/codeparrot-clean-valid"),
+    "pile": lambda: stream_hf("monology/pile-uncopyrighted"),
+    "code": lambda: stream_hf("codeparrot/codeparrot-clean-valid"),
     "commoncrawl": lambda: stream_commoncrawl(),
 }
 
@@ -81,7 +87,7 @@ def fetch(name):
             docs += 1
             if n >= cap:
                 break
-    print(f"{name}: {n/1e6:.1f} MB, {docs} docs -> {out}  ({time.time()-t0:.1f}s)")
+    print(f"{name}: {n / 1e6:.1f} MB, {docs} docs -> {out}  ({time.time() - t0:.1f}s)")
 
 
 def main():

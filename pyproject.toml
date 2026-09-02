@@ -48,3 +48,33 @@ include = [{ path = "crates/toktok/data/*", format = "sdist" }]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+# Markdown carries hand-aligned example code; formatting it collapses the
+# alignment that makes the docs readable
+extend-exclude = ["*.md"]
+
+[tool.ruff.lint]
+select = [
+  "E", "W",   # pycodestyle
+  "F",        # pyflakes
+  "I",        # import sorting
+  "UP",       # pyupgrade — we are 3.11+
+  "B",        # bugbear
+  "SIM",      # simplify
+  "RUF",      # ruff's own
+]
+ignore = [
+  # "ambiguous unicode character": this is a tokenizer. Greek, CJK, fullwidth
+  # and combining characters in the fixtures are the point, not a typo.
+  "RUF001",
+  "RUF002",
+  "RUF003",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# benchmarks and tools import optional third-party encoders inside functions on
+# purpose, so each subprocess loads only the one it measures
+"bench/*" = ["E402", "PLC0415"]

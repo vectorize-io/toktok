@@ -15,11 +15,11 @@ Encodings are loaded once and cached, and counting releases the GIL and runs
 across threads, so calling this per request is fine.
 """
 
-from typing import Iterable, List
+from collections.abc import Iterable
 
 from ._toktok import BUILTIN_ENCODINGS as _BUILTIN
 from ._toktok import Tokenizer as _Tokenizer
-from ._toktok import __version__
+from ._toktok import __version__ as __version__  # re-exported
 
 # The vocabularies are compiled into the extension module, so there are no data
 # files to find, ship or download.
@@ -54,8 +54,7 @@ def _resolve(name: str) -> str:
         if m == prefix or m.startswith(prefix + "-") or m.startswith(prefix + "."):
             return enc
     raise KeyError(
-        f"unknown encoding or model {name!r}; bundled encodings are "
-        f"{', '.join(_BUILTIN)}"
+        f"unknown encoding or model {name!r}; bundled encodings are {', '.join(_BUILTIN)}"
     )
 
 
@@ -75,7 +74,7 @@ def batch_count(
     encoding: str = "cl100k_base",
     threads: int = 0,
     with_special: bool = False,
-) -> List[int]:
+) -> list[int]:
     """Count the tokens in each of `texts`. Returns one int per text, in order.
 
     Args:
