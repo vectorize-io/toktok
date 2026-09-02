@@ -120,7 +120,7 @@ checksum = "adb6935a6f5c20170eeceb1a3835a49e12e19d792f6dd344ccc76a985ca5a6ca"
 
 [[package]]
 name = "toktok-py"
-version = "0.1.2"
+version = "0.1.3"
 dependencies = [
  "pyo3",
  "toktok-rs",
@@ -128,7 +128,7 @@ dependencies = [
 
 [[package]]
 name = "toktok-rs"
-version = "0.1.2"
+version = "0.1.3"
 
 [[package]]
 name = "unicode-ident"
