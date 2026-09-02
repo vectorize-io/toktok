@@ -39,11 +39,30 @@ fn rss_bytes() -> u64 {
     }
 }
 
+/// CPU seconds burned by this process so far (user + system, all threads).
+/// Divided by bytes it gives CPU-s/MB, which is what a pipeline actually pays.
+#[cfg(unix)]
+fn cpu_seconds() -> f64 {
+    unsafe {
+        let mut ru: libc::rusage = std::mem::zeroed();
+        if libc::getrusage(libc::RUSAGE_SELF, &mut ru) != 0 {
+            return f64::NAN;
+        }
+        let t = |tv: libc::timeval| tv.tv_sec as f64 + tv.tv_usec as f64 / 1e6;
+        t(ru.ru_utime) + t(ru.ru_stime)
+    }
+}
+#[cfg(not(unix))]
+fn cpu_seconds() -> f64 {
+    f64::NAN
+}
+
 struct Row {
     label: &'static str,
     load_ms: f64,
     rss_load: i64,
     mbs: f64,
+    cpu_per_mb: f64,
     p50: f64,
     p99: f64,
     p999: f64,
@@ -76,10 +95,15 @@ fn measure(
         return None;
     }
     let mut best = f64::INFINITY;
+    let mut best_cpu = f64::NAN;
     for _ in 0..REPS {
-        let t = Instant::now();
+        let (c0, t) = (cpu_seconds(), Instant::now());
         let out = encode(text);
-        best = best.min(t.elapsed().as_secs_f64());
+        let (wall, cpu) = (t.elapsed().as_secs_f64(), cpu_seconds() - c0);
+        if wall < best {
+            best = wall;
+            best_cpu = cpu;
+        }
         std::hint::black_box(out);
     }
     for d in docs.iter().take(50) {
@@ -97,6 +121,7 @@ fn measure(
         load_ms,
         rss_load,
         mbs: text.len() as f64 / 1e6 / best,
+        cpu_per_mb: best_cpu / (text.len() as f64 / 1e6),
         p50: pct(&lat, 0.50),
         p99: pct(&lat, 0.99),
         p999: pct(&lat, 0.999),
@@ -195,15 +220,16 @@ fn main() {
     rows.sort_by(|a, b| b.mbs.partial_cmp(&a.mbs).unwrap());
     let base = rows.last().map(|r| r.mbs).unwrap_or(1.0);
     println!(
-        "\n  {:<12}  {:>8}  {:>7}  {:>9}  {:>8}  {:>9}  {:>9}  {:>9}",
-        "encoder", "MB/s", "vs slow", "RSS@load", "load", "p50 µs", "p99 µs", "p99.9 µs"
+        "\n  {:<12}  {:>8}  {:>7}  {:>9}  {:>9}  {:>8}  {:>9}  {:>9}  {:>9}",
+        "encoder", "MB/s", "vs slow", "CPU-s/MB", "RSS@load", "load", "p50 µs", "p99 µs", "p99.9 µs"
     );
     for r in &rows {
         println!(
-            "  {:<12}  {:8.1}  {:6.2}x  {:8.1}M  {:7.0}ms  {:9.1}  {:9.1}  {:9.1}{}",
+            "  {:<12}  {:8.1}  {:6.2}x  {:9.4}  {:8.1}M  {:7.0}ms  {:9.1}  {:9.1}  {:9.1}{}",
             r.label,
             r.mbs,
             r.mbs / base,
+            r.cpu_per_mb,
             r.rss_load as f64 / 1048576.0,
             r.load_ms,
             r.p50,
