@@ -95,4 +95,40 @@ def batch_count(
     return _encoding(encoding).count_batch(list(texts), threads, with_special)
 
 
-__all__ = ["batch_count"]
+def truncate(
+    text: str,
+    max_tokens: int,
+    encoding: str = "cl100k_base",
+) -> tuple[str, int]:
+    """Cut `text` down to at most `max_tokens` tokens.
+
+    Returns `(text, total_tokens)`. `total_tokens` is the count of the *whole*
+    input, truncated or not, so you can report how much was dropped:
+
+        >>> toktok.truncate("hello world", 1, "gpt-4o")
+        ('hello', 2)
+
+    One pass over the input, no token ids built, and nothing decoded — the cut
+    is a byte offset into the string you passed in. When nothing needs cutting
+    the original string object is returned as-is.
+
+    The cut always lands on a character boundary. Byte-level BPE can split one
+    character across tokens ("🧠" is three tokens), so cutting at the token
+    boundary — which is what `decode(encode(text)[:n])` does — can leave a
+    partial character that decodes to U+FFFD. This drops that partial character
+    instead.
+    """
+    return _encoding(encoding).truncate(text, max_tokens)
+
+
+def batch_truncate(
+    texts: Iterable[str],
+    max_tokens: int,
+    encoding: str = "cl100k_base",
+    threads: int = 0,
+) -> list[tuple[str, int]]:
+    """`truncate` over many texts, in parallel. See `truncate` and `batch_count`."""
+    return _encoding(encoding).truncate_batch(list(texts), max_tokens, threads)
+
+
+__all__ = ["batch_count", "batch_truncate", "truncate"]

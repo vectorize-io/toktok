@@ -27,6 +27,8 @@ can be promoted.
 | `encode_with_offsets(text, unit="byte")` | `(ids, spans)`; `unit="char"` gives code-point spans (HF `offset_mapping` shape) |
 | `encode_single_token(piece)` | the id of an exact token; `KeyError` if it is not one |
 | `count(text)` / `count_batch(texts, threads=0, with_special=False)` | token counts, no ids built |
+| `truncate(text, max_tokens)` | `(text, total_tokens)` — see `toktok.truncate` |
+| `truncate_batch(texts, max_tokens, threads=0)` | the same, in parallel |
 
 `encode_to_numpy` and the batch paths avoid building a `list[int]`, which is
 where most of the time and memory goes on large inputs — a Python list costs

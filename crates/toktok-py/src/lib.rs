@@ -221,6 +221,49 @@ impl PyTokenizer {
         }
     }
 
+    /// Truncate to at most `max_tokens` tokens. Returns `(text, total_tokens)`,
+    /// where `total_tokens` counts the whole input whether or not it was cut.
+    #[pyo3(signature = (text, max_tokens))]
+    fn truncate<'py>(
+        &self,
+        py: Python<'py>,
+        text: &Bound<'py, PyString>,
+        max_tokens: usize,
+    ) -> PyResult<(Bound<'py, PyString>, usize)> {
+        let s = text.extract::<std::borrow::Cow<'_, str>>()?;
+        let t = py.detach(|| self.inner.truncate(s.as_bytes(), max_tokens));
+        if t.bytes == s.len() {
+            // nothing to cut: hand back the same object rather than a copy
+            return Ok((text.clone(), t.total_tokens));
+        }
+        Ok((PyString::new(py, &s[..t.bytes]), t.total_tokens))
+    }
+
+    /// `truncate` over many texts, in parallel.
+    #[pyo3(signature = (texts, max_tokens, threads = 0))]
+    fn truncate_batch<'py>(
+        &self,
+        py: Python<'py>,
+        texts: Vec<String>,
+        max_tokens: usize,
+        threads: usize,
+    ) -> Vec<(String, usize)> {
+        let cuts = py.detach(|| {
+            let refs: Vec<&[u8]> = texts.iter().map(|s| s.as_bytes()).collect();
+            self.inner.truncate_batch(&refs, max_tokens, threads)
+        });
+        texts
+            .into_iter()
+            .zip(cuts)
+            .map(|(mut s, t)| {
+                if t.bytes < s.len() {
+                    s.truncate(t.bytes);
+                }
+                (s, t.total_tokens)
+            })
+            .collect()
+    }
+
     fn count(&self, py: Python<'_>, text: &str) -> usize {
         py.detach(|| self.inner.count(text.as_bytes()))
     }

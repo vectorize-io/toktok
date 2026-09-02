@@ -79,6 +79,28 @@ batch of any size allocates O(threads), not O(tokens).
 Wheels cover CPython **3.11–3.14** plus free-threaded **3.14t**, on Linux
 (x86_64, aarch64), macOS and Windows.
 
+### `truncate(text, max_tokens, encoding="cl100k_base")`
+
+Cut text to a token budget. Returns `(text, total_tokens)`, where
+`total_tokens` counts the whole input — truncated or not — so you can report how
+much was dropped.
+
+```python
+toktok.truncate("hello world", 1)          # ('hello', 2)
+toktok.truncate("hello world", 50)         # ('hello world', 2) — same object back
+
+toktok.batch_truncate(docs, 8192, "gpt-4o", threads=8)   # [(text, total), ...]
+```
+
+One pass, no ids built, nothing decoded — the cut is a byte offset into the
+string you passed in. About **2× faster** than `decode(encode(text)[:n])`, and
+~7× with the batch form.
+
+It also cuts on a **character boundary**. Byte-level BPE can split one character
+across tokens (`"🧠"` is three), so a token-boundary cut can leave a partial
+character that decodes to `U+FFFD` — `decode(enc.encode("hello 🧠")[:2])` gives
+`'hello \ufffd'`. `truncate` gives `'hello '`.
+
 Need ids, decoding or offsets? `toktok._encoding(name)` returns the full
 tokenizer — see [docs/PYTHON.md](docs/PYTHON.md).
 
@@ -101,6 +123,11 @@ let counts = tok.count_batch(&docs, 0, false);   // no ids materialized
 let batches = tok.encode_batch(&docs, 0, false);
 
 let (ids, spans) = tok.encode_with_offsets(b"per-token byte spans");
+
+// truncation without building ids or decoding: a byte offset back
+let t = tok.truncate(text, 8192);
+let kept = &text[..t.bytes];        // always a character boundary
+t.total_tokens;                     // the whole input, truncated or not
 ```
 
 Every batch method takes the same two knobs as the Python API:
