@@ -135,6 +135,21 @@ jobs:
       - id: auth
         uses: rust-lang/crates-io-auth-action@v1
         continue-on-error: true
+      - name: Report how this run is authenticating
+        # Make the mechanism explicit in the log. Otherwise a broken trusted
+        # publisher is invisible: the run just quietly falls back to a secret.
+        env:
+          OIDC_TOKEN: ${{ steps.auth.outputs.token }}
+          SECRET_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: |
+          if [ -n "$OIDC_TOKEN" ]; then
+            echo "::notice::Publishing with a short-lived Trusted Publishing token — no secret involved"
+          elif [ -n "$SECRET_TOKEN" ]; then
+            echo "::warning::Trusted Publishing returned no token; falling back to the CARGO_REGISTRY_TOKEN secret. Check the trusted publisher at https://crates.io/crates/toktok-rs/settings"
+          else
+            echo "::error::Trusted Publishing failed and there is no CARGO_REGISTRY_TOKEN to fall back on — see RELEASING.md"
+            exit 1
+          fi
       - name: Publish
         if: env.DRY_RUN != 'true'
         run: cargo publish -p toktok-rs
