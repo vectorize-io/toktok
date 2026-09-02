@@ -3,34 +3,40 @@
 A fast, exact BPE tokenizer for OpenAI encodings — Rust core, Python bindings.
 Token ids are **byte-identical to [tiktoken](https://github.com/openai/tiktoken)**.
 
-**From Python** — the speed is not behind a Rust-only door. Encoding happens in
-Rust with the GIL released, so a plain `pip install` gets it on every supported
-interpreter:
+The Pile, 25 MB, cl100k_base, single thread, GitHub runners. Ids verified
+identical before timing.
 
-| interpreter | toktok | tiktoken | | CPU per MB | p99 per doc |
-|---|---:|---:|---|---:|---:|
-| CPython 3.11 | **85.1 MB/s** | 11.5 | **7.4× faster** | **0.0117 s** vs 0.0873 | **34.8 µs** vs 226.8 |
-| CPython 3.14 | **68.6 MB/s** | 12.0 | **5.7× faster** | **0.0146 s** vs 0.0832 | **37.5 µs** vs 208.6 |
-| CPython 3.14t <sub>free-threaded</sub> | **94.5 MB/s** | 14.0 | **6.8× faster** | **0.0106 s** vs 0.0716 | **35.1 µs** vs 188.8 |
+#### Python 3.11
 
-Each row is a same-machine comparison. Compare *within* a row, not down a column:
-the three ran on separate runners, which is why tiktoken's own number drifts
-11.5 → 14.0. The takeaway is that the ratio holds everywhere — you do not need a
-new Python, or the free-threaded build, to get this.
+| encoder | throughput | CPU per MB | p99 per doc | |
+|---|---:|---:|---:|---|
+| **toktok** | **85.1 MB/s** | **0.0117 s** | **34.8 µs** | **7.4×** |
+| tiktoken | 11.5 MB/s | 0.0873 s | 226.8 µs | 1× |
 
-**From Rust** — against the other exact tokenizers:
+#### Python 3.14
 
-| encoder | throughput | CPU per MB | p99 per doc |
-|---|---:|---:|---:|
-| **toktok** | **89.7 MB/s** | **0.0111 s** | **13.4 µs** |
-| [bpe-openai](https://crates.io/crates/bpe-openai) | 30.3 | 0.0330 | 38.4 µs |
-| [tiktoken-rs](https://crates.io/crates/tiktoken-rs) | 7.3 | 0.1369 | 169.9 µs |
+| encoder | throughput | CPU per MB | p99 per doc | |
+|---|---:|---:|---:|---|
+| **toktok** | **68.6 MB/s** | **0.0146 s** | **37.5 µs** | **5.7×** |
+| tiktoken | 12.0 MB/s | 0.0832 s | 208.6 µs | 1× |
 
-<sub>The Pile, 25 MB, cl100k_base, single thread on GitHub runners, produced by
-the Benchmarks workflow. Every encoder's ids are verified identical before
-timing. At one thread CPU-per-MB tracks 1/throughput; it earns its keep in the
-threaded numbers, where `batch_count` sustains ~186 MB/s across 4 cores against
-tiktoken's 6–16. Full tables, memory figures and method:
+#### Python 3.14t · free-threaded
+
+| encoder | throughput | CPU per MB | p99 per doc | |
+|---|---:|---:|---:|---|
+| **toktok** | **94.5 MB/s** | **0.0106 s** | **35.1 µs** | **6.8×** |
+| tiktoken | 14.0 MB/s | 0.0716 s | 188.8 µs | 1× |
+
+#### Rust
+
+| encoder | throughput | CPU per MB | p99 per doc | |
+|---|---:|---:|---:|---|
+| **toktok** | **89.7 MB/s** | **0.0111 s** | **13.4 µs** | **12.3×** |
+| [bpe-openai](https://crates.io/crates/bpe-openai) | 30.3 MB/s | 0.0330 s | 38.4 µs | 4.2× |
+| [tiktoken-rs](https://crates.io/crates/tiktoken-rs) | 7.3 MB/s | 0.1369 s | 169.9 µs | 1× |
+
+<sub>Each table is one machine; the Python ones ran on separate runners, so
+compare within a table. Method and full results:
 **[docs/BENCHMARKS.md](docs/BENCHMARKS.md)**.</sub>
 
 Encodings: `cl100k_base` (GPT-3.5/GPT-4), `o200k_base` (GPT-4o),
