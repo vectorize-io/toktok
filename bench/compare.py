@@ -18,6 +18,32 @@ import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CORPUS_DIR = os.path.join(HERE, "corpus")
+RANKS_DIR = os.path.join(HERE, "ranks")
+
+# gigatoken loads merge ranks from a `.tiktoken` file and takes the
+# pretokenization scheme from that file's *name*; tiktoken's own cache stores the
+# same bytes under a hashed filename, so fetch our own copy rather than reach
+# into its cache.
+RANK_URLS = {
+    "cl100k_base": "https://openaipublic.blob.core.windows.net/encodings/cl100k_base.tiktoken",
+    "o200k_base": "https://openaipublic.blob.core.windows.net/encodings/o200k_base.tiktoken",
+}
+
+
+def rank_file(enc_name):
+    """Path to `enc_name`'s rank file, downloaded once. None if unavailable."""
+    url = RANK_URLS.get(enc_name)
+    if url is None:
+        return None
+    path = os.path.join(RANKS_DIR, f"{enc_name}.tiktoken")
+    if not os.path.exists(path):
+        import urllib.request
+
+        os.makedirs(RANKS_DIR, exist_ok=True)
+        tmp = f"{path}.part"
+        urllib.request.urlretrieve(url, tmp)
+        os.replace(tmp, path)
+    return path
 
 
 def interpreter() -> str:
@@ -49,6 +75,15 @@ def encoders(enc_name):
         out.append(("quicktok (C++)", lambda s: qt.encode_ordinary(s)))
         if hasattr(qt, "encode_to_numpy"):
             out.append(("quicktok (numpy)", lambda s: qt.encode_to_numpy(s)))
+    except Exception:
+        pass
+    try:
+        import gigatoken as gt
+
+        path = rank_file(enc_name)
+        if path:
+            gg = gt.Tokenizer.from_tiktoken(path)
+            out.append(("gigatoken", lambda s: gg.encode(s)))
     except Exception:
         pass
     try:
@@ -129,6 +164,18 @@ def run(corpus_path, enc_name, repeats, threads):
             t0 = time.perf_counter()
             qt.encode_batch(docs, threads, False)
             print(f"    quicktok encode_batch {mb / (time.perf_counter() - t0):7.1f} MB/s")
+        except Exception:
+            pass
+        try:
+            import gigatoken as gt
+
+            path = rank_file(enc_name)
+            if path:
+                gg = gt.Tokenizer.from_tiktoken(path)
+                gg.encode_batch(docs[:64], parallel=True)  # warm the thread pool
+                t0 = time.perf_counter()
+                gg.encode_batch(docs, parallel=True)
+                print(f"    gigatoken encode_batch{mb / (time.perf_counter() - t0):7.1f} MB/s")
         except Exception:
             pass
 

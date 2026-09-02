@@ -35,9 +35,34 @@ CORPUS_DIR = os.path.join(HERE, "corpus")
 ENCODERS = {
     "toktok": "toktok",
     "toktok-numpy": "toktok (numpy)",
+    "gigatoken": "gigatoken",
     "quicktok": "quicktok (C++)",
     "tiktoken": "tiktoken",
 }
+
+# gigatoken reads merge ranks from a `.tiktoken` file whose *name* selects the
+# pretokenization scheme, so it needs its own copy rather than tiktoken's
+# hash-named cache entry. Downloaded once, into a directory git ignores.
+RANK_URLS = {
+    "cl100k_base": "https://openaipublic.blob.core.windows.net/encodings/cl100k_base.tiktoken",
+    "o200k_base": "https://openaipublic.blob.core.windows.net/encodings/o200k_base.tiktoken",
+}
+
+
+def rank_file(enc_name):
+    """Path to `enc_name`'s rank file, downloaded once. None if unavailable."""
+    url = RANK_URLS.get(enc_name)
+    if url is None:
+        return None
+    path = os.path.join(HERE, "ranks", f"{enc_name}.tiktoken")
+    if not os.path.exists(path):
+        import urllib.request
+
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        tmp = f"{path}.part"
+        urllib.request.urlretrieve(url, tmp)
+        os.replace(tmp, path)
+    return path
 
 # how many documents to time individually for the latency distribution
 LATENCY_DOCS = 4000
@@ -86,6 +111,21 @@ def load_encoder(which, enc_name):
             lambda docs, n: e.encode_batch(docs, n, False),
             # the public API, which is what users actually call
             lambda docs, n: toktok.batch_count(docs, enc_name, n),
+        )
+    if which == "gigatoken":
+        import gigatoken as gt
+
+        path = rank_file(enc_name)
+        if path is None:
+            raise SystemExit(f"gigatoken: no rank file for {enc_name}")
+        e = gt.Tokenizer.from_tiktoken(path)
+        return (
+            lambda s: e.encode(s),
+            # gigatoken parallelizes a batch on its own process-global pool; it
+            # takes no thread count, so `n` is ignored here and the row is
+            # labelled as "all cores" rather than pretending otherwise
+            lambda docs, n: e.encode_batch(docs, parallel=True),
+            None,
         )
     if which == "quicktok":
         import quicktok

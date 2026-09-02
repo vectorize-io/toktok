@@ -8,3 +8,6 @@ __pycache__/
 
 # benchmark corpora: 3 x 25 MB, fetched with bench/fetch_corpus.py
 bench/corpus/
+
+# gigatoken merge-rank files, downloaded on demand by the benchmarks
+bench/ranks/
