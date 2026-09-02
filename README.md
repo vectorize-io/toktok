@@ -10,30 +10,30 @@ identical before timing.
 
 | encoder | throughput | CPU per MB | p99 per doc | |
 |---|---:|---:|---:|---|
-| **toktok** | **85.1 MB/s** | **0.0117 s** | **34.8 µs** | **7.4×** |
-| tiktoken | 11.5 MB/s | 0.0873 s | 226.8 µs | 1× |
+| **toktok** | **211.8 MB/s** | **0.0054 s** | **17.4 µs** | **15.4×** |
+| tiktoken | 13.8 MB/s | 0.0752 s | 187.3 µs | 1× |
 
 #### Python 3.14
 
 | encoder | throughput | CPU per MB | p99 per doc | |
 |---|---:|---:|---:|---|
-| **toktok** | **68.6 MB/s** | **0.0146 s** | **37.5 µs** | **5.7×** |
-| tiktoken | 12.0 MB/s | 0.0832 s | 208.6 µs | 1× |
+| **toktok** | **187.0 MB/s** | **0.0058 s** | **21.4 µs** | **16.6×** |
+| tiktoken | 11.3 MB/s | 0.0931 s | 235.6 µs | 1× |
 
 #### Python 3.14t · free-threaded
 
 | encoder | throughput | CPU per MB | p99 per doc | |
 |---|---:|---:|---:|---|
-| **toktok** | **94.5 MB/s** | **0.0106 s** | **35.1 µs** | **6.8×** |
-| tiktoken | 14.0 MB/s | 0.0716 s | 188.8 µs | 1× |
+| **toktok** | **174.7 MB/s** | **0.0064 s** | **21.0 µs** | **15.2×** |
+| tiktoken | 11.5 MB/s | 0.0901 s | 227.8 µs | 1× |
 
 #### Rust
 
 | encoder | throughput | CPU per MB | p99 per doc | |
 |---|---:|---:|---:|---|
-| **toktok** | **89.7 MB/s** | **0.0111 s** | **13.4 µs** | **12.3×** |
-| [bpe-openai](https://crates.io/crates/bpe-openai) | 30.3 MB/s | 0.0330 s | 38.4 µs | 4.2× |
-| [tiktoken-rs](https://crates.io/crates/tiktoken-rs) | 7.3 MB/s | 0.1369 s | 169.9 µs | 1× |
+| **toktok** | **249.8 MB/s** | **0.0040 s** | **4.1 µs** | **26.6×** |
+| [bpe-openai](https://crates.io/crates/bpe-openai) | 36.4 MB/s | 0.0274 s | 32.4 µs | 3.9× |
+| [tiktoken-rs](https://crates.io/crates/tiktoken-rs) | 9.4 MB/s | 0.1066 s | 132.4 µs | 1× |
 
 <sub>Each table is one machine; the Python ones ran on separate runners, so
 compare within a table. Method and full results:
@@ -103,8 +103,8 @@ toktok.batch_truncate(docs, 8192, "o200k_base", threads=8)   # [(text, total), .
 ```
 
 One pass, no ids built, nothing decoded — the cut is a byte offset into the
-string you passed in. About **2× faster** than `decode(encode(text)[:n])`, and
-~7× with the batch form.
+string you passed in. About **3× faster** than `decode(encode(text)[:n])`, and
+~6× with the batch form.
 
 It also cuts on a **character boundary**. Byte-level BPE can split one character
 across tokens (`"🧠"` is three), so a token-boundary cut can leave a partial
