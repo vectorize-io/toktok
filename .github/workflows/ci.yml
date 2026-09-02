@@ -1,26 +1,46 @@
 name: CI
 
-# Tests and wheel builds. Publishing lives in release.yml (tag-driven).
+# Pull requests only. Nothing runs on a push to main: main is only reached
+# through a PR that already passed this, so re-running it post-merge tests a
+# commit that was tested minutes ago. Releases are the one exception and live
+# in release.yml, triggered by a tag you push deliberately.
 on:
-  push:
-    branches: [main]
   pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  test:
-    name: test ${{ matrix.os }} py${{ matrix.python }}
+  rust:
+    name: rust ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python: ["3.12"]
-        include:
-          # every supported interpreter, including the free-threaded build
-          - { os: ubuntu-latest, python: "3.11" }
-          - { os: ubuntu-latest, python: "3.13" }
-          - { os: ubuntu-latest, python: "3.14" }
-          - { os: ubuntu-latest, python: "3.14t" }
-          - { os: macos-latest, python: "3.14t" }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12" # pyo3 needs an interpreter to build against
+      - name: Tests (exactness fixtures, offsets, batch, invalid UTF-8, memory)
+        run: cargo test --release
+      - name: Lints
+        run: |
+          cargo fmt --check
+          cargo clippy --release --all-targets -- -D warnings
+
+  python:
+    # Every interpreter we publish wheels for, on every platform we publish for.
+    name: python ${{ matrix.python }} ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ["3.11", "3.12", "3.13", "3.14", "3.14t"]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -28,19 +48,15 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-      - name: Rust tests (exactness fixtures, offsets, batch, invalid UTF-8)
-        run: cargo test --release
-      - name: Build and install the extension
-        # uv drives the maturin PEP 517 backend, which compiles the Rust cdylib.
+      - name: Build the extension from source
         # On 3.14t pyo3's abi3 feature falls back to a version-specific
-        # free-threaded build, which is what we want.
+        # free-threaded build, which is what the cp314t wheel is
         run: uv sync --no-editable --python ${{ matrix.python }}
-      - name: Python tests (parity vs tiktoken, free-threading)
+      - name: Tests (parity vs tiktoken, the Python API, free-threading)
         run: uv run --python ${{ matrix.python }} pytest -q
 
   wheels:
-    name: wheels ${{ matrix.target }}
-    needs: test
+    name: wheels ${{ matrix.target }}${{ matrix.freethreaded && ' (3.14t)' || '' }}
     strategy:
       fail-fast: false
       matrix:
@@ -49,51 +65,66 @@ jobs:
           - { os: ubuntu-latest, target: aarch64 }
           - { os: macos-latest, target: universal2-apple-darwin }
           - { os: windows-latest, target: x64 }
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v4
-      # One abi3 wheel per platform covers CPython 3.11 through 3.14 (and later)
-      - uses: PyO3/maturin-action@v1
-        with:
-          target: ${{ matrix.target }}
-          args: --release --out dist
-          manylinux: auto
-      - uses: actions/upload-artifact@v4
-        with:
-          name: wheels-abi3-${{ matrix.os }}-${{ matrix.target }}
-          path: dist
-
-  wheels-freethreaded:
-    # abi3 does not exist for free-threaded CPython, so these are version-specific.
-    # 3.14t is the floor: pyo3 rejects the free-threaded build below 3.14.
-    name: wheels free-threaded ${{ matrix.target }}
-    needs: test
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - { os: ubuntu-latest, target: x86_64 }
-          - { os: ubuntu-latest, target: aarch64 }
-          - { os: macos-latest, target: universal2-apple-darwin }
-          - { os: windows-latest, target: x64 }
+          - { os: ubuntu-latest, target: x86_64, freethreaded: true }
+          - { os: ubuntu-latest, target: aarch64, freethreaded: true }
+          - { os: macos-latest, target: universal2-apple-darwin, freethreaded: true }
+          - { os: windows-latest, target: x64, freethreaded: true }
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
+        if: matrix.freethreaded
         with:
           python-version: "3.14t"
       - uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
-          args: --release --out dist --interpreter 3.14t
-          manylinux: 2_28 # the older images have no free-threaded interpreter
+          args: --release --out dist ${{ matrix.freethreaded && '--interpreter 3.14t' || '' }}
+          manylinux: ${{ matrix.freethreaded && '2_28' || 'auto' }}
       - uses: actions/upload-artifact@v4
         with:
-          name: wheels-ft-${{ matrix.os }}-${{ matrix.target }}
+          name: wheels-${{ matrix.os }}-${{ matrix.target }}${{ matrix.freethreaded && '-ft' || '' }}
           path: dist
 
+  wheel-smoke:
+    # The matrix above builds from source. This installs the *shipped artifact*
+    # — one abi3 wheel serving 3.11-3.14, plus the cp314t wheel — and checks it
+    # loads and tokenizes on each interpreter, which is what users actually get.
+    name: wheel install ${{ matrix.os }}
+    needs: wheels
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, abi3: wheels-ubuntu-latest-x86_64, ft: wheels-ubuntu-latest-x86_64-ft }
+          - { os: macos-latest, abi3: wheels-macos-latest-universal2-apple-darwin, ft: wheels-macos-latest-universal2-apple-darwin-ft }
+          - { os: windows-latest, abi3: wheels-windows-latest-x64, ft: wheels-windows-latest-x64-ft }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/download-artifact@v4
+        with: { name: "${{ matrix.abi3 }}", path: dist }
+      - uses: actions/download-artifact@v4
+        with: { name: "${{ matrix.ft }}", path: dist }
+      - name: Install the wheel on every interpreter it claims to support
+        shell: bash
+        run: |
+          set -euo pipefail
+          abi3=$(ls dist/*abi3*.whl)
+          ft=$(ls dist/*cp314t*.whl)
+          echo "abi3 wheel: $abi3"
+          echo "free-threaded wheel: $ft"
+          for v in 3.11 3.12 3.13 3.14; do
+            echo "::group::abi3 wheel on python $v"
+            uv run --no-project --python "$v" --with "$abi3" python tools/smoke.py
+            echo "::endgroup::"
+          done
+          echo "::group::free-threaded wheel on python 3.14t"
+          uv run --no-project --python 3.14t --with "$ft" python tools/smoke.py
+          echo "::endgroup::"
+
   sdist:
-    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -101,6 +132,9 @@ jobs:
         with:
           command: sdist
           args: --out dist
+      - uses: astral-sh/setup-uv@v5
+      - name: The sdist must build and work
+        run: uv run --no-project --with dist/*.tar.gz python tools/smoke.py
       - uses: actions/upload-artifact@v4
         with:
           name: sdist

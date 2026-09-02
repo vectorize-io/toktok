@@ -12,6 +12,11 @@
 //! mixed validity memos, odd-depth side table, r2/r3 direct tables) is what makes
 //! this fast; the layouts and bit packings below are bit-identical to the C++.
 
+// The table-construction loops below walk token ids and index several parallel
+// arrays with them (`tb`, `tnode_tok`, `npm`, `split`). Rewriting them as zipped
+// iterators would obscure that they are all keyed by the same id.
+#![allow(clippy::needless_range_loop)]
+
 use std::collections::HashMap;
 use std::io::Read;
 use std::sync::atomic::{AtomicU16, AtomicU32, Ordering};
@@ -61,9 +66,9 @@ impl std::fmt::Display for VocabError {
 impl std::error::Error for VocabError {}
 
 pub struct Vocab {
-    pub all: Vec<u8>,          // token bytes concatenated, by id
-    pub tstart: Vec<u32>,      // tstart[id]..tstart[id+1]
-    pub tlen: Vec<u8>,         // token byte-length — L1-hot, 1 load vs 2 in tstart
+    pub all: Vec<u8>,     // token bytes concatenated, by id
+    pub tstart: Vec<u32>, // tstart[id]..tstart[id+1]
+    pub tlen: Vec<u8>,    // token byte-length — L1-hot, 1 load vs 2 in tstart
     pub n: u32,
     b2id: HashMap<Box<[u8]>, u32>,
     // trie edges: open-addressing, slot = (key+1)<<32 | child; key = node<<8|byte
@@ -203,7 +208,9 @@ impl Vocab {
         }
         unsafe {
             if len == 1 {
-                let n = *self.root_child.get_unchecked(*text.get_unchecked(0) as usize);
+                let n = *self
+                    .root_child
+                    .get_unchecked(*text.get_unchecked(0) as usize);
                 return if n != 0 {
                     *self.tnode_tok.get_unchecked(n as usize)
                 } else {
@@ -455,7 +462,10 @@ impl Vocab {
             ("otab (odd tokens)", v(&self.otab)),
             ("split", v(&self.split)),
             ("npm", v(&self.npm)),
-            ("token bytes", v(&self.all) + v(&self.tstart) + v(&self.tlen)),
+            (
+                "token bytes",
+                v(&self.all) + v(&self.tstart) + v(&self.tlen),
+            ),
         ];
         out.sort_by_key(|&(_, n)| std::cmp::Reverse(n));
         out
@@ -556,8 +566,12 @@ impl Vocab {
     }
 
     pub fn load(path: &std::path::Path) -> Result<Vocab, VocabError> {
-        let mut f = std::fs::File::open(path)
-            .map_err(|e| VocabError(format!("toktok: cannot open vocab file {}: {e}", path.display())))?;
+        let mut f = std::fs::File::open(path).map_err(|e| {
+            VocabError(format!(
+                "toktok: cannot open vocab file {}: {e}",
+                path.display()
+            ))
+        })?;
         let mut raw = Vec::new();
         f.read_to_end(&mut raw)
             .map_err(|e| VocabError(format!("toktok: cannot read {}: {e}", path.display())))?;
@@ -758,7 +772,8 @@ impl Vocab {
                         h = (h + 1) & v.omask;
                     }
                     if v.otab[h as usize] == 0 {
-                        v.otab[h as usize] = ((k + 1) << OTAB_KEYSH) | id as u64; // hasdeeper OR'd in later
+                        v.otab[h as usize] = ((k + 1) << OTAB_KEYSH) | id as u64;
+                        // hasdeeper OR'd in later
                     }
                 }
             }
@@ -782,7 +797,11 @@ impl Vocab {
                     let k = kp1 - 1;
                     let child = (val >> 32) as u32;
                     let best32 = val as u32;
-                    let best18 = if best32 == RANK_MAX { E2BEST_NONE } else { best32 };
+                    let best18 = if best32 == RANK_MAX {
+                        E2BEST_NONE
+                    } else {
+                        best32
+                    };
                     let m = mix36(k);
                     let mut j = (m >> v.e2tb) as u32;
                     while v.e2[j as usize] != 0 {
@@ -851,7 +870,9 @@ impl Vocab {
         v.ivmask = (icap - 1) as u32;
         v.wide_ids = n > (1 << 17); // ids past 17 bits: the 34-bit mixer can't pack the pair key
         if v.wide_ids {
-            v.ivmw = (0..(1usize << IVBITS_W)).map(|_| AtomicU32::new(0)).collect();
+            v.ivmw = (0..(1usize << IVBITS_W))
+                .map(|_| AtomicU32::new(0))
+                .collect();
         } else {
             v.ivm = (0..icap).map(|_| AtomicU16::new(0)).collect();
         }

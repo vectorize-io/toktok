@@ -8,6 +8,9 @@ use std::collections::BTreeSet;
 
 use toktok::Tokenizer as Core;
 
+/// Token ids plus one `(start, end)` span per token.
+type IdsAndSpans = (Vec<u32>, Vec<(u32, u32)>);
+
 #[pyclass(name = "Tokenizer", module = "toktok._toktok", frozen)]
 struct PyTokenizer {
     inner: Core,
@@ -171,12 +174,7 @@ impl PyTokenizer {
     /// offsets (they tile the input); `unit="char"` gives code-point offsets
     /// (HF `offset_mapping` shape).
     #[pyo3(signature = (text, unit = "byte"))]
-    fn encode_with_offsets(
-        &self,
-        py: Python<'_>,
-        text: &str,
-        unit: &str,
-    ) -> PyResult<(Vec<u32>, Vec<(u32, u32)>)> {
+    fn encode_with_offsets(&self, py: Python<'_>, text: &str, unit: &str) -> PyResult<IdsAndSpans> {
         if unit != "byte" && unit != "char" {
             return Err(PyValueError::new_err("unit must be 'byte' or 'char'"));
         }
@@ -360,7 +358,10 @@ impl PyTokenizer {
 
     #[getter]
     fn special_tokens_set<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PySet>> {
-        PySet::new(py, self.inner.special_tokens().iter().map(|(s, _)| s.as_str()))
+        PySet::new(
+            py,
+            self.inner.special_tokens().iter().map(|(s, _)| s.as_str()),
+        )
     }
 
     /// `{special string: id}` — tiktoken's `_special_tokens`.
@@ -368,7 +369,14 @@ impl PyTokenizer {
         PyList::new(
             py,
             self.inner.special_tokens().iter().map(|(s, id)| {
-                PyTuple::new(py, [s.into_pyobject(py).unwrap().into_any(), id.into_pyobject(py).unwrap().into_any()]).unwrap()
+                PyTuple::new(
+                    py,
+                    [
+                        s.into_pyobject(py).unwrap().into_any(),
+                        id.into_pyobject(py).unwrap().into_any(),
+                    ],
+                )
+                .unwrap()
             }),
         )
     }

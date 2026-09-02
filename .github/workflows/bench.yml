@@ -6,6 +6,9 @@ name: Benchmarks
 # still leans on same-run ratios, pins single-threaded work to one core, and
 # reports the spread across repeated runs so noise is visible rather than hidden.
 
+# Manual only. Benchmarks are slow, and a number measured on a shared runner is
+# not worth blocking a merge or a release on — run this when you want to know,
+# not on every commit.
 on:
   workflow_dispatch:
     inputs:
@@ -18,10 +21,6 @@ on:
       runs:
         description: "Repeat the whole matrix N times to show run-to-run spread"
         default: "2"
-  schedule:
-    - cron: "0 4 * * 1" # Mondays, to catch regressions
-  push:
-    tags: ["v*"] # the numbers that ship with a release
 
 concurrency:
   # never let two benchmark jobs share a runner

@@ -7,7 +7,9 @@ use std::time::Instant;
 
 fn main() {
     let mut args = std::env::args().skip(1);
-    let path = args.next().unwrap_or_else(|| "bench/corpus/pile.txt".into());
+    let path = args
+        .next()
+        .unwrap_or_else(|| "bench/corpus/pile.txt".into());
     let enc = args.next().unwrap_or_else(|| "cl100k_base".into());
     let reps: usize = args.next().and_then(|s| s.parse().ok()).unwrap_or(3);
 
