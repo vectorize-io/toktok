@@ -48,5 +48,5 @@ pub mod vocab;
 pub use builtin::BUILTIN_ENCODINGS;
 pub use pretok::UClass;
 pub use pretok_o200k::UClassO;
-pub use tokenizer::{Scanner, Tokenizer};
+pub use tokenizer::{Scanner, Tokenizer, Truncation};
 pub use vocab::{Vocab, VocabError, RANK_MAX};

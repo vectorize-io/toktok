@@ -112,23 +112,76 @@ def test_memory_bytes(enc):
     assert toktok._encoding("o200k_base").memory_bytes > enc.memory_bytes
 
 
+def test_truncate(enc):
+    # nothing to cut: the input is returned unchanged, with its real count
+    text = "hello world"
+    assert toktok.truncate(text, 50) == (text, 2)
+    assert toktok.truncate(text, 50)[0] is text  # same object, no copy
+
+    # cut: text shortened, but the count describes the whole input
+    assert toktok.truncate("hello world", 1) == ("hello", 2)
+    assert toktok.truncate("", 10) == ("", 0)
+    assert toktok.truncate("hello world", 0) == ("", 2)
+
+
+def test_truncate_matches_encode_slice_decode(enc):
+    """The result is what decode(encode(text)[:n]) gives, minus the U+FFFD."""
+    for text in ["one two three four five", "日本語のテキストです", "a" * 500, TEXT]:
+        ids = enc.encode_ordinary(text)
+        for n in range(len(ids) + 2):
+            got, total = toktok.truncate(text, n)
+            assert total == len(ids)
+            reference = enc.decode(ids[: min(n, len(ids))])
+            # identical, except we never emit a replacement character
+            assert reference.startswith(got.rstrip("\ufffd")) or got == reference
+            assert "\ufffd" not in got or "\ufffd" in text
+
+
+def test_truncate_never_leaves_a_partial_character():
+    """Byte-level BPE splits some characters across tokens, so a token-boundary
+    cut can land mid-character — that is what puts U+FFFD at the tail of
+    decode(encode(x)[:n]). We cut at the character boundary instead."""
+    enc = toktok._encoding("cl100k_base")
+    text = "hello 🧠"
+    ids = enc.encode_ordinary(text)
+    assert len(ids) == 4, "expected the emoji to span several tokens"
+
+    # the reference pattern produces the replacement character
+    assert enc.decode(ids[:2]) == "hello \ufffd"
+    # and we do not
+    for n in range(len(ids) + 1):
+        got, total = toktok.truncate(text, n)
+        assert total == 4
+        assert "\ufffd" not in got, f"partial character survived at n={n}"
+        got.encode("utf-8")  # valid on its own
+
+
+def test_batch_truncate(enc):
+    docs = ["hello world", "short", "hello 🧠", "", "word " * 100]
+    want = [toktok.truncate(d, 3) for d in docs]
+    assert toktok.batch_truncate(docs, 3) == want
+    assert toktok.batch_truncate(docs, 3, threads=4) == want
+    assert toktok.batch_truncate([], 3) == []
+
+
 def test_batch_count_is_the_public_api():
-    assert toktok.__all__ == ["batch_count"]
+    assert set(toktok.__all__) == {"batch_count", "truncate", "batch_truncate"}
     # texts and an encoding in, one count per text out — no ids
     assert toktok.batch_count(["hello world", "", "how many tokens?"]) == [2, 0, 4]
     assert toktok.batch_count([]) == []
 
 
-def test_batch_count_accepts_encoding_or_model_names():
+def test_batch_count_encodings():
     texts = ["hello world", "日本語のテキストです"]
     cl = toktok.batch_count(texts, "cl100k_base")
     o2 = toktok.batch_count(texts, "o200k_base")
-    assert toktok.batch_count(texts, "gpt-4") == cl
-    assert toktok.batch_count(texts, "text-embedding-3-small") == cl
-    assert toktok.batch_count(texts, "gpt-4o") == o2
-    assert toktok.batch_count(texts, "openai/gpt-oss-20b") == o2
-    with pytest.raises(KeyError, match="unknown encoding or model"):
-        toktok.batch_count(texts, "not-a-model")
+    assert cl != o2
+    # harmony shares o200k_base's merge ranks, only its specials differ
+    assert toktok.batch_count(texts, "o200k_harmony") == o2
+    # encodings only: a model name is not a valid argument
+    for name in ("gpt-4o", "gpt-4", "not-an-encoding"):
+        with pytest.raises(KeyError, match="unknown encoding"):
+            toktok.batch_count(texts, name)
 
 
 def test_batch_count_options(enc):
@@ -145,7 +198,7 @@ def test_batch_count_options(enc):
 
 
 def test_unknown_encoding_raises():
-    with pytest.raises(KeyError, match="unknown encoding or model"):
+    with pytest.raises(KeyError, match="unknown encoding"):
         toktok._encoding("does_not_exist")
 
 

@@ -9,6 +9,21 @@ use crate::pretok_o200k::{self as pk8, UClassO};
 use crate::vocab::{Vocab, VocabError, RANK_MAX};
 use std::path::{Path, PathBuf};
 
+/// What [`Tokenizer::truncate`] found: where to cut, and what it cost.
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+pub struct Truncation {
+    /// Byte offset to cut the input at — always on a character boundary.
+    /// Equal to the input length when nothing needed truncating.
+    pub bytes: usize,
+    /// Tokens in the whole input, whether or not it was truncated. This is the
+    /// number to report when you want to say how much was dropped.
+    pub total_tokens: usize,
+    /// Tokens in the kept prefix. Equals `total_tokens` when nothing was cut,
+    /// and can be one less than `max_tokens` when the cut landed inside a
+    /// character.
+    pub kept_tokens: usize,
+}
+
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum Scanner {
     /// cl100k_base grammar (GPT-3.5 / GPT-4)
@@ -223,6 +238,56 @@ impl Tokenizer {
         let mut out = Vec::with_capacity(text.len() / 3 + 8);
         self.encode_into(text, &mut out);
         out.len()
+    }
+
+    /// Where to cut `text` so it fits in `max_tokens`, and what it cost.
+    ///
+    /// See [`Tokenizer::truncate`].
+    pub fn truncate(&self, text: &[u8], max_tokens: usize) -> Truncation {
+        crate::scratch::with_ids(|ids| {
+            ids.clear();
+            self.encode_into(text, ids);
+            let total_tokens = ids.len();
+            if total_tokens <= max_tokens {
+                return Truncation {
+                    bytes: text.len(),
+                    total_tokens,
+                    kept_tokens: total_tokens,
+                };
+            }
+            // Token bounds tile the input exactly, so the byte offset after
+            // `max_tokens` tokens is the same string `decode(ids[..max_tokens])`
+            // would produce — without building either the ids or the string.
+            let mut bytes = 0usize;
+            for &id in &ids[..max_tokens] {
+                bytes += self.v.token_len(id) as usize;
+            }
+            // A token can end mid-character: byte-level BPE splits rare
+            // characters across tokens, so `🚀` (F0 9F 9A 80) can arrive as
+            // ` \xf0\x9f` + `\x9a` + `\x80`. Cutting there is what leaves the
+            // familiar U+FFFD at the tail of `decode(encode(x)[:n])`. Back off to
+            // the character boundary instead — and only that far, since the
+            // straddling token can carry text before the partial character (that
+            // ` ` in the example) which is worth keeping.
+            while bytes > 0 && (text[bytes] & 0xC0) == 0x80 {
+                bytes -= 1;
+            }
+            // tokens wholly inside the kept bytes, for reporting
+            let (mut off, mut kept_tokens) = (0usize, 0usize);
+            for &id in &ids[..max_tokens] {
+                let end = off + self.v.token_len(id) as usize;
+                if end > bytes {
+                    break;
+                }
+                off = end;
+                kept_tokens += 1;
+            }
+            Truncation {
+                bytes,
+                total_tokens,
+                kept_tokens,
+            }
+        })
     }
 
     /// Ordinary ids + the exclusive byte bound of each token (tiles the input).
@@ -726,6 +791,50 @@ impl Tokenizer {
                         let c = count1(texts[i], &mut buf);
                         unsafe { *slots.0.add(i) = c };
                     }
+                });
+            }
+        });
+        out
+    }
+
+    /// `truncate` over many texts, in parallel.
+    pub fn truncate_batch(
+        &self,
+        texts: &[&[u8]],
+        max_tokens: usize,
+        threads: usize,
+    ) -> Vec<Truncation> {
+        use std::sync::atomic::{AtomicUsize, Ordering};
+        let empty = Truncation {
+            bytes: 0,
+            total_tokens: 0,
+            kept_tokens: 0,
+        };
+        let mut out = vec![empty; texts.len()];
+        if texts.is_empty() {
+            return out;
+        }
+        let n = self.threads_for(threads, texts.len());
+        if n <= 1 {
+            for (i, t) in texts.iter().enumerate() {
+                out[i] = self.truncate(t, max_tokens);
+            }
+            return out;
+        }
+        struct Slots(*mut Truncation);
+        unsafe impl Sync for Slots {}
+        let slots = Slots(out.as_mut_ptr());
+        let next = AtomicUsize::new(0);
+        std::thread::scope(|scope| {
+            let (slots, next) = (&slots, &next);
+            for _ in 0..n {
+                scope.spawn(move || loop {
+                    let i = next.fetch_add(1, Ordering::Relaxed);
+                    if i >= texts.len() {
+                        break;
+                    }
+                    let t = self.truncate(texts[i], max_tokens);
+                    unsafe { *slots.0.add(i) = t };
                 });
             }
         });

@@ -144,6 +144,82 @@ fn memory_accounting_is_consistent() {
 }
 
 #[test]
+fn truncate_matches_encode_slice_decode() {
+    let tok = load("cl100k_base");
+    let cases: Vec<&[u8]> = vec![
+        b"hello world",
+        b"",
+        "The quick brown fox jumps over the lazy dog, repeatedly and at length.".as_bytes(),
+        "日本語のテキストです。これはテストです。".as_bytes(),
+        "mixed ASCII and 日本語 and emoji 🚀🎉 and more text".as_bytes(),
+        "\u{1F600}\u{1F601}\u{1F602}\u{1F603}".as_bytes(),
+    ];
+    for text in cases {
+        let all = tok.encode(text);
+        for max in 0..=all.len() + 2 {
+            let t = tok.truncate(text, max);
+            assert_eq!(t.total_tokens, all.len(), "total for max={max}");
+
+            // the kept prefix is exactly what encode/slice/decode would give,
+            // except we never cut a character in half
+            let reference = tok.decode(&all[..all.len().min(max)]);
+            let got = &text[..t.bytes];
+            if max >= all.len() {
+                assert_eq!(got, &reference[..], "no truncation expected at max={max}");
+            } else {
+                assert!(
+                    reference.starts_with(got),
+                    "truncated prefix diverges at max={max}"
+                );
+                // the only difference is the partial character we declined to
+                // emit — at most 3 bytes, never any complete character
+                assert!(
+                    reference.len() - got.len() < 4,
+                    "dropped {} bytes at max={max}, expected at most a partial character",
+                    reference.len() - got.len()
+                );
+            }
+            assert!(
+                std::str::from_utf8(got).is_ok(),
+                "truncation left invalid UTF-8 at max={max}"
+            );
+            // kept_tokens counts whole tokens of the ORIGINAL encoding inside the
+            // kept bytes. Re-encoding the prefix can differ — a shortened tail
+            // tokenizes on its own terms — which is equally true of the
+            // decode(encode(x)[:n]) pattern this replaces.
+            assert!(t.kept_tokens <= max.min(all.len()));
+            let kept_bytes: usize = all[..t.kept_tokens]
+                .iter()
+                .map(|&id| tok.token_bytes(id).unwrap().len())
+                .sum();
+            assert!(
+                kept_bytes <= t.bytes,
+                "kept_tokens overruns the cut at max={max}"
+            );
+        }
+    }
+}
+
+#[test]
+fn truncate_cuts_on_a_character_boundary() {
+    let tok = load("cl100k_base");
+    // a character whose bytes span more than one token: cutting between them
+    // must not produce invalid UTF-8
+    let text = "🚀🚀🚀🚀".as_bytes();
+    let all = tok.encode(text);
+    assert!(all.len() > 4, "expected the emoji to span several tokens");
+    for max in 1..all.len() {
+        let t = tok.truncate(text, max);
+        let kept = &text[..t.bytes];
+        assert!(
+            std::str::from_utf8(kept).is_ok(),
+            "invalid UTF-8 at max={max}"
+        );
+        assert_eq!(t.bytes % 4, 0, "cut inside a 4-byte character at max={max}");
+    }
+}
+
+#[test]
 fn unknown_encoding_errors() {
     assert!(toktok::Tokenizer::builtin("nope").is_err());
     // the directory loader agrees, and still works for supplying your own data
