@@ -12,6 +12,24 @@ use std::io::Read;
 /// per step. Stops at the first non-ASCII-letter byte (incl. any byte >= 0x80,
 /// which the caller handles via `u8dec`). Every ISA path computes the IDENTICAL
 /// predicate as the scalar tail — `(b|0x20).wrapping_sub(b'a') <= 25`.
+/// NEON's answer to `movemask`: pack a comparison result (each lane 0x00 or
+/// 0xFF) into a `u64` holding one nibble per input byte, so the first matching
+/// lane is `trailing_zeros() >> 2`.
+///
+/// aarch64 has no `movemask`, and the obvious substitute — store the vector and
+/// scan it — is the wrong shape here: words in natural text average ~5 bytes, so
+/// the 16-byte loop almost always stops on its first iteration and this is the
+/// common path, not the rare one.
+#[cfg(target_arch = "aarch64")]
+#[inline(always)]
+unsafe fn neon_mask(v: std::arch::aarch64::uint8x16_t) -> u64 {
+    use std::arch::aarch64::*;
+    // Narrow 8 u16 lanes to 8 nibble-pairs: 4 bits survive per input byte.
+    vget_lane_u64::<0>(vreinterpret_u64_u8(vshrn_n_u16::<4>(vreinterpretq_u16_u8(
+        v,
+    ))))
+}
+
 #[inline(always)]
 pub fn ascii_letter_run(t: &[u8], q: usize, len: usize) -> usize {
     let mut q = q;
@@ -42,14 +60,9 @@ pub fn ascii_letter_run(t: &[u8], q: usize, len: usize) -> usize {
             let lo = vorrq_u8(v, vdupq_n_u8(0x20)); // ASCII-lowercase fold
                                                     // (lo-'a') > 25 -> not a-z (also flags >= 0x80)
             let notlet = vcgtq_u8(vsubq_u8(lo, vdupq_n_u8(b'a')), vdupq_n_u8(25));
-            if vmaxvq_u8(notlet) != 0 {
-                let mut m = [0u8; 16];
-                vst1q_u8(m.as_mut_ptr(), notlet);
-                for (j, &x) in m.iter().enumerate() {
-                    if x != 0 {
-                        return q + j;
-                    }
-                }
+            let m = neon_mask(notlet);
+            if m != 0 {
+                return q + (m.trailing_zeros() >> 2) as usize;
             }
             q += 16;
         }
@@ -91,6 +104,23 @@ fn ascii_case_run(t: &[u8], q: usize, len: usize, base: u8) -> usize {
             q += 16;
         }
     }
+    #[cfg(target_arch = "aarch64")]
+    unsafe {
+        use std::arch::aarch64::*;
+        let vb = vdupq_n_u8(base);
+        let v25 = vdupq_n_u8(25);
+        while q + 16 <= len {
+            let v = vld1q_u8(t.as_ptr().add(q));
+            // wrapping sub, so bytes below `base` (and every byte >= 0x80) land
+            // above 25 and stop the run — the same predicate as the scalar tail.
+            let nc = vcgtq_u8(vsubq_u8(v, vb), v25);
+            let m = neon_mask(nc);
+            if m != 0 {
+                return q + (m.trailing_zeros() >> 2) as usize;
+            }
+            q += 16;
+        }
+    }
     while q < len && unsafe { *t.get_unchecked(q) }.wrapping_sub(base) <= 25 {
         q += 1;
     }
@@ -110,7 +140,23 @@ pub fn ascii_lower_run(t: &[u8], q: usize, len: usize) -> usize {
 /// `lastnl` to the last \r/\n position seen. Matches uniclass \s for ASCII exactly.
 #[inline(always)]
 pub fn ascii_ws_run(t: &[u8], q: usize, len: usize, lastnl: &mut usize) -> usize {
+    // A single space is by far the most common run; take one byte scalar-ly
+    // before building vectors.
     let mut q = q;
+    {
+        let b = if q < len {
+            unsafe { *t.get_unchecked(q) }
+        } else {
+            return q;
+        };
+        if !(b == 0x20 || b.wrapping_sub(9) <= 4) {
+            return q;
+        }
+        if b == 0x0A || b == 0x0D {
+            *lastnl = q;
+        }
+        q += 1;
+    }
     #[cfg(target_arch = "x86_64")]
     unsafe {
         use std::arch::x86_64::*;
@@ -142,6 +188,35 @@ pub fn ascii_ws_run(t: &[u8], q: usize, len: usize, lastnl: &mut usize) -> usize
             q += 16;
         }
     }
+    #[cfg(target_arch = "aarch64")]
+    unsafe {
+        use std::arch::aarch64::*;
+        while q + 16 <= len {
+            let v = vld1q_u8(t.as_ptr().add(q));
+            let isws = vorrq_u8(
+                vceqq_u8(v, vdupq_n_u8(0x20)),
+                vcleq_u8(vsubq_u8(v, vdupq_n_u8(9)), vdupq_n_u8(4)), // 9..=13
+            );
+            let mstop = neon_mask(vmvnq_u8(isws));
+            let mnl = neon_mask(vorrq_u8(
+                vceqq_u8(v, vdupq_n_u8(0x0A)),
+                vceqq_u8(v, vdupq_n_u8(0x0D)),
+            ));
+            if mstop != 0 {
+                // One nibble per byte, so byte j lives in bits 4j..4j+3.
+                let stop = (mstop.trailing_zeros() >> 2) as usize;
+                let before = mnl & ((1u64 << (stop * 4)) - 1);
+                if before != 0 {
+                    *lastnl = q + ((63 - before.leading_zeros()) >> 2) as usize;
+                }
+                return q + stop;
+            }
+            if mnl != 0 {
+                *lastnl = q + ((63 - mnl.leading_zeros()) >> 2) as usize;
+            }
+            q += 16;
+        }
+    }
     while q < len {
         let b = unsafe { *t.get_unchecked(q) };
         if b == 0x20 || b.wrapping_sub(9) <= 4 {
@@ -159,7 +234,25 @@ pub fn ascii_ws_run(t: &[u8], q: usize, len: usize, lastnl: &mut usize) -> usize
 /// Advance over a run of ASCII bytes that are NOT \s, \p{L}, or \p{N} (alt4's class).
 #[inline(always)]
 pub fn ascii_punct_run(t: &[u8], q: usize, len: usize) -> usize {
+    // Punctuation almost always comes one or two bytes at a time, so walk those
+    // scalar-ly before paying to build four comparison vectors. Same shape as
+    // `ascii_case_run`'s pre-check, and for the same reason.
     let mut q = q;
+    let mut steps = 0;
+    while q < len && steps < 2 {
+        let b = unsafe { *t.get_unchecked(q) };
+        let lo = b | 0x20;
+        if b >= 0x80
+            || b == 0x20
+            || b.wrapping_sub(9) <= 4
+            || lo.wrapping_sub(b'a') <= 25
+            || b.wrapping_sub(b'0') <= 9
+        {
+            return q;
+        }
+        q += 1;
+        steps += 1;
+    }
     #[cfg(target_arch = "x86_64")]
     unsafe {
         use std::arch::x86_64::*;
@@ -190,6 +283,29 @@ pub fn ascii_punct_run(t: &[u8], q: usize, len: usize) -> usize {
                     & 0xFFFF;
             if mstop != 0 {
                 return q + mstop.trailing_zeros() as usize;
+            }
+            q += 16;
+        }
+    }
+    #[cfg(target_arch = "aarch64")]
+    unsafe {
+        use std::arch::aarch64::*;
+        while q + 16 <= len {
+            let v = vld1q_u8(t.as_ptr().add(q));
+            let ws = vorrq_u8(
+                vceqq_u8(v, vdupq_n_u8(0x20)),
+                vcleq_u8(vsubq_u8(v, vdupq_n_u8(9)), vdupq_n_u8(4)),
+            );
+            let lett = vcleq_u8(
+                vsubq_u8(vorrq_u8(v, vdupq_n_u8(0x20)), vdupq_n_u8(b'a')),
+                vdupq_n_u8(25),
+            );
+            let dig = vcleq_u8(vsubq_u8(v, vdupq_n_u8(b'0')), vdupq_n_u8(9));
+            let hi = vcgeq_u8(v, vdupq_n_u8(0x80));
+            let stopv = vorrq_u8(vorrq_u8(ws, lett), vorrq_u8(dig, hi));
+            let m = neon_mask(stopv);
+            if m != 0 {
+                return q + (m.trailing_zeros() >> 2) as usize;
             }
             q += 16;
         }

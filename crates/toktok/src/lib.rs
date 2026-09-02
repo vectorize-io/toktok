@@ -39,6 +39,7 @@
 
 mod builtin;
 pub mod mb;
+mod pcache;
 pub mod pretok;
 pub mod pretok_o200k;
 mod scratch;

@@ -226,3 +226,58 @@ fn unknown_encoding_errors() {
     assert!(toktok::Tokenizer::load_dir(root().join("crates/toktok/data"), "nope").is_err());
     assert!(toktok::Tokenizer::load_dir(root().join("crates/toktok/data"), "cl100k_base").is_ok());
 }
+
+/// The pretoken cache memoizes pieces of <= 15 bytes that encode to <= 4 tokens,
+/// and every other piece has to keep taking the ordinary encoder path. This
+/// walks a text over all of those boundaries at once — repeated pieces (so the
+/// second occurrence is served from the cache), lengths straddling the 15-byte
+/// key limit, and pieces long enough to exceed the four inline id slots — and
+/// checks that a warm cache answers exactly like a cold one.
+#[test]
+fn pretoken_cache_matches_a_cold_encode() {
+    for encoding in ["cl100k_base", "o200k_base"] {
+        let tok = load(encoding);
+        let mut pieces: Vec<String> = Vec::new();
+        for n in 1..=40usize {
+            pieces.push("a".repeat(n));
+            pieces.push(format!(" {}", "z".repeat(n)));
+            pieces.push("1".repeat(n));
+            pieces.push("!".repeat(n));
+            pieces.push(" ".repeat(n));
+            pieces.push("é".repeat(n)); // multi-byte: 2 bytes per char
+            pieces.push("🧠".repeat(n)); // 4 bytes per char, crosses 15 fast
+        }
+        // Each piece encoded alone, cold-ish, is the reference.
+        let want: Vec<Vec<u32>> = pieces.iter().map(|s| tok.encode(s.as_bytes())).collect();
+        // Now encode them repeatedly and interleaved, which guarantees the cache
+        // is hot for the second pass and that evictions have churned the table.
+        for _ in 0..3 {
+            for (i, s) in pieces.iter().enumerate() {
+                assert_eq!(
+                    tok.encode(s.as_bytes()),
+                    want[i],
+                    "{encoding}: warm cache differs for {s:?}"
+                );
+            }
+        }
+        // And concatenated, so pretoken boundaries land at every offset.
+        let joined = pieces.join(" ");
+        let ids = tok.encode(joined.as_bytes());
+        assert_eq!(tok.decode(&ids), joined.as_bytes(), "{encoding} roundtrip");
+    }
+}
+
+/// Two encodings alive at once must not serve each other's ids: the caches are
+/// keyed by tokenizer, and cl100k and o200k give different ids to the same text.
+#[test]
+fn caches_do_not_leak_between_encodings() {
+    let a = load("cl100k_base");
+    let b = load("o200k_base");
+    let text = b"the quick brown fox jumps over the lazy dog";
+    let (want_a, want_b) = (a.encode(text), b.encode(text));
+    assert_ne!(want_a, want_b, "fixture must actually differ per encoding");
+    for _ in 0..64 {
+        assert_eq!(a.encode(text), want_a);
+        assert_eq!(b.encode(text), want_b);
+    }
+}

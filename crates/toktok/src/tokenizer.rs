@@ -4,6 +4,7 @@
 //! Port of quicktok's `src/quicktok.cpp`.
 
 use crate::mb::encode_mb;
+use crate::pcache::PretokenCache;
 use crate::pretok::{self, UClass};
 use crate::pretok_o200k::{self as pk8, UClassO};
 use crate::vocab::{Vocab, VocabError, RANK_MAX};
@@ -32,8 +33,20 @@ pub enum Scanner {
     O200k,
 }
 
+/// Monotonic source for [`Tokenizer::id`].
+fn next_tokenizer_id() -> u64 {
+    use std::sync::atomic::{AtomicU64, Ordering};
+    static NEXT: AtomicU64 = AtomicU64::new(1);
+    NEXT.fetch_add(1, Ordering::Relaxed)
+}
+
 pub struct Tokenizer {
     pub(crate) v: Vocab,
+    /// Identifies this tokenizer to the per-thread pretoken caches. Ids packed
+    /// by one vocab are meaningless to another, so each instance gets its own
+    /// counter value rather than reusing an address that a later instance could
+    /// inherit.
+    id: u64,
     name: String,
     scanner: Scanner,
     u: UClass,                    // cl100k-pattern classes (L/N/S)
@@ -115,6 +128,7 @@ impl Tokenizer {
         };
         Ok(Tokenizer {
             v: Vocab::from_bytes(vocab, encoding)?,
+            id: next_tokenizer_id(),
             name: encoding.to_string(),
             scanner,
             u,
@@ -147,6 +161,7 @@ impl Tokenizer {
         };
         Ok(Tokenizer {
             v,
+            id: next_tokenizer_id(),
             name: encoding.to_string(),
             scanner,
             u,
@@ -228,10 +243,25 @@ impl Tokenizer {
     }
 
     pub fn encode_into(&self, text: &[u8], out: &mut Vec<u32>) {
-        match self.scanner {
-            Scanner::Cl100k => self.encode_core_cl100k(text, out),
-            Scanner::O200k => self.encode_core_o200k(text, out),
-        }
+        self.encode_into_workers(text, out, 1)
+    }
+
+    /// `encode_into` for a caller that is running `workers` of these
+    /// concurrently. The count only sizes a newly created pretoken cache — see
+    /// [`crate::pcache`] — so that a batch's workers divide the process budget
+    /// instead of the first one claiming all of it.
+    pub(crate) fn encode_into_workers(&self, text: &[u8], out: &mut Vec<u32>, workers: usize) {
+        // Reserve the whole plausible output up front. Besides saving the
+        // regrowth, it keeps the cache's four-lane store on its fast path: that
+        // store writes 16 bytes and advances the length by 1-4, so it needs
+        // slack above the length and falls back to a copy without it.
+        out.reserve(text.len() / 3 + 8);
+        // The pretoken cache is borrowed once here and threaded down, so the
+        // hot loop pays no thread-local lookup per pretoken.
+        crate::pcache::with_cache(self.id, workers, |pc| match self.scanner {
+            Scanner::Cl100k => self.encode_core_cl100k(text, out, pc),
+            Scanner::O200k => self.encode_core_o200k(text, out, pc),
+        })
     }
 
     pub fn count(&self, text: &[u8]) -> usize {
@@ -369,17 +399,16 @@ impl Tokenizer {
     // for one piece, so output is byte-exact by construction.
 
     #[inline(always)]
-    fn emit(&self, t: &[u8], off: usize, plen: usize, out: &mut Vec<u32>) {
+    fn emit(&self, t: &[u8], off: usize, plen: usize, out: &mut Vec<u32>, pc: &mut PretokenCache) {
         let piece = unsafe { t.get_unchecked(off..off + plen) };
-        let first = self.v.next_match(piece);
-        self.v.encode_with_first(piece, first, out);
+        pc.emit(&self.v, piece, out);
     }
 
     /// pieces starting with a *valid* 3-byte UTF-8 char take the multibyte-optimized
     /// encoder. An ill-formed 3-byte-lead sequence must fall through to the
     /// byte-accurate path — otherwise encode would be lossy on invalid UTF-8.
     #[inline(always)]
-    fn merge_piece(&self, piece: &[u8], out: &mut Vec<u32>) {
+    fn merge_piece(&self, piece: &[u8], out: &mut Vec<u32>, pc: &mut PretokenCache) {
         if piece.len() >= 3
             && piece[0] >= 0xE0
             && piece[0] < 0xF0
@@ -388,11 +417,11 @@ impl Tokenizer {
         {
             encode_mb(&self.v, piece, out);
         } else {
-            self.v.encode(piece, out);
+            pc.emit(&self.v, piece, out);
         }
     }
 
-    fn encode_core_cl100k(&self, t: &[u8], out: &mut Vec<u32>) {
+    fn encode_core_cl100k(&self, t: &[u8], out: &mut Vec<u32>, pc: &mut PretokenCache) {
         let l = t.len();
         let mut p = 0usize;
         while p < l {
@@ -405,7 +434,7 @@ impl Tokenizer {
                         // '(?i:[sdmt]|ll|ve|re)
                         let c1 = at(t, p + 1) | 0x20;
                         if c1 == b's' || c1 == b'd' || c1 == b'm' || c1 == b't' {
-                            self.emit(t, p, 2, out);
+                            self.emit(t, p, 2, out, pc);
                             adv = 2;
                             break 'blk;
                         }
@@ -415,7 +444,7 @@ impl Tokenizer {
                                 || (c1 == b'v' && c2 == b'e')
                                 || (c1 == b'r' && c2 == b'e')
                             {
-                                self.emit(t, p, 3, out);
+                                self.emit(t, p, 3, out, pc);
                                 adv = 3;
                                 break 'blk;
                             }
@@ -440,7 +469,7 @@ impl Tokenizer {
                             fb = true;
                             break 'blk;
                         }
-                        self.emit(t, p, we - p, out);
+                        self.emit(t, p, we - p, out, pc);
                         adv = we - p;
                         break 'blk;
                     }
@@ -455,17 +484,14 @@ impl Tokenizer {
                             fb = true;
                             break 'blk;
                         }
-                        self.emit(t, p, q - p, out);
+                        self.emit(t, p, q - p, out, pc);
                         adv = q - p;
                         break 'blk;
                     }
                     {
                         //  ?punct+[\r\n]*
-                        let mut q = p + if b0 == b' ' { 1 } else { 0 };
-                        let s4 = q;
-                        while q < l && a_pun(at(t, q)) {
-                            q += 1;
-                        }
+                        let s4 = p + if b0 == b' ' { 1 } else { 0 };
+                        let mut q = pretok::ascii_punct_run(t, s4, l);
                         if q > s4 {
                             if q < l && at(t, q) >= 0x80 {
                                 fb = true;
@@ -474,21 +500,15 @@ impl Tokenizer {
                             while q < l && (at(t, q) == b'\r' || at(t, q) == b'\n') {
                                 q += 1;
                             }
-                            self.emit(t, p, q - p, out);
+                            self.emit(t, p, q - p, out, pc);
                             adv = q - p;
                             break 'blk;
                         }
                     }
                     if a_ws(b0) {
                         // \s++$ | \s*[\r\n] | \s+(?!\S) | \s
-                        let mut e2 = p;
                         let mut lastnl = usize::MAX;
-                        while e2 < l && a_ws(at(t, e2)) {
-                            if at(t, e2) == b'\r' || at(t, e2) == b'\n' {
-                                lastnl = e2;
-                            }
-                            e2 += 1;
-                        }
+                        let e2 = pretok::ascii_ws_run(t, p, l, &mut lastnl);
                         if e2 < l && at(t, e2) >= 0x80 {
                             fb = true;
                             break 'blk;
@@ -502,7 +522,7 @@ impl Tokenizer {
                         } else {
                             1
                         };
-                        self.emit(t, p, plen, out);
+                        self.emit(t, p, plen, out, pc);
                         adv = plen;
                         break 'blk;
                     }
@@ -514,7 +534,7 @@ impl Tokenizer {
                 if len == 0 {
                     len = 1;
                 }
-                self.merge_piece(&t[p..p + len], out);
+                self.merge_piece(&t[p..p + len], out, pc);
                 p += len;
             } else {
                 p += adv;
@@ -522,7 +542,7 @@ impl Tokenizer {
         }
     }
 
-    fn encode_core_o200k(&self, t: &[u8], out: &mut Vec<u32>) {
+    fn encode_core_o200k(&self, t: &[u8], out: &mut Vec<u32>, pc: &mut PretokenCache) {
         let l = t.len();
         let u = &self.uo;
         let mut p = 0usize;
@@ -608,7 +628,7 @@ impl Tokenizer {
                     }
                     if e != 0 {
                         let e = pk8::o_contraction(t, e, l);
-                        self.emit(t, p, e - p, out);
+                        self.emit(t, p, e - p, out, pc);
                         adv = e - p;
                         break 'blk;
                     }
@@ -623,17 +643,14 @@ impl Tokenizer {
                             fb = true;
                             break 'blk;
                         }
-                        self.emit(t, p, q - p, out);
+                        self.emit(t, p, q - p, out, pc);
                         adv = q - p;
                         break 'blk;
                     }
                     {
                         //  ?punct+[\r\n/]*
-                        let mut q = p + if b0 == b' ' { 1 } else { 0 };
-                        let s4 = q;
-                        while q < l && a_pun(at(t, q)) {
-                            q += 1;
-                        }
+                        let s4 = p + if b0 == b' ' { 1 } else { 0 };
+                        let mut q = pretok::ascii_punct_run(t, s4, l);
                         if q > s4 {
                             if q < l && at(t, q) >= 0x80 {
                                 fb = true;
@@ -644,21 +661,15 @@ impl Tokenizer {
                             {
                                 q += 1;
                             }
-                            self.emit(t, p, q - p, out);
+                            self.emit(t, p, q - p, out, pc);
                             adv = q - p;
                             break 'blk;
                         }
                     }
                     if a_ws(b0) {
                         // \s*[\r\n]+ | \s+(?!\S) | \s+
-                        let mut e2 = p;
                         let mut lastnl = usize::MAX;
-                        while e2 < l && a_ws(at(t, e2)) {
-                            if at(t, e2) == b'\r' || at(t, e2) == b'\n' {
-                                lastnl = e2;
-                            }
-                            e2 += 1;
-                        }
+                        let e2 = pretok::ascii_ws_run(t, p, l, &mut lastnl);
                         if e2 < l && at(t, e2) >= 0x80 {
                             fb = true;
                             break 'blk;
@@ -672,7 +683,7 @@ impl Tokenizer {
                         } else {
                             1
                         };
-                        self.emit(t, p, plen, out);
+                        self.emit(t, p, plen, out, pc);
                         adv = plen;
                         break 'blk;
                     }
@@ -684,7 +695,7 @@ impl Tokenizer {
                 if len == 0 {
                     len = 1;
                 }
-                self.merge_piece(&t[p..p + len], out);
+                self.merge_piece(&t[p..p + len], out, pc);
                 p += len;
             } else {
                 p += adv;
@@ -722,10 +733,6 @@ fn a_dig(b: u8) -> bool {
 fn a_ws(b: u8) -> bool {
     b.wrapping_sub(9) <= 4 || b == b' '
 }
-#[inline(always)]
-fn a_pun(b: u8) -> bool {
-    b < 0x80 && !a_ws(b) && !a_let(b) && !a_dig(b)
-}
 
 #[inline]
 fn find_from(hay: &[u8], needle: &[u8], from: usize) -> Option<usize> {
@@ -754,7 +761,7 @@ impl Tokenizer {
         if texts.is_empty() {
             return out;
         }
-        let count1 = |s: &[u8], buf: &mut Vec<u32>| -> u32 {
+        let count1 = |s: &[u8], buf: &mut Vec<u32>, workers: usize| -> u32 {
             buf.clear();
             if with_special {
                 // encode_allowed builds its own vector; counting still beats
@@ -763,14 +770,14 @@ impl Tokenizer {
                     return self.encode_with_special(st).len() as u32;
                 }
             }
-            self.encode_into(s, buf);
+            self.encode_into_workers(s, buf, workers);
             buf.len() as u32
         };
         let n = self.threads_for(threads, texts.len());
         if n <= 1 {
             let mut buf = Vec::with_capacity(4096);
             for (i, t) in texts.iter().enumerate() {
-                out[i] = count1(t, &mut buf);
+                out[i] = count1(t, &mut buf, 1);
             }
             return out;
         }
@@ -788,7 +795,7 @@ impl Tokenizer {
                         if i >= texts.len() {
                             break;
                         }
-                        let c = count1(texts[i], &mut buf);
+                        let c = count1(texts[i], &mut buf, n);
                         unsafe { *slots.0.add(i) = c };
                     }
                 });
@@ -864,7 +871,7 @@ impl Tokenizer {
         if texts.is_empty() {
             return out;
         }
-        let enc1 = |s: &[u8]| -> Vec<u32> {
+        let enc1 = |s: &[u8], workers: usize| -> Vec<u32> {
             if with_special {
                 // specials are matched on bytes; invalid UTF-8 can't contain one
                 match std::str::from_utf8(s) {
@@ -872,13 +879,15 @@ impl Tokenizer {
                     Err(_) => self.encode(s),
                 }
             } else {
-                self.encode(s)
+                let mut o = Vec::new();
+                self.encode_into_workers(s, &mut o, workers);
+                o
             }
         };
         let n = self.threads_for(threads, texts.len());
         if n <= 1 {
             for (i, t) in texts.iter().enumerate() {
-                out[i] = enc1(t);
+                out[i] = enc1(t, 1);
             }
             return out;
         }
@@ -897,7 +906,7 @@ impl Tokenizer {
                     if i >= texts.len() {
                         break;
                     }
-                    let ids = enc1(texts[i]);
+                    let ids = enc1(texts[i], n);
                     unsafe { *slots.0.add(i) = ids };
                 });
             }
