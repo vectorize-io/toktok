@@ -75,6 +75,18 @@ organisation and nobody's personal token is needed again.
    | Workflow filename | `release.yml` |
    | Environment | `crates-io` |
 
+   > The **Environment** must be byte-identical to the GitHub environment name
+   > in `release.yml` — `crates-io`, with a hyphen. crates.io checks it against
+   > the `environment` claim in the OIDC token, so entering `crates.io` (the
+   > registry's own name, an easy slip) fails the publish with:
+   >
+   > ```
+   > The Trusted Publishing config for repository `vectorize-io/toktok` does not
+   > match the environment `crates-io` in the JWT. Expected environments: `crates.io`
+   > ```
+   >
+   > Fix it in either place, as long as both say the same thing.
+
    From then on `rust-lang/crates-io-auth-action` in the release workflow mints a
    short-lived token scoped to this repository. **This is the answer to "my token
    is bound to my personal account"** — after step 3 the token is irrelevant, the
