@@ -16,6 +16,7 @@ encoder is checked against toktok before anything is measured.
     python bench/profile.py --enc o200k_base --corpus code
     python bench/profile.py --threads 8                      # add the parallel-batch row
 """
+
 import argparse
 import gc
 import glob
@@ -46,14 +47,16 @@ LATENCY_DOCS = 4000
 # worker: runs inside a fresh interpreter, one encoder only
 # --------------------------------------------------------------------------
 
+
 def rss_bytes():
     """Current resident set size, in bytes."""
     # ru_maxrss is a high-water mark: for the *current* RSS read the OS directly.
     if sys.platform == "linux":
         with open("/proc/self/statm") as f:
             return int(f.read().split()[1]) * os.sysconf("SC_PAGESIZE")
-    out = subprocess.run(["ps", "-o", "rss=", "-p", str(os.getpid())],
-                         capture_output=True, text=True).stdout.strip()
+    out = subprocess.run(
+        ["ps", "-o", "rss=", "-p", str(os.getpid())], capture_output=True, text=True
+    ).stdout.strip()
     return int(out) * 1024
 
 
@@ -77,24 +80,31 @@ def load_encoder(which, enc_name):
         e = toktok.get_encoding(enc_name)
         # the numpy path returns one uint32 buffer instead of a list[int] — same
         # ids, ~8x less memory for the result
-        enc_fn = (e.encode_ordinary if which == "toktok"
-                  else (lambda s: toktok.encode_to_numpy(e, s)))
-        return (enc_fn,
-                lambda docs, n: e.encode_batch(docs, n, False),
-                lambda docs, n: e.count_batch(docs, n, False))
+        enc_fn = (
+            e.encode_ordinary if which == "toktok" else (lambda s: toktok.encode_to_numpy(e, s))
+        )
+        return (
+            enc_fn,
+            lambda docs, n: e.encode_batch(docs, n, False),
+            lambda docs, n: e.count_batch(docs, n, False),
+        )
     if which == "quicktok":
         import quicktok
 
         e = quicktok.get_encoding(enc_name)
-        batch = (lambda docs, n: e.encode_batch(docs, n, False)) if hasattr(e, "encode_batch") else None
+        batch = (
+            (lambda docs, n: e.encode_batch(docs, n, False)) if hasattr(e, "encode_batch") else None
+        )
         return e.encode_ordinary, batch, None
     if which == "tiktoken":
         import tiktoken
 
         e = tiktoken.get_encoding(enc_name)
-        return (e.encode_ordinary,
-                lambda docs, n: e.encode_ordinary_batch(docs, num_threads=n),
-                None)
+        return (
+            e.encode_ordinary,
+            lambda docs, n: e.encode_ordinary_batch(docs, num_threads=n),
+            None,
+        )
     raise SystemExit(f"unknown encoder {which}")
 
 
@@ -108,12 +118,16 @@ def mem_worker(which, enc_name):
     load_encoder(which, enc_name)
     load_s = time.perf_counter() - t0
     gc.collect()
-    print(json.dumps({
-        "rss_load": rss_bytes() - base,
-        "peak_rss": peak_rss_bytes(),
-        "load_s": load_s,
-        "tables_exact": exact_table_bytes(which, enc_name),
-    }))
+    print(
+        json.dumps(
+            {
+                "rss_load": rss_bytes() - base,
+                "peak_rss": peak_rss_bytes(),
+                "load_s": load_s,
+                "tables_exact": exact_table_bytes(which, enc_name),
+            }
+        )
+    )
 
 
 def exact_table_bytes(which, enc_name):
@@ -192,39 +206,48 @@ def worker(which, enc_name, corpus_path, threads):
         rss0 = rss_bytes()
         c0, w0 = cpu_seconds(), time.perf_counter()
         counts = count_batch(docs, max(1, threads))
-        count = {"wall_s": time.perf_counter() - w0, "cpu_s": cpu_seconds() - c0,
-                 "rss_delta": rss_bytes() - rss0, "total": int(sum(counts))}
+        count = {
+            "wall_s": time.perf_counter() - w0,
+            "cpu_s": cpu_seconds() - c0,
+            "rss_delta": rss_bytes() - rss0,
+            "total": int(sum(counts)),
+        }
         del counts
 
-    print(json.dumps({
-        "encoder": which,
-        "load_s": load_s,
-        "tables_rss": tables_rss,
-        "peak_rss": peak_rss_bytes(),
-        "bytes": nbytes,
-        "wall_s": best_wall,
-        "cpu_s": best_cpu,
-        "n_tokens": len(ids),
-        "checksum": sum(int(i) for i in ids),
-        "doc_bytes": sum(len(d.encode("utf-8")) for d in docs),
-        "n_docs": len(docs),
-        "lat_ns": lat_ns,
-        "batch": batch,
-        "batch_rss": batch_rss,
-        "count": count,
-    }))
+    print(
+        json.dumps(
+            {
+                "encoder": which,
+                "load_s": load_s,
+                "tables_rss": tables_rss,
+                "peak_rss": peak_rss_bytes(),
+                "bytes": nbytes,
+                "wall_s": best_wall,
+                "cpu_s": best_cpu,
+                "n_tokens": len(ids),
+                "checksum": sum(int(i) for i in ids),
+                "doc_bytes": sum(len(d.encode("utf-8")) for d in docs),
+                "n_docs": len(docs),
+                "lat_ns": lat_ns,
+                "batch": batch,
+                "batch_rss": batch_rss,
+                "count": count,
+            }
+        )
+    )
 
 
 # --------------------------------------------------------------------------
 # parent: run every encoder in its own process, then tabulate
 # --------------------------------------------------------------------------
 
+
 def pct(sorted_vals, q):
     """Nearest-rank percentile (no interpolation — p99 of a latency sample
     should be an observed value, not an average of two)."""
     if not sorted_vals:
         return float("nan")
-    k = max(0, min(len(sorted_vals) - 1, int(round(q * len(sorted_vals) + 0.5)) - 1))
+    k = max(0, min(len(sorted_vals) - 1, round(q * len(sorted_vals) + 0.5) - 1))
     return sorted_vals[k]
 
 
@@ -234,9 +257,20 @@ def mb(n):
 
 def run_worker(which, enc_name, corpus_path, threads, mode="--worker"):
     r = subprocess.run(
-        [sys.executable, os.path.abspath(__file__), mode, which,
-         "--enc", enc_name, "--corpus-path", corpus_path, "--threads", str(threads)],
-        capture_output=True, text=True,
+        [
+            sys.executable,
+            os.path.abspath(__file__),
+            mode,
+            which,
+            "--enc",
+            enc_name,
+            "--corpus-path",
+            corpus_path,
+            "--threads",
+            str(threads),
+        ],
+        capture_output=True,
+        text=True,
     )
     if r.returncode != 0:
         return None, (r.stderr.strip().splitlines() or ["failed"])[-1]
@@ -244,8 +278,10 @@ def run_worker(which, enc_name, corpus_path, threads, mode="--worker"):
 
 
 def report(enc_name, corpus_path, threads, only):
-    print(f"\n=== {os.path.basename(corpus_path)} · {enc_name} "
-          f"· {mb(os.path.getsize(corpus_path)):.1f} MiB ===")
+    print(
+        f"\n=== {os.path.basename(corpus_path)} · {enc_name} "
+        f"· {mb(os.path.getsize(corpus_path)):.1f} MiB ==="
+    )
     results = []
     for which, label in ENCODERS.items():
         if only and which not in only:
@@ -257,8 +293,14 @@ def report(enc_name, corpus_path, threads, only):
         res["label"] = label
         # load cost measured in its own bare process (best of 3 — RSS accounting
         # on macOS wobbles by a few MB between runs)
-        mem = [m for m in (run_worker(which, enc_name, corpus_path, threads, "--memworker")[0]
-                           for _ in range(3)) if m]
+        mem = [
+            m
+            for m in (
+                run_worker(which, enc_name, corpus_path, threads, "--memworker")[0]
+                for _ in range(3)
+            )
+            if m
+        ]
         if mem:
             best = min(mem, key=lambda m: m["rss_load"])
             res["rss_load"] = best["rss_load"]
@@ -272,20 +314,26 @@ def report(enc_name, corpus_path, threads, only):
     ref = next((r for r in results if r["encoder"] == "toktok"), results[0])
     for r in results:
         if r["checksum"] != ref["checksum"] or r["n_tokens"] != ref["n_tokens"]:
-            print(f"  !! {r['label']} ids differ from {ref['label']} — results not comparable",
-                  file=sys.stderr)
+            print(
+                f"  !! {r['label']} ids differ from {ref['label']} — results not comparable",
+                file=sys.stderr,
+            )
     print(f"    {ref['n_tokens']} tokens, {len(results)} encoders agree byte-for-byte")
 
     w = max(len(r["label"]) for r in results)
 
     print("\n  memory")
-    print(f"    {'encoder':<{w}}  {'tables':>8}  {'RSS@load':>9}  {'load':>7}  "
-          f"{'RSS peak':>9}  {'ids held':>9}")
+    print(
+        f"    {'encoder':<{w}}  {'tables':>8}  {'RSS@load':>9}  {'load':>7}  "
+        f"{'RSS peak':>9}  {'ids held':>9}"
+    )
     for r in sorted(results, key=lambda r: r.get("rss_load", 0)):
         exact = f"{mb(r['tables_exact']):7.1f}M" if r.get("tables_exact") else "      —"
         held = f"{mb(r['batch_rss']):8.1f}M" if r.get("batch_rss") is not None else "      n/a"
-        print(f"    {r['label']:<{w}}  {exact}  {mb(r.get('rss_load', 0)):8.1f}M  "
-              f"{r['load_s'] * 1e3:6.0f}ms  {mb(r['load_peak_rss']):8.1f}M  {held}")
+        print(
+            f"    {r['label']:<{w}}  {exact}  {mb(r.get('rss_load', 0)):8.1f}M  "
+            f"{r['load_s'] * 1e3:6.0f}ms  {mb(r['load_peak_rss']):8.1f}M  {held}"
+        )
     print("      tables  = exact live table bytes (where the encoder reports them)")
     print("      RSS@load = RSS growth of a bare process that only loads the encoding —")
     print("                 also counts construction scratch the allocator kept")
@@ -295,8 +343,10 @@ def report(enc_name, corpus_path, threads, only):
     print(f"    {'encoder':<{w}}  {'MB/s':>7}  {'CPU-s/MB':>9}  {'cores':>6}")
     for r in sorted(results, key=lambda r: -r["bytes"] / r["wall_s"]):
         mbs = mb(r["bytes"]) / r["wall_s"]
-        print(f"    {r['label']:<{w}}  {mbs:7.1f}  {r['cpu_s'] / mb(r['bytes']):9.4f}  "
-              f"{r['cpu_s'] / r['wall_s']:6.2f}")
+        print(
+            f"    {r['label']:<{w}}  {mbs:7.1f}  {r['cpu_s'] / mb(r['bytes']):9.4f}  "
+            f"{r['cpu_s'] / r['wall_s']:6.2f}"
+        )
 
     med_doc = statistics.median(r["doc_bytes"] / r["n_docs"] for r in results)
     print(f"\n  per-document latency, µs ({ref['n_docs']} docs, mean {med_doc / 1024:.1f} KiB)")
@@ -317,18 +367,25 @@ def report(enc_name, corpus_path, threads, only):
             vs = ""
             if r.get("batch_rss"):
                 vs = f"{mb(r['batch_rss']):15.1f}M"
-            print(f"    {r['label']:<{w}}  {mb(r['doc_bytes']) / c['wall_s']:7.1f}  "
-                  f"{mb(c['rss_delta']):9.1f}M  {vs:>15}")
+            print(
+                f"    {r['label']:<{w}}  {mb(r['doc_bytes']) / c['wall_s']:7.1f}  "
+                f"{mb(c['rss_delta']):9.1f}M  {vs:>15}"
+            )
 
     if threads > 1 and any(r["batch"] for r in results):
         print(f"\n  batch encode, {threads} threads")
         print(f"    {'encoder':<{w}}  {'MB/s':>7}  {'CPU-s/MB':>9}  {'cores':>6}")
-        for r in sorted(results, key=lambda r: -(r["batch"]["bytes"] / r["batch"]["wall_s"]) if r["batch"] else 0):
+        for r in sorted(
+            results,
+            key=lambda r: -(r["batch"]["bytes"] / r["batch"]["wall_s"]) if r["batch"] else 0,
+        ):
             b = r["batch"]
             if not b:
                 continue
-            print(f"    {r['label']:<{w}}  {mb(b['bytes']) / b['wall_s']:7.1f}  "
-                  f"{b['cpu_s'] / mb(b['bytes']):9.4f}  {b['cpu_s'] / b['wall_s']:6.2f}")
+            print(
+                f"    {r['label']:<{w}}  {mb(b['bytes']) / b['wall_s']:7.1f}  "
+                f"{b['cpu_s'] / mb(b['bytes']):9.4f}  {b['cpu_s'] / b['wall_s']:6.2f}"
+            )
 
 
 def main():

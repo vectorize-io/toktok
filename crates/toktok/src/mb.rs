@@ -7,7 +7,9 @@
 //!    depths 3, 9, ...); the hasdeeper flag lets the walk stop after 1 probe
 //!  - ASCII bytes inside a mixed piece fall back to the e2-first order
 
-use crate::vocab::{mix36, Vocab, E2BEST_NONE, E2_CMP, E2_USED, OTAB_DEEPBIT, OTAB_TOKMASK, RANK_MAX};
+use crate::vocab::{
+    mix36, Vocab, E2BEST_NONE, E2_CMP, E2_USED, OTAB_DEEPBIT, OTAB_TOKMASK, RANK_MAX,
+};
 
 /// next_match with the multibyte-optimized walk.
 #[inline]
@@ -32,8 +34,7 @@ pub fn nm_mb(v: &Vocab, text: &[u8]) -> u32 {
         // masked), so it is valid ONLY for well-formed sequences; ill-formed bytes
         // take the byte-accurate r2 path so encode stays lossless.
         let b0 = *text.get_unchecked(0);
-        if b0 >= 0xE0
-            && b0 < 0xF0
+        if (0xE0..0xF0).contains(&b0)
             && len >= 3
             && (*text.get_unchecked(1) & 0xC0) == 0x80
             && (*text.get_unchecked(2) & 0xC0) == 0x80

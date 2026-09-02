@@ -8,6 +8,20 @@ cargo test --release          # exactness fixtures, offsets, batch, invalid UTF-
 uv build                      # wheel + sdist into dist/
 ```
 
+Lint and format — CI runs exactly these, so a clean run here is a clean run there:
+
+```sh
+uvx ruff format .             # Python formatting
+uvx ruff check --fix .        # Python lints
+cargo fmt                     # Rust formatting
+cargo clippy --release --all-targets -- -D warnings
+```
+
+Two deliberate ruff settings, both in `pyproject.toml`: Markdown is excluded
+from formatting (it collapses hand-aligned example code in the docs), and
+`RUF001-003` are off — "ambiguous unicode character" fires on the Greek, CJK and
+fullwidth text in the fixtures, which for a tokenizer is the data, not a typo.
+
 The Rust extension is compiled by [maturin](https://www.maturin.rs), declared as
 the PEP 517 build backend in `pyproject.toml` — uv drives it, so `uv sync`,
 `uv run` and `uv build` are the only commands you need. After changing the Rust
@@ -35,6 +49,10 @@ scripts/release.sh   version bump, tag and push
 - `tests/test_api.py` — the Python surface.
 - `tests/test_freethreading.py` — the GIL stays off on 3.14t, concurrent counts
   agree, and work actually runs in parallel (CPU time vs wall time).
+
+CI runs this same suite three ways: from a source build on every interpreter and
+platform, against the built wheel on each interpreter it claims to support, and
+against a source install from the sdist.
 
 Regenerate the exactness fixtures after touching the vocabularies:
 

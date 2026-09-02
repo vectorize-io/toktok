@@ -71,7 +71,9 @@ impl UClassO {
     /// Exact heap footprint of the class tables, in bytes.
     pub fn memory_bytes(&self) -> usize {
         (0..5)
-            .map(|c| std::mem::size_of_val(&self.lo[c][..]) + std::mem::size_of_val(&self.hi[c][..]))
+            .map(|c| {
+                std::mem::size_of_val(&self.lo[c][..]) + std::mem::size_of_val(&self.hi[c][..])
+            })
             .sum::<usize>()
             + self.bmp.len()
     }
@@ -227,8 +229,11 @@ pub fn o_contraction(t: &[u8], e: usize, len: usize) -> usize {
         return e + 2;
     }
     if e + 2 < len {
-        let c2 = lc(t[e + 2]);
-        if (c1 == b'r' && c2 == b'e') || (c1 == b'v' && c2 == b'e') || (c1 == b'l' && c2 == b'l') {
+        // 're | 've | 'll
+        if matches!(
+            (c1, lc(t[e + 2])),
+            (b'r', b'e') | (b'v', b'e') | (b'l', b'l')
+        ) {
             return e + 3;
         }
     }

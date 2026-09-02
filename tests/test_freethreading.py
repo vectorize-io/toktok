@@ -14,7 +14,6 @@ import sys
 import threading
 
 import pytest
-
 import toktok
 
 FREE_THREADED = not getattr(sys, "_is_gil_enabled", lambda: True)()
@@ -37,7 +36,7 @@ def test_concurrent_batch_count_agrees():
     def work():
         try:
             results.append(toktok.batch_count(DOCS, "cl100k_base", threads=4))
-        except Exception as e:  # noqa: BLE001 — surface it in the assertion
+        except Exception as e:
             errors.append(e)
 
     threads = [threading.Thread(target=work) for _ in range(8)]
@@ -52,8 +51,10 @@ def test_concurrent_batch_count_agrees():
 
 def test_concurrent_mixed_encodings():
     """Different encodings in parallel: separate tokenizers, shared cache."""
-    want = {e: toktok.batch_count(DOCS[:100], e, threads=1)
-            for e in ("cl100k_base", "o200k_base", "o200k_harmony")}
+    want = {
+        e: toktok.batch_count(DOCS[:100], e, threads=1)
+        for e in ("cl100k_base", "o200k_base", "o200k_harmony")
+    }
     out, errors = {}, []
     lock = threading.Lock()
 
@@ -62,11 +63,10 @@ def test_concurrent_mixed_encodings():
             got = toktok.batch_count(DOCS[:100], enc, threads=2)
             with lock:
                 out.setdefault(enc, []).append(got)
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:
             errors.append(e)
 
-    threads = [threading.Thread(target=work, args=(e,))
-               for e in want for _ in range(4)]
+    threads = [threading.Thread(target=work, args=(e,)) for e in want for _ in range(4)]
     for t in threads:
         t.start()
     for t in threads:

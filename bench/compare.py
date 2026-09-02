@@ -9,6 +9,7 @@ a mismatch is reported and that encoder is dropped from the run.
     python bench/compare.py --enc cl100k_base --corpus pile
     python bench/compare.py --threads 8           # batch/parallel scaling too
 """
+
 import argparse
 import glob
 import os
@@ -59,9 +60,15 @@ def verify(encs, text):
     for label, fn in encs[1:]:
         got = list(fn(text))
         if got != ref:
-            i = next((i for i, (a, b) in enumerate(zip(ref, got)) if a != b), min(len(ref), len(got)))
-            print(f"  !! {label} differs from {ref_label} at token {i} "
-                  f"({ref[i:i+3]} vs {got[i:i+3]}) — excluded", file=sys.stderr)
+            i = next(
+                (i for i, (a, b) in enumerate(zip(ref, got, strict=False)) if a != b),
+                min(len(ref), len(got)),
+            )
+            print(
+                f"  !! {label} differs from {ref_label} at token {i} "
+                f"({ref[i : i + 3]} vs {got[i : i + 3]}) — excluded",
+                file=sys.stderr,
+            )
             continue
         kept.append((label, fn))
     return kept, len(ref)
@@ -77,12 +84,13 @@ def bench_one(fn, text, repeats):
 
 
 def run(corpus_path, enc_name, repeats, threads):
-    with open(corpus_path, "r", encoding="utf-8", errors="ignore") as f:
+    with open(corpus_path, encoding="utf-8", errors="ignore") as f:
         text = f.read()
     mb = len(text.encode("utf-8")) / 1e6
     encs = encoders(enc_name)
-    print(f"\n=== {os.path.basename(corpus_path)} · {enc_name} · {mb:.1f} MB "
-          f"· best of {repeats} ===")
+    print(
+        f"\n=== {os.path.basename(corpus_path)} · {enc_name} · {mb:.1f} MB · best of {repeats} ==="
+    )
     encs, ntok = verify(encs, text)
     print(f"    {ntok} tokens, all {len(encs)} encoders byte-exact\n")
     rows = []

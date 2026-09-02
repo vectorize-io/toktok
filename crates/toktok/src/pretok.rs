@@ -40,7 +40,7 @@ pub fn ascii_letter_run(t: &[u8], q: usize, len: usize) -> usize {
         while q + 16 <= len {
             let v = vld1q_u8(t.as_ptr().add(q));
             let lo = vorrq_u8(v, vdupq_n_u8(0x20)); // ASCII-lowercase fold
-            // (lo-'a') > 25 -> not a-z (also flags >= 0x80)
+                                                    // (lo-'a') > 25 -> not a-z (also flags >= 0x80)
             let notlet = vcgtq_u8(vsubq_u8(lo, vdupq_n_u8(b'a')), vdupq_n_u8(25));
             if vmaxvq_u8(notlet) != 0 {
                 let mut m = [0u8; 16];
@@ -125,10 +125,8 @@ pub fn ascii_ws_run(t: &[u8], q: usize, len: usize, lastnl: &mut usize) -> usize
             let ctl = _mm_cmpeq_epi8(_mm_subs_epu8(_mm_sub_epi8(v, n9), four), z); // v in 9..13
             let isws = _mm_or_si128(_mm_cmpeq_epi8(v, sp), ctl);
             let mws = (_mm_movemask_epi8(isws) as u32) & 0xFFFF;
-            let mnl = (_mm_movemask_epi8(_mm_or_si128(
-                _mm_cmpeq_epi8(v, lf),
-                _mm_cmpeq_epi8(v, cr),
-            )) as u32)
+            let mnl = (_mm_movemask_epi8(_mm_or_si128(_mm_cmpeq_epi8(v, lf), _mm_cmpeq_epi8(v, cr)))
+                as u32)
                 & 0xFFFF;
             if mws != 0xFFFF {
                 let stop = ((!mws) & 0xFFFF).trailing_zeros();
@@ -186,11 +184,10 @@ pub fn ascii_punct_run(t: &[u8], q: usize, len: usize) -> usize {
             );
             let dig = _mm_cmpeq_epi8(_mm_subs_epu8(_mm_sub_epi8(v, v0), v9), z);
             let hi = _mm_cmpgt_epi8(z, v); // v >= 0x80 (signed < 0)
-            let mstop = (_mm_movemask_epi8(_mm_or_si128(
-                _mm_or_si128(ws, let_),
-                _mm_or_si128(dig, hi),
-            )) as u32)
-                & 0xFFFF;
+            let mstop =
+                (_mm_movemask_epi8(_mm_or_si128(_mm_or_si128(ws, let_), _mm_or_si128(dig, hi)))
+                    as u32)
+                    & 0xFFFF;
             if mstop != 0 {
                 return q + mstop.trailing_zeros() as usize;
             }
@@ -203,7 +200,10 @@ pub fn ascii_punct_run(t: &[u8], q: usize, len: usize) -> usize {
             break;
         }
         let l = b | 0x20;
-        if b == 0x20 || b.wrapping_sub(9) <= 4 || l.wrapping_sub(b'a') <= 25 || b.wrapping_sub(b'0') <= 9
+        if b == 0x20
+            || b.wrapping_sub(9) <= 4
+            || l.wrapping_sub(b'a') <= 25
+            || b.wrapping_sub(b'0') <= 9
         {
             break;
         }
@@ -302,10 +302,12 @@ impl UClass {
 
     /// Exact heap footprint of the class tables, in bytes.
     pub fn memory_bytes(&self) -> usize {
-        [&self.llo, &self.lhi, &self.nlo, &self.nhi, &self.slo, &self.shi]
-            .iter()
-            .map(|v| std::mem::size_of_val(&v[..]))
-            .sum::<usize>()
+        [
+            &self.llo, &self.lhi, &self.nlo, &self.nhi, &self.slo, &self.shi,
+        ]
+        .iter()
+        .map(|v| std::mem::size_of_val(&v[..]))
+        .sum::<usize>()
             + self.bmp.len()
     }
 

@@ -21,8 +21,8 @@ pub struct Tokenizer {
     pub(crate) v: Vocab,
     name: String,
     scanner: Scanner,
-    u: UClass,   // cl100k-pattern classes (L/N/S)
-    uo: UClassO, // o200k-pattern classes (L/N/S/UPPER/LOWER)
+    u: UClass,                    // cl100k-pattern classes (L/N/S)
+    uo: UClassO,                  // o200k-pattern classes (L/N/S/UPPER/LOWER)
     specials: Vec<(String, u32)>, // sorted by id
 }
 
@@ -247,8 +247,7 @@ impl Tokenizer {
     pub fn encode_allowed(&self, text: &str, allow: impl Fn(&str) -> bool) -> Vec<u32> {
         let mut out = Vec::with_capacity(text.len() / 3 + 8);
         let bytes = text.as_bytes();
-        let allowed: Vec<&(String, u32)> =
-            self.specials.iter().filter(|(s, _)| allow(s)).collect();
+        let allowed: Vec<&(String, u32)> = self.specials.iter().filter(|(s, _)| allow(s)).collect();
         let mut p = 0usize;
         while p < bytes.len() {
             // leftmost occurrence of any allowed special from p
@@ -360,7 +359,11 @@ impl Tokenizer {
                     // [^\r\n\p{L}\p{N}]?+\p{L}++
                     let ls = if a_let(b0) {
                         Some(p)
-                    } else if !a_dig(b0) && b0 != b'\r' && b0 != b'\n' && p + 1 < l && a_let(at(t, p + 1))
+                    } else if !a_dig(b0)
+                        && b0 != b'\r'
+                        && b0 != b'\n'
+                        && p + 1 < l
+                        && a_let(at(t, p + 1))
                     {
                         Some(p + 1)
                     } else {
@@ -571,7 +574,9 @@ impl Tokenizer {
                                 fb = true;
                                 break 'blk;
                             }
-                            while q < l && (at(t, q) == b'\r' || at(t, q) == b'\n' || at(t, q) == b'/') {
+                            while q < l
+                                && (at(t, q) == b'\r' || at(t, q) == b'\n' || at(t, q) == b'/')
+                            {
                                 q += 1;
                             }
                             self.emit(t, p, q - p, out);
@@ -687,11 +692,10 @@ impl Tokenizer {
         let count1 = |s: &[u8], buf: &mut Vec<u32>| -> u32 {
             buf.clear();
             if with_special {
-                match std::str::from_utf8(s) {
-                    // encode_allowed builds its own vector; counting still beats
-                    // encode_batch because nothing is kept after the count
-                    Ok(st) => return self.encode_with_special(st).len() as u32,
-                    Err(_) => {}
+                // encode_allowed builds its own vector; counting still beats
+                // encode_batch because nothing is kept after the count
+                if let Ok(st) = std::str::from_utf8(s) {
+                    return self.encode_with_special(st).len() as u32;
                 }
             }
             self.encode_into(s, buf);
@@ -740,7 +744,12 @@ impl Tokenizer {
 
     /// Encode many texts in parallel (work-stealing over an atomic cursor, like
     /// the C++ `encode_batch`). `threads == 0` picks the hardware concurrency.
-    pub fn encode_batch(&self, texts: &[&[u8]], threads: usize, with_special: bool) -> Vec<Vec<u32>> {
+    pub fn encode_batch(
+        &self,
+        texts: &[&[u8]],
+        threads: usize,
+        with_special: bool,
+    ) -> Vec<Vec<u32>> {
         use std::sync::atomic::{AtomicUsize, Ordering};
         let mut out: Vec<Vec<u32>> = vec![Vec::new(); texts.len()];
         if texts.is_empty() {
