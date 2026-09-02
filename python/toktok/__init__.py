@@ -8,8 +8,8 @@ encoding, get back a token count per text. Ids are never materialized.
     counts = toktok.batch_count(["hello world", "how many tokens?"], "cl100k_base")
     # [2, 4]
 
-`encoding` takes an encoding name (cl100k_base, o200k_base, o200k_harmony) or a
-model name (gpt-4o, gpt-4, openai/gpt-oss-20b, text-embedding-3-small).
+`encoding` is one of the bundled encodings: cl100k_base, o200k_base,
+o200k_harmony.
 
 Encodings are loaded once and cached, and counting releases the GIL and runs
 across threads, so calling this per request is fine.
@@ -25,47 +25,17 @@ from ._toktok import __version__ as __version__  # re-exported
 # files to find, ship or download.
 _CACHE = {}
 
-# model name -> encoding. Lookup lowercases and strips an org prefix, so HF-style
-# ids like "openai/gpt-oss-20b" resolve too.
-_MODEL_TO_ENCODING = {
-    "gpt-5": "o200k_base",
-    "gpt-4.1": "o200k_base",
-    "gpt-4o": "o200k_base",
-    "gpt-4o-mini": "o200k_base",
-    "o1": "o200k_base",
-    "o3": "o200k_base",
-    "o4-mini": "o200k_base",
-    "gpt-oss": "o200k_harmony",
-    "gpt-4": "cl100k_base",
-    "gpt-4-turbo": "cl100k_base",
-    "gpt-3.5-turbo": "cl100k_base",
-    "text-embedding-3-small": "cl100k_base",
-    "text-embedding-3-large": "cl100k_base",
-    "text-embedding-ada-002": "cl100k_base",
-}
-
-
-def _resolve(name: str) -> str:
-    """Encoding name, or the encoding a model name maps to."""
-    if name in _BUILTIN:
-        return name
-    m = name.lower().rsplit("/", 1)[-1]  # "openai/gpt-oss-20b" -> "gpt-oss-20b"
-    for prefix, enc in sorted(_MODEL_TO_ENCODING.items(), key=lambda kv: -len(kv[0])):
-        if m == prefix or m.startswith(prefix + "-") or m.startswith(prefix + "."):
-            return enc
-    raise KeyError(
-        f"unknown encoding or model {name!r}; bundled encodings are {', '.join(_BUILTIN)}"
-    )
-
 
 def _encoding(name: str, data_dir: str = "") -> _Tokenizer:
-    """The loaded (and cached) tokenizer behind an encoding or model name.
+    """The loaded (and cached) tokenizer for an encoding.
 
-    Private: the supported API is `batch_count`. This is here for tests and for
-    anyone who knowingly wants the full encode/decode surface."""
+    Private: the supported API is `batch_count` and `truncate`. This is here for
+    tests and for anyone who knowingly wants the full encode/decode surface."""
     key = (name, data_dir)
     if key not in _CACHE:
-        _CACHE[key] = _Tokenizer(_resolve(name), data_dir)
+        if not data_dir and name not in _BUILTIN:
+            raise KeyError(f"unknown encoding {name!r}; available: {', '.join(_BUILTIN)}")
+        _CACHE[key] = _Tokenizer(name, data_dir)
     return _CACHE[key]
 
 
@@ -79,8 +49,9 @@ def batch_count(
 
     Args:
         texts: the strings to count.
-        encoding: encoding name ('cl100k_base', 'o200k_base', 'o200k_harmony')
-            or a model name ('gpt-4o', 'openai/gpt-oss-20b').
+        encoding: one of 'cl100k_base' (GPT-3.5, GPT-4, text-embedding-3),
+            'o200k_base' (GPT-4o, o-series, GPT-4.1, GPT-5) or 'o200k_harmony'
+            (GPT-OSS). An unknown name raises KeyError.
         threads: worker threads; 0 (default) uses every core. Counting releases
             the GIL, so this scales.
         with_special: if True, a special-token string such as '<|endoftext|>'
@@ -89,7 +60,7 @@ def batch_count(
     Counting never builds the token ids: one scratch buffer per thread is reused
     across texts, so a batch of any size allocates O(threads), not O(tokens).
 
-        >>> toktok.batch_count(["hello world"], "gpt-4o")
+        >>> toktok.batch_count(["hello world"], "o200k_base")
         [2]
     """
     return _encoding(encoding).count_batch(list(texts), threads, with_special)
@@ -105,7 +76,7 @@ def truncate(
     Returns `(text, total_tokens)`. `total_tokens` is the count of the *whole*
     input, truncated or not, so you can report how much was dropped:
 
-        >>> toktok.truncate("hello world", 1, "gpt-4o")
+        >>> toktok.truncate("hello world", 1, "o200k_base")
         ('hello', 2)
 
     One pass over the input, no token ids built, and nothing decoded — the cut

@@ -39,9 +39,19 @@ identical before timing.
 compare within a table. Method and full results:
 **[docs/BENCHMARKS.md](docs/BENCHMARKS.md)**.</sub>
 
-Encodings: `cl100k_base` (GPT-3.5/GPT-4), `o200k_base` (GPT-4o),
-`o200k_harmony` (GPT-OSS). They are compiled into the binary — no data files, no
-downloads, no runtime dependencies.
+## Encodings
+
+Pass an encoding name — not a model name. The three bundled encodings are
+compiled into the binary, so there are no data files, downloads or runtime
+dependencies.
+
+| encoding | used by |
+|---|---|
+| `cl100k_base` | GPT-3.5, GPT-4, GPT-4 Turbo, `text-embedding-3-*`, `text-embedding-ada-002` |
+| `o200k_base` | GPT-4o, GPT-4o mini, GPT-4.1, GPT-5, o1 / o3 / o4-mini |
+| `o200k_harmony` | GPT-OSS (o200k_base's merge ranks plus the harmony special tokens) |
+
+An unknown name raises `KeyError` listing the valid ones.
 
 ## Python
 
@@ -57,7 +67,7 @@ import toktok
 toktok.batch_count(["hello world", "how many tokens is this?"])
 # [2, 6]
 
-toktok.batch_count(docs, "gpt-4o")                    # model names work too
+toktok.batch_count(docs, "o200k_base")                # GPT-4o and friends
 toktok.batch_count(docs, "cl100k_base", threads=4)    # 0 = every core (default)
 toktok.batch_count(["a<|endoftext|>b"], with_special=True)   # [3]
 ```
@@ -69,7 +79,7 @@ Returns `list[int]` — one count per text, in the order given.
 | parameter | default | what it does |
 |---|---|---|
 | `texts` | — | any iterable of `str`. An empty iterable returns `[]`; an empty string counts as `0`. |
-| `encoding` | `"cl100k_base"` | which tokenizer to count with. Takes an **encoding name** — `cl100k_base`, `o200k_base`, `o200k_harmony` — or a **model name**, which resolves to that model's encoding: `gpt-4o`, `gpt-4`, `gpt-3.5-turbo`, `o1`, `o3`, `text-embedding-3-small`, `openai/gpt-oss-20b`. An org prefix is stripped, so HF-style ids work. Anything unrecognized raises `KeyError`. |
+| `encoding` | `"cl100k_base"` | which tokenizer to count with — one of the three [encodings](#encodings). Model names are not accepted; look yours up in that table. An unknown name raises `KeyError`. |
 | `threads` | `0` | worker threads. `0` uses every core; `1` counts on the calling thread; any other number caps the pool. Counting releases the GIL, so this scales — including on free-threaded builds. Threads are only worth it for large batches; for a handful of short strings the pool costs more than it saves. |
 | `with_special` | `False` | how to treat special-token strings. `False` counts `<\|endoftext\|>` as the ordinary text it looks like (7 tokens); `True` counts it as the single special token it is (1). Use `True` when your text already contains rendered chat/control markup and you want the count the model will see. |
 
@@ -89,7 +99,7 @@ much was dropped.
 toktok.truncate("hello world", 1)          # ('hello', 2)
 toktok.truncate("hello world", 50)         # ('hello world', 2) — same object back
 
-toktok.batch_truncate(docs, 8192, "gpt-4o", threads=8)   # [(text, total), ...]
+toktok.batch_truncate(docs, 8192, "o200k_base", threads=8)   # [(text, total), ...]
 ```
 
 One pass, no ids built, nothing decoded — the cut is a byte offset into the

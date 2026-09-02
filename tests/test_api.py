@@ -171,16 +171,17 @@ def test_batch_count_is_the_public_api():
     assert toktok.batch_count([]) == []
 
 
-def test_batch_count_accepts_encoding_or_model_names():
+def test_batch_count_encodings():
     texts = ["hello world", "日本語のテキストです"]
     cl = toktok.batch_count(texts, "cl100k_base")
     o2 = toktok.batch_count(texts, "o200k_base")
-    assert toktok.batch_count(texts, "gpt-4") == cl
-    assert toktok.batch_count(texts, "text-embedding-3-small") == cl
-    assert toktok.batch_count(texts, "gpt-4o") == o2
-    assert toktok.batch_count(texts, "openai/gpt-oss-20b") == o2
-    with pytest.raises(KeyError, match="unknown encoding or model"):
-        toktok.batch_count(texts, "not-a-model")
+    assert cl != o2
+    # harmony shares o200k_base's merge ranks, only its specials differ
+    assert toktok.batch_count(texts, "o200k_harmony") == o2
+    # encodings only: a model name is not a valid argument
+    for name in ("gpt-4o", "gpt-4", "not-an-encoding"):
+        with pytest.raises(KeyError, match="unknown encoding"):
+            toktok.batch_count(texts, name)
 
 
 def test_batch_count_options(enc):
@@ -197,7 +198,7 @@ def test_batch_count_options(enc):
 
 
 def test_unknown_encoding_raises():
-    with pytest.raises(KeyError, match="unknown encoding or model"):
+    with pytest.raises(KeyError, match="unknown encoding"):
         toktok._encoding("does_not_exist")
 
 
