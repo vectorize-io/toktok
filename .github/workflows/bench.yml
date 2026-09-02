@@ -131,11 +131,17 @@ jobs:
           uv run python bench/fetch_corpus.py
 
       - name: Build
-        # the bench group pulls the C++ tokenizer we compare against, which has
-        # no wheel for every interpreter — fall back to just the dev deps
+        # Both comparison groups are best-effort and independent: quicktok-v1 has
+        # no wheel past 3.11 and gigatoken none for the free-threaded build, so
+        # try both, then each alone, then neither. Whichever encoders installed
+        # are the ones the benchmarks report — they all detect what is present.
         run: |
-          uv sync --group bench --no-editable --python ${{ matrix.python }} \
-            || uv sync --no-editable --python ${{ matrix.python }}
+          P="--no-editable --python ${{ matrix.python }}"
+          # shellcheck disable=SC2086
+          uv sync --group bench --group gigatoken $P \
+            || uv sync --group gigatoken $P \
+            || uv sync --group bench $P \
+            || uv sync $P
 
       - name: Verify exactness before measuring anything
         # tiktoken has no free-threaded wheel yet, so on 3.14t the parity tests

@@ -1661,7 +1661,6 @@ numpy = [
 [package.dev-dependencies]
 bench = [
     { name = "datasets" },
-    { name = "gigatoken" },
     { name = "quicktok-v1" },
     { name = "zstandard" },
 ]
@@ -1672,6 +1671,9 @@ dev = [
     { name = "pytest" },
     { name = "tiktoken" },
 ]
+gigatoken = [
+    { name = "gigatoken" },
+]
 
 [package.metadata]
 requires-dist = [{ name = "numpy", marker = "extra == 'numpy'", specifier = ">=1.21" }]
@@ -1680,7 +1682,6 @@ provides-extras = ["numpy"]
 [package.metadata.requires-dev]
 bench = [
     { name = "datasets" },
-    { name = "gigatoken" },
     { name = "quicktok-v1" },
     { name = "zstandard" },
 ]
@@ -1690,6 +1691,7 @@ dev = [
     { name = "pytest", specifier = ">=7" },
     { name = "tiktoken" },
 ]
+gigatoken = [{ name = "gigatoken" }]
 
 [[package]]
 name = "tqdm"

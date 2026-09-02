@@ -35,11 +35,12 @@ numpy = ["numpy>=1.21"]
 # `uv sync` installs these and builds the extension: one command to a working checkout
 dev = ["pytest>=7", "tiktoken", "numpy>=1.21", "maturin>=1.7,<2"]
 # benchmark-only extras: the corpus fetcher and the C++ tokenizer we compare against
-# gigatoken publishes a single cp310 abi3 wheel, which covers 3.11-3.14 but not
-# the free-threaded build; `no-build-package` below keeps a missing wheel from
-# turning into a from-source Rust build, so the group simply fails to resolve on
-# 3.14t and the workflow falls back to the dev deps.
-bench = ["datasets", "zstandard", "quicktok-v1", "gigatoken"]
+bench = ["datasets", "zstandard", "quicktok-v1"]
+# Its own group, not part of `bench`: quicktok-v1 has no wheel past 3.11, and
+# sharing a group would mean gigatoken disappearing from the comparison on every
+# interpreter quicktok cannot install on. gigatoken publishes a single cp310
+# abi3 wheel, which covers 3.11-3.14 but not the free-threaded build.
+gigatoken = ["gigatoken"]
 
 [tool.uv]
 # Never build these from source: both are large Rust extensions, and a missing
