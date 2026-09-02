@@ -77,16 +77,15 @@ def load_encoder(which, enc_name):
     if which in ("toktok", "toktok-numpy"):
         import toktok
 
-        e = toktok.get_encoding(enc_name)
+        e = toktok._encoding(enc_name)
         # the numpy path returns one uint32 buffer instead of a list[int] — same
         # ids, ~8x less memory for the result
-        enc_fn = (
-            e.encode_ordinary if which == "toktok" else (lambda s: toktok.encode_to_numpy(e, s))
-        )
+        enc_fn = e.encode_ordinary if which == "toktok" else (lambda s: e.encode_to_numpy(s))
         return (
             enc_fn,
             lambda docs, n: e.encode_batch(docs, n, False),
-            lambda docs, n: e.count_batch(docs, n, False),
+            # the public API, which is what users actually call
+            lambda docs, n: toktok.batch_count(docs, enc_name, n),
         )
     if which == "quicktok":
         import quicktok
@@ -106,6 +105,15 @@ def load_encoder(which, enc_name):
             None,
         )
     raise SystemExit(f"unknown encoder {which}")
+
+
+def interpreter() -> str:
+    """Which Python produced these numbers — the free-threaded build is a
+    different answer to the same question, so results must say which they are."""
+    import sys
+
+    gil = getattr(sys, "_is_gil_enabled", lambda: True)()
+    return f"CPython {sys.version.split()[0]}{'' if gil else 't (free-threaded, GIL off)'}"
 
 
 def mem_worker(which, enc_name):
@@ -137,7 +145,7 @@ def exact_table_bytes(which, enc_name):
     if which.startswith("toktok"):
         import toktok
 
-        return toktok.get_encoding(enc_name).memory_bytes
+        return toktok._encoding(enc_name).memory_bytes
     return None
 
 
@@ -280,7 +288,7 @@ def run_worker(which, enc_name, corpus_path, threads, mode="--worker"):
 def report(enc_name, corpus_path, threads, only):
     print(
         f"\n=== {os.path.basename(corpus_path)} · {enc_name} "
-        f"· {mb(os.path.getsize(corpus_path)):.1f} MiB ==="
+        f"· {mb(os.path.getsize(corpus_path)):.1f} MiB · {interpreter()} ==="
     )
     results = []
     for which, label in ENCODERS.items():

@@ -20,17 +20,26 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 CORPUS_DIR = os.path.join(HERE, "corpus")
 
 
+def interpreter() -> str:
+    """Which Python produced these numbers — the free-threaded build is a
+    different answer to the same question, so results must say which they are."""
+    import sys
+
+    gil = getattr(sys, "_is_gil_enabled", lambda: True)()
+    return f"CPython {sys.version.split()[0]}{'' if gil else 't (free-threaded, GIL off)'}"
+
+
 def encoders(enc_name):
     """(label, encode_fn) for every encoder available in this environment."""
     out = []
     import toktok
 
-    tt = toktok.get_encoding(enc_name)
+    tt = toktok._encoding(enc_name)
     out.append(("toktok", lambda s: tt.encode_ordinary(s)))
     try:
         import numpy as np  # noqa: F401
 
-        out.append(("toktok (numpy)", lambda s: toktok.encode_to_numpy(tt, s)))
+        out.append(("toktok (numpy)", lambda s: tt.encode_to_numpy(s)))
     except ImportError:
         pass
     try:
@@ -89,7 +98,8 @@ def run(corpus_path, enc_name, repeats, threads):
     mb = len(text.encode("utf-8")) / 1e6
     encs = encoders(enc_name)
     print(
-        f"\n=== {os.path.basename(corpus_path)} · {enc_name} · {mb:.1f} MB · best of {repeats} ==="
+        f"\n=== {os.path.basename(corpus_path)} · {enc_name} · {mb:.1f} MB "
+        f"· best of {repeats} · {interpreter()} ==="
     )
     encs, ntok = verify(encs, text)
     print(f"    {ntok} tokens, all {len(encs)} encoders byte-exact\n")
@@ -106,7 +116,7 @@ def run(corpus_path, enc_name, repeats, threads):
     if threads > 1:
         import toktok
 
-        tt = toktok.get_encoding(enc_name)
+        tt = toktok._encoding(enc_name)
         docs = [d for d in text.split("\n\n") if d]
         print(f"\n  batch, {len(docs)} docs, {threads} threads:")
         t0 = time.perf_counter()

@@ -5,7 +5,7 @@ name: Benchmarks
 # runner is not a quiet lab machine either — it is a shared vCPU — so this job
 # still leans on same-run ratios, pins single-threaded work to one core, and
 # reports the spread across repeated runs so noise is visible rather than hidden.
-
+#
 # Manual only. Benchmarks are slow, and a number measured on a shared runner is
 # not worth blocking a merge or a release on — run this when you want to know,
 # not on every commit.
@@ -28,15 +28,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  bench:
+  rust:
+    name: rust encoders
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
@@ -44,14 +42,13 @@ jobs:
       - name: Record the machine
         run: |
           {
-            echo "## Benchmark run"
+            echo "## Benchmarks"
             echo
             echo "| | |"
             echo "|---|---|"
             echo "| commit | \`${GITHUB_SHA:0:9}\` |"
             echo "| runner | $(uname -sm), $(nproc) vCPU |"
             echo "| cpu | $(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2- | xargs) |"
-            echo "| memory | $(free -h | awk '/^Mem:/{print $2}') |"
             echo "| load at start | $(cut -d' ' -f1-3 /proc/loadavg) |"
             echo
           } >> "$GITHUB_STEP_SUMMARY"
@@ -65,26 +62,15 @@ jobs:
         with:
           path: bench/corpus
           key: corpus-v1-${{ hashFiles('bench/fetch_corpus.py') }}
-
       - name: Fetch corpora
         if: steps.corpus-cache.outputs.cache-hit != 'true'
         run: |
           uv sync --group bench
           uv run python bench/fetch_corpus.py
 
-      - name: Build
+      - name: toktok vs bpe-openai vs tiktoken-rs
         run: |
           cargo build --release --manifest-path bench/rust/Cargo.toml
-          # uv drives the maturin PEP 517 backend (release build of the cdylib);
-          # the bench group adds the corpus fetcher and the C++ tokenizer we
-          # compare against, which has no wheel on every platform
-          uv sync --group bench --no-editable || uv sync --no-editable
-
-      - name: Verify exactness before measuring anything
-        run: uv run pytest tests/test_parity.py -q
-
-      - name: Rust vs Rust (toktok, bpe-openai, tiktoken-rs)
-        run: |
           # taskset pins the single-threaded measurement to one core so the
           # scheduler cannot move it between vCPUs mid-run
           for run in $(seq 1 "${RUNS:-2}"); do
@@ -97,39 +83,96 @@ jobs:
             done
           done | tee rust-bench.txt
         env:
-          CORPORA: ${{ github.event.inputs.corpora || 'pile,code,commoncrawl' }}
-          ENCODINGS: ${{ github.event.inputs.encodings || 'cl100k_base,o200k_base' }}
-          RUNS: ${{ github.event.inputs.runs || '2' }}
-
-      - name: Python encoders (toktok, quicktok, tiktoken)
-        run: taskset -c 0 uv run python bench/compare.py --repeats 5 | tee python-bench.txt
-
-      - name: Resource profile (memory, CPU, latency percentiles)
-        run: uv run python bench/profile.py --threads "$(nproc)" | tee profile.txt
+          CORPORA: ${{ inputs.corpora || 'pile,code,commoncrawl' }}
+          ENCODINGS: ${{ inputs.encodings || 'cl100k_base,o200k_base' }}
+          RUNS: ${{ inputs.runs || '2' }}
 
       - name: Summarize
         if: always()
         run: |
-          for f in rust-bench.txt python-bench.txt profile.txt; do
+          {
+            echo "<details><summary>Rust encoders</summary>"
+            echo; echo '```'; cat rust-bench.txt; echo '```'; echo
+            echo "</details>"; echo
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: bench-rust, path: rust-bench.txt }
+
+  python:
+    # One row per interpreter, because they are not interchangeable: the
+    # free-threaded build is the whole point of the cp314t wheel and its threaded
+    # numbers are what differ, while 3.11 is the oldest we ship and answers "do I
+    # need a new Python to get this?".
+    name: python ${{ matrix.python }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11", "3.14", "3.14t"]
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Cache corpora
+        id: corpus-cache
+        uses: actions/cache@v4
+        with:
+          path: bench/corpus
+          key: corpus-v1-${{ hashFiles('bench/fetch_corpus.py') }}
+      - name: Fetch corpora
+        if: steps.corpus-cache.outputs.cache-hit != 'true'
+        run: |
+          uv sync --group bench
+          uv run python bench/fetch_corpus.py
+
+      - name: Build
+        # the bench group pulls the C++ tokenizer we compare against, which has
+        # no wheel for every interpreter — fall back to just the dev deps
+        run: |
+          uv sync --group bench --no-editable --python ${{ matrix.python }} \
+            || uv sync --no-editable --python ${{ matrix.python }}
+
+      - name: Verify exactness before measuring anything
+        # tiktoken has no free-threaded wheel yet, so on 3.14t the parity tests
+        # skip themselves; the rest of the suite still guards the build
+        run: uv run --python ${{ matrix.python }} pytest tests -q
+
+      - name: Throughput vs tiktoken
+        run: |
+          taskset -c 0 uv run --python ${{ matrix.python }} \
+            python bench/compare.py --repeats 5 --corpus "${CORPORA%%,*}" \
+            | tee "python-bench-${{ matrix.python }}.txt"
+        env:
+          CORPORA: ${{ inputs.corpora || 'pile' }}
+
+      - name: Memory, CPU and latency percentiles
+        run: |
+          uv run --python ${{ matrix.python }} \
+            python bench/profile.py --threads "$(nproc)" --corpus "${CORPORA%%,*}" \
+            | tee "profile-${{ matrix.python }}.txt"
+        env:
+          CORPORA: ${{ inputs.corpora || 'pile' }}
+
+      - name: Summarize
+        if: always()
+        run: |
+          for f in python-bench-${{ matrix.python }}.txt profile-${{ matrix.python }}.txt; do
             [ -s "$f" ] || continue
             {
-              echo "<details><summary>$f</summary>"
-              echo
-              echo '```'
-              cat "$f"
-              echo '```'
-              echo
-              echo "</details>"
-              echo
+              echo "<details><summary>Python ${{ matrix.python }} — $f</summary>"
+              echo; echo '```'; cat "$f"; echo '```'; echo
+              echo "</details>"; echo
             } >> "$GITHUB_STEP_SUMMARY"
           done
-          echo "| load at end | $(cut -d' ' -f1-3 /proc/loadavg) |" >> "$GITHUB_STEP_SUMMARY"
-
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: benchmark-results
+          name: bench-python-${{ matrix.python }}
           path: |
-            rust-bench.txt
-            python-bench.txt
-            profile.txt
+            python-bench-${{ matrix.python }}.txt
+            profile-${{ matrix.python }}.txt
