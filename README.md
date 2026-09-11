@@ -80,11 +80,15 @@ Returns `list[int]` — one count per text, in the order given.
 |---|---|---|
 | `texts` | — | any iterable of `str`. An empty iterable returns `[]`; an empty string counts as `0`. |
 | `encoding` | `"cl100k_base"` | which tokenizer to count with — one of the three [encodings](#encodings). Model names are not accepted; look yours up in that table. An unknown name raises `KeyError`. |
-| `threads` | `0` | worker threads. `0` uses every core; `1` counts on the calling thread; any other number caps the pool. Counting releases the GIL, so this scales — including on free-threaded builds. Threads are only worth it for large batches; for a handful of short strings the pool costs more than it saves. |
+| `threads` | `0` | worker threads. `0` uses every core; `1` counts on the calling thread; any other number caps the pool. Counting releases the GIL, so this scales — including on free-threaded builds. Threads are only worth it for large batches; for a handful of short strings the pool costs more than it saves — below ~100k tokens per call, `threads=1` is both faster and cheaper ([numbers](docs/BENCHMARKS.md#many-small-texts-batching-and-threads)). |
 | `with_special` | `False` | how to treat special-token strings. `False` counts `<\|endoftext\|>` as the ordinary text it looks like (7 tokens); `True` counts it as the single special token it is (1). Use `True` when your text already contains rendered chat/control markup and you want the count the model will see. |
 
 Ids are never built: one scratch buffer per thread is reused across texts, so a
 batch of any size allocates O(threads), not O(tokens).
+
+To total a corpus, pass every text in one call and `sum()` the result. Don't
+concatenate first: BPE merges across the joins, so the count of `"".join(texts)`
+is not the sum of the parts.
 
 Wheels cover CPython **3.11–3.14** plus free-threaded **3.14t**, on Linux
 (x86_64, aarch64), macOS and Windows.

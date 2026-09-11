@@ -109,6 +109,43 @@ ingestion pipeline burns on tokenization.
 | toktok `encode_batch()` | 151.3 MB/s | 0.2 MiB |
 | tiktoken `encode_ordinary_batch()` | 8.3 MB/s | 8.9 MiB |
 
+## Many small texts: batching and threads
+
+Totalling a corpus of many short texts — 600 Pile slices of ~70 chars, 9 903
+tokens, cl100k_base, best of 5 on a 14-core Mac:
+
+| strategy | time | total |
+|---|---:|---:|
+| **`sum(batch_count(texts, threads=1))`** | **95 µs** | 9 903 |
+| 12 sub-batches of 50, `threads=1` | 103 µs | 9 903 |
+| `batch_count(texts)` (default `threads=0`, every core) | 173 µs | 9 903 |
+| 600 calls of `batch_count([t])`, summed | 430 µs | 9 903 |
+| `batch_count(["".join(texts)])` | 97 µs | **9 246 — wrong** |
+| tiktoken, 600 `encode_ordinary` calls | 2 063 µs | 9 903 |
+
+One call over the whole list is fastest; per-call overhead makes 600 calls
+~4.5× slower. **Never concatenate to count:** BPE merges across the joins, so
+`"".join` undercounts (−6.6% here) and `"\n".join` overcounts (+4.7%). The
+total of a corpus is the sum of its per-text counts.
+
+**Threads trade CPU for wall time** — `threads=1` vs `threads=2`, the choice on a
+2-vCPU box. CPU is process CPU time, so `threads=2` counts both workers:
+
+| texts | tokens | `threads=1` wall / CPU | `threads=2` wall / CPU | speedup | CPU cost |
+|---:|---:|---:|---:|---:|---:|
+| 600 | 9.9k | 0.09 / 0.09 ms | 0.11 / 0.19 ms | 0.86× | 1.99× |
+| 3 000 | 50k | 0.55 / 0.55 ms | 0.54 / 0.96 ms | 1.02× | 1.74× |
+| 6 000 | 105k | 1.26 / 1.26 ms | 1.21 / 2.18 ms | 1.04× | 1.73× |
+| 30 000 | 501k | 9.45 / 9.43 ms | 7.27 / 13.08 ms | 1.30× | 1.39× |
+| 60 000 | 1.05M | 20.0 / 20.0 ms | 15.6 / 28.6 ms | 1.28× | 1.43× |
+
+Below ~100k tokens per call a second thread is pure overhead — up to 2× the
+CPU for no speedup. Above ~500k it buys ~1.3× wall time for ~1.4× CPU. On a
+small box pass `threads=1` explicitly (the default `0` spreads over every
+core) and get throughput by running independent calls in parallel instead.
+These ran on two real cores; 2 vCPUs that are hyperthreads of one core gain
+less.
+
 ## Reproducing
 
 The **Benchmarks** workflow runs the whole set on a runner — manual dispatch,

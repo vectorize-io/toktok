@@ -197,6 +197,18 @@ def test_batch_count_options(enc):
     assert toktok.batch_count([special]) == [len(enc.encode_ordinary(special))]
 
 
+def test_corpus_total_is_sum_of_batch_not_count_of_concat(enc):
+    # 600 short texts: the total is sum(batch_count(texts)), however it's split
+    texts = [f"doc {i}: Hello, world! It's 日本語 text #{i}." for i in range(600)]
+    want = sum(len(enc.encode_ordinary(t)) for t in texts)
+    assert sum(toktok.batch_count(texts)) == want
+    assert sum(toktok.batch_count(texts, threads=1)) == want
+    assert sum(sum(toktok.batch_count(texts[i : i + 50])) for i in range(0, 600, 50)) == want
+    assert sum(toktok.batch_count([t])[0] for t in texts) == want
+    # concatenating lets BPE merge across boundaries: a different number
+    assert toktok.batch_count(["".join(texts)])[0] != want
+
+
 def test_unknown_encoding_raises():
     with pytest.raises(KeyError, match="unknown encoding"):
         toktok._encoding("does_not_exist")
