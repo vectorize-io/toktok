@@ -443,6 +443,60 @@ fn frombuffer<'py>(
     np.call_method1("frombuffer", (buf, dtype))
 }
 
+/// Upper bound on Jev's token count for each text (see `toktok::jev`).
+#[pyfunction]
+#[pyo3(signature = (texts, threads = 0))]
+fn jev_count_batch(py: Python<'_>, texts: Vec<String>, threads: usize) -> Vec<u32> {
+    py.detach(|| {
+        let refs: Vec<&[u8]> = texts.iter().map(|s| s.as_bytes()).collect();
+        toktok::jev::count_batch(&refs, threads)
+    })
+}
+
+/// `Tokenizer.truncate` against the Jev estimate: `(text, total_tokens)`.
+#[pyfunction]
+fn jev_truncate<'py>(
+    py: Python<'py>,
+    text: &Bound<'py, PyString>,
+    max_tokens: usize,
+) -> PyResult<(Bound<'py, PyString>, usize)> {
+    let s = text.extract::<std::borrow::Cow<'_, str>>()?;
+    let t = py.detach(|| toktok::jev::truncate(s.as_bytes(), max_tokens));
+    if t.bytes == s.len() {
+        return Ok((text.clone(), t.total_tokens));
+    }
+    Ok((PyString::new(py, &s[..t.bytes]), t.total_tokens))
+}
+
+/// `jev_truncate` over many texts, in parallel.
+#[pyfunction]
+#[pyo3(signature = (texts, max_tokens, threads = 0))]
+fn jev_truncate_batch(
+    py: Python<'_>,
+    texts: Vec<String>,
+    max_tokens: usize,
+    threads: usize,
+) -> Vec<(String, usize)> {
+    let cuts = py.detach(|| {
+        let refs: Vec<&[u8]> = texts.iter().map(|s| s.as_bytes()).collect();
+        toktok::jev::truncate_batch(&refs, max_tokens, threads)
+    });
+    texts
+        .into_iter()
+        .zip(cuts)
+        .map(|(mut s, t)| {
+            s.truncate(t.bytes);
+            (s, t.total_tokens)
+        })
+        .collect()
+}
+
+/// Per-class sizes behind the Jev estimate, in `JEV_CLASSES` order: for refitting.
+#[pyfunction]
+fn jev_features(text: &str) -> Vec<u32> {
+    toktok::jev::features(text.as_bytes()).to_vec()
+}
+
 // `gil_used = false` tells a free-threaded interpreter it does not need to
 // re-enable the GIL for this module. Sound here: `Tokenizer` is a frozen pyclass
 // wrapping a `Sync` engine whose only mutable state is its relaxed-atomic memos,
@@ -450,6 +504,11 @@ fn frombuffer<'py>(
 #[pymodule(gil_used = false)]
 fn _toktok(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyTokenizer>()?;
+    m.add_function(wrap_pyfunction!(jev_count_batch, m)?)?;
+    m.add_function(wrap_pyfunction!(jev_features, m)?)?;
+    m.add_function(wrap_pyfunction!(jev_truncate, m)?)?;
+    m.add_function(wrap_pyfunction!(jev_truncate_batch, m)?)?;
+    m.add("JEV_CLASSES", toktok::jev::CLASSES.to_vec())?;
     m.add("__version__", env!("CARGO_PKG_VERSION"))?;
     m.add("BUILTIN_ENCODINGS", toktok::BUILTIN_ENCODINGS.to_vec())?;
     Ok(())

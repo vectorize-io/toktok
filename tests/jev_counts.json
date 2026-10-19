@@ -1,0 +1,2190 @@
+{
+"_about": "Token counts reported by TypeSafe's API (usage.input_tokens minus the 268-token empty-state baseline, one noul question), jev-1.13.0; jev-1.14.0 counts the same. tests/test_jev.py checks the jev estimate is never under these.",
+"cases": [
+{
+"source": "short",
+"jev": 1,
+"text": "a"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "aa"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "aaa"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "aaaa"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "aaaaa"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "aaaaaa"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "aaaaaaa"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "aaaaaaaa"
+},
+{
+"source": "short",
+"jev": 3,
+"text": "aaaaaaaaa"
+},
+{
+"source": "short",
+"jev": 3,
+"text": "aaaaaaaaaa"
+},
+{
+"source": "short",
+"jev": 3,
+"text": "aaaaaaaaaaa"
+},
+{
+"source": "short",
+"jev": 3,
+"text": "aaaaaaaaaaaa"
+},
+{
+"source": "short",
+"jev": 4,
+"text": "aaaaaaaaaaaaa"
+},
+{
+"source": "short",
+"jev": 4,
+"text": "aaaaaaaaaaaaaa"
+},
+{
+"source": "short",
+"jev": 4,
+"text": "aaaaaaaaaaaaaaa"
+},
+{
+"source": "short",
+"jev": 4,
+"text": "aaaaaaaaaaaaaaaa"
+},
+{
+"source": "short",
+"jev": 5,
+"text": "aaaaaaaaaaaaaaaaa"
+},
+{
+"source": "short",
+"jev": 5,
+"text": "aaaaaaaaaaaaaaaaaa"
+},
+{
+"source": "short",
+"jev": 5,
+"text": "aaaaaaaaaaaaaaaaaaa"
+},
+{
+"source": "short",
+"jev": 5,
+"text": "aaaaaaaaaaaaaaaaaaaa"
+},
+{
+"source": "short",
+"jev": 6,
+"text": "aaaaaaaaaaaaaaaaaaaaa"
+},
+{
+"source": "short",
+"jev": 6,
+"text": "aaaaaaaaaaaaaaaaaaaaaa"
+},
+{
+"source": "short",
+"jev": 6,
+"text": "aaaaaaaaaaaaaaaaaaaaaaa"
+},
+{
+"source": "short",
+"jev": 6,
+"text": "aaaaaaaaaaaaaaaaaaaaaaaa"
+},
+{
+"source": "short",
+"jev": 7,
+"text": "aaaaaaaaaaaaaaaaaaaaaaaaa"
+},
+{
+"source": "short",
+"jev": 7,
+"text": "aaaaaaaaaaaaaaaaaaaaaaaaaa"
+},
+{
+"source": "short",
+"jev": 7,
+"text": "aaaaaaaaaaaaaaaaaaaaaaaaaaa"
+},
+{
+"source": "short",
+"jev": 7,
+"text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+},
+{
+"source": "short",
+"jev": 8,
+"text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+},
+{
+"source": "short",
+"jev": 8,
+"text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+},
+{
+"source": "short",
+"jev": 8,
+"text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+},
+{
+"source": "short",
+"jev": 8,
+"text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "1"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "11"
+},
+{
+"source": "short",
+"jev": 3,
+"text": "111"
+},
+{
+"source": "short",
+"jev": 4,
+"text": "1111"
+},
+{
+"source": "short",
+"jev": 5,
+"text": "11111"
+},
+{
+"source": "short",
+"jev": 6,
+"text": "111111"
+},
+{
+"source": "short",
+"jev": 7,
+"text": "1111111"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "П"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "Пр"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "При"
+},
+{
+"source": "short",
+"jev": 6,
+"text": "Привет"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "é"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "日"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "日本"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "🚀"
+},
+{
+"source": "short",
+"jev": 4,
+"text": "👍🏽"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "م"
+},
+{
+"source": "short",
+"jev": 5,
+"text": "مرحبا"
+},
+{
+"source": "short",
+"jev": 1,
+"text": " a"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "a "
+},
+{
+"source": "short",
+"jev": 1,
+"text": "  "
+},
+{
+"source": "short",
+"jev": 1,
+"text": "\n"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "\t"
+},
+{
+"source": "short",
+"jev": 1,
+"text": " "
+},
+{
+"source": "short",
+"jev": 1,
+"text": "hello"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "Hello"
+},
+{
+"source": "short",
+"jev": 1,
+"text": " hello"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "hello world"
+},
+{
+"source": "short",
+"jev": 4,
+"text": "Hello, World!"
+},
+{
+"source": "short",
+"jev": 10,
+"text": "The quick brown fox jumps over the lazy dog."
+},
+{
+"source": "short",
+"jev": 10,
+"text": "1234567890"
+},
+{
+"source": "short",
+"jev": 16,
+"text": "3.14159265358979"
+},
+{
+"source": "short",
+"jev": 20,
+"text": "2026-10-19T12:34:56Z"
+},
+{
+"source": "short",
+"jev": 11,
+"text": "def foo(x):\n    return x * 2\n"
+},
+{
+"source": "short",
+"jev": 9,
+"text": "    indented\n\n\n  lines\t\ttabs"
+},
+{
+"source": "short",
+"jev": 5,
+"text": "naïve café résumé"
+},
+{
+"source": "short",
+"jev": 11,
+"text": "日本語のテキストです。"
+},
+{
+"source": "short",
+"jev": 6,
+"text": "中文分词测试"
+},
+{
+"source": "short",
+"jev": 10,
+"text": "Привет, как дела?"
+},
+{
+"source": "short",
+"jev": 12,
+"text": "مرحبا بالعالم"
+},
+{
+"source": "short",
+"jev": 11,
+"text": "emoji 🚀🔥👍🏽 test"
+},
+{
+"source": "short",
+"jev": 7,
+"text": "<|endoftext|>"
+},
+{
+"source": "short",
+"jev": 12,
+"text": "https://example.com/path?q=1&b=2"
+},
+{
+"source": "short",
+"jev": 8,
+"text": "I'm don't you'll we've"
+},
+{
+"source": "short",
+"jev": 5,
+"text": "   leading and trailing   "
+},
+{
+"source": "short",
+"jev": 10,
+"text": "CamelCaseIdentifierName snake_case_name"
+},
+{
+"source": "short",
+"jev": 4,
+"text": "Прив"
+},
+{
+"source": "short",
+"jev": 5,
+"text": "Приве"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "\t\t"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "\n\n"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "\n "
+},
+{
+"source": "short",
+"jev": 2,
+"text": "\nhello"
+},
+{
+"source": "short",
+"jev": 1,
+"text": " \n"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "   "
+},
+{
+"source": "short",
+"jev": 1,
+"text": "    "
+},
+{
+"source": "short",
+"jev": 2,
+"text": "    return"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "  hello"
+},
+{
+"source": "short",
+"jev": 1,
+"text": " ("
+},
+{
+"source": "short",
+"jev": 2,
+"text": " (x"
+},
+{
+"source": "short",
+"jev": 1,
+"text": " :"
+},
+{
+"source": "short",
+"jev": 1,
+"text": " :)"
+},
+{
+"source": "short",
+"jev": 1,
+"text": " return"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "!"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "!!"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "!!!"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "\""
+},
+{
+"source": "short",
+"jev": 1,
+"text": "#"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "#include"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "$"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "$x"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "'"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "'M"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "'S"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "'m"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "'re"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "'s"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "'t"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "("
+},
+{
+"source": "short",
+"jev": 1,
+"text": "('"
+},
+{
+"source": "short",
+"jev": 1,
+"text": ")"
+},
+{
+"source": "short",
+"jev": 1,
+"text": ","
+},
+{
+"source": "short",
+"jev": 1,
+"text": ",\""
+},
+{
+"source": "short",
+"jev": 1,
+"text": "->"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "->x"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "."
+},
+{
+"source": "short",
+"jev": 1,
+"text": ".\n"
+},
+{
+"source": "short",
+"jev": 1,
+"text": ".."
+},
+{
+"source": "short",
+"jev": 1,
+"text": "..."
+},
+{
+"source": "short",
+"jev": 2,
+"text": ".5"
+},
+{
+"source": "short",
+"jev": 1,
+"text": ".b"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "1,"
+},
+{
+"source": "short",
+"jev": 3,
+"text": "1.5"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "12"
+},
+{
+"source": "short",
+"jev": 3,
+"text": "123"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "2"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "3"
+},
+{
+"source": "short",
+"jev": 1,
+"text": ";"
+},
+{
+"source": "short",
+"jev": 1,
+"text": ";\n"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "="
+},
+{
+"source": "short",
+"jev": 1,
+"text": "=="
+},
+{
+"source": "short",
+"jev": 1,
+"text": "==="
+},
+{
+"source": "short",
+"jev": 1,
+"text": "@"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "@user"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "Camel"
+},
+{
+"source": "short",
+"jev": 3,
+"text": "CamelCase"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "Case"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "HTTP"
+},
+{
+"source": "short",
+"jev": 4,
+"text": "HTTPServer"
+},
+{
+"source": "short",
+"jev": 4,
+"text": "HelloWorld"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "I"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "I'M"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "I'm"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "Server"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "Value"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "World"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "_"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "__"
+},
+{
+"source": "short",
+"jev": 3,
+"text": "__init__"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "_bar"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "_init"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "a.b"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "a1"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "bar"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "don"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "don't"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "e"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "e²"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "é"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "foo"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "foo_"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "foo_bar"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "get"
+},
+{
+"source": "short",
+"jev": 3,
+"text": "getValue"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "hello\n"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "hello "
+},
+{
+"source": "short",
+"jev": 4,
+"text": "hello123"
+},
+{
+"source": "short",
+"jev": 4,
+"text": "helloworld"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "include"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "init"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "init__"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "it"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "it'S"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "it's"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "na"
+},
+{
+"source": "short",
+"jev": 3,
+"text": "naïve"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "return"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "user"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "v"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "v1"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "we"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "we're"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "world"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "x"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "x2"
+},
+{
+"source": "short",
+"jev": 3,
+"text": "xⅫ"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "{"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "{\n"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "}"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "}\n"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "²"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "²3"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "½"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "½x"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "ïve"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "́"
+},
+{
+"source": "short",
+"jev": 4,
+"text": "ивет"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "٣"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "٣٤"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "٤"
+},
+{
+"source": "short",
+"jev": 2,
+"text": "Ⅻ"
+},
+{
+"source": "short",
+"jev": 3,
+"text": "日本語"
+},
+{
+"source": "short",
+"jev": 1,
+"text": "語"
+},
+{
+"source": "am",
+"jev": 489,
+"text": "тана) የካዛክስታን ዋና ከተማ ነው።\nየሚኖርበት የህዝብ ቁጥር 288,200 ሆኖ ይገመታል። ከተማው 51°18′ ሰሜን ኬክሮስ እና 7°45′ ምሥራቅ ኬንትሮስ  ላይ ተቀምጦ ይገኛል።\nበሥፍራው ላይ የሩስያ ወታደሮች አምባ በ1816 ዓ.ም. ሠሩ። ይህ በኋላ አክሞሊንስክ የተባለ መንደር ሆነ። በ1953 ዓ.ም. ስሙ ጸሊኖግራድ ሆነ። በ1983 ደግሞ ስሙ አቅሞላ ሆነ። ከ1989 ዓ.ም. ጀምሮ ዋና ከተማ በሆነበት ወቅት ስሙ አስታና ሆነ፣ በመጨረሻም በ2011 ዓም ስሙ ኑርሡልጣን "
+},
+{
+"source": "am",
+"jev": 2658,
+"text": "እንደነበር» ብላታ ጌታዬ አስፋው ተፈራ ገልጸዋል። ከዚህም ሌላ የብላታ ጌታዬ ትውስታ፣ በዘመኑ «የ ዩ.ኔ.ስ.ኮ. ኃላፊ የነበሩት ክቡር አቶ አካለ ወርቅ ሀብተ ወልድ ፓሪስ ለስብሰባ በተገኙበት ጊዜ ሀገራችን በየዓመቱ ፵ሺ ዶላር ለመክፈል በመስማማት ግዴታዋን ስትወጣ በአንፃሩም በአባልነታቸው በርካታ መጽሐፎችን ያገኙ እንደነበር ይመሰክራሉ» ይላል። \n\n\n== እሴቶች ==\nየአባላት ደራስያንን ሥራዎች ለኅትመት እንዲበቁ ለማድረግ የሚያስችሉ ምቹ ኹኔታዎችን ከሚፈጥርባቸው ነገሮች አንዱ ከማተሚያ ቤቶች ጋራ ያለው የሥራ ትብብር እና ስምምነት ነው። በዚህም ረገድ ከአርቲስቲክ ማተሚያ ቤት በተገኘ የ፪መቶ ፶ሺ ብር ‘ተዘዋዋሪ ድጎማ’ አያሌ የተለማማጅ እና አንጋፋ ደራስያንን እና ገጣምያንን ሥራዎች ለኅትመት እንዲበቁ አድርጓል። ተመሳሳይ ስምምነቶችም ከብርሃን እና ሰላም እንዲሁም  ከብራና ማተሚያ ቤቶች ጋራም እንደተደረጉ ተዘግቧል። ማተሚያ ቤቶቹ በጥሬ ገንዘብ የሚሰጡት ብር ባይኖርም ከኢ.ደ.ማ. ጋራ እስከ ተስማሙበት የገንዘብ መጠን ድረስ ከማኅበሩ ገምጋሚ ኮሚቴ አልፈው የሚመጡትን የአባላቱን ረቂቆች በነጻ ያትማሉ።\nበማኅበሩ የሥራ ደንብ፣ የአንድ ደራሲ ረቂቅ የገምጋሚ ኮሚቴውን ምዘና አልፎ፤ አርትኦቱ ተሠርቶ እና ታትሞ ለገበያ ከቀረበ በኋላ ከሚያገኘው ትርፍ ላይ የአርትኦት ክፍሎ፣ ለማተሚያ ቤቱ እና ለኢትዮጵያ ደራስያን ማኅበር የተወሰነ ክፍያ የማድረግ ግዴታ ይኖርበታል።\n\nኢ.ደ.ማ. ካከወናቸው ዐበይት ተግባራት አንዱ በ፳፻፪ ዓ.ም. የተከበረውን የ፶ኛ ዓመት የወርቅ በዓል አጋጣሚ በማድረግና የኢትዮጵያ ፖስታ አገልግሎት ድርጅትን በማስተባበር በሀዲስ አለማየሁ ፣ በከበደ ሚካኤል ፣ በሎሬት ጸጋዬ ገብረ መድህን እና በስንዱ ገብሩ ምስል ያሳተማቸው የመታሠቢያ ቴምብሮች አንዱ ነው። በዚህ ትብብር “የኢትዮጵያ ደራስያን ፪ኛ ዕትም” በሚል የታተሙትና ጳጉሜ ፪ ቀን ፳፻፬ ዓ.ም. በአዲስ አበባ ቴአትርና ባህል አዳራሽ የተመረቁት ቴምብሮች ደግም ደራስያን ነጋድራስአፈወርቅ ገብረ ኢየሱስ፣ ቀኝ-ጌታ ዮፍታሄ ንጉሤ፣ ብላቴን ጌታ ኅሩይ ወልደ ሥላሴ እና አቶ ተመስገን ገብሬ ናቸው። የቴምብሮቹ ምስሎች የተነደፉት በአገኘሁ አዳነና እሸቱ ጥሩነህ ሲሆን፤ የ፳ ሳንቲም፣ የ፹ ሳንቲም፣ የአንድና ሁለት ብር ዋጋ አላቸው።  እነዚህ አንጋፋ ደራሲያን በኢትዮጵያ ዘመናዊ ሥነ ጽሑፍ ታሪክ ውስጥ ጉልህ እና ዘላለማዊ አሻራ የተዉ ናቸው፡፡ \nየኢትዮጵያ ደራስያን ማኅበር በግማሽ ምዕተ ዓመት ሕይወቱ ጊዜያት በርካታ ውጣ ውረዶችን አሳልፏል። አቋሙ ዘለቄታ ባለው መልክ እንዲቀጥል ለማድረግ የመጀመርያው ፕሬዝዳንት የነበሩት የ“አርዐያ” እና “የኤደኑ ጃንደረባ” መጻሕፍት ደራሲ ግርማቸው ተክለ"
+},
+{
+"source": "am",
+"jev": 2428,
+"text": " 5ሺ ዓመት ታሪክ ከ ኖሕ እስከ ኢሀዴግ በ2003 ዓ.ም በጋዜጠኛና ደራሲፍስሐ ያዜ ካሳ የተፃፈ መጽሐፍ ነው።የኢትዮጵያን የተዘነጋ ታሪክ ሳይቀር በከፍተኛ ምርምር ያሙዋላና በብዙሃኑ አንባቢያን ዘንድ ግዙፍ አድናቆት የተቸረውም ነው።የአለም ታሪክ መነሻ ኢትዮጵያ መሆኑዋን ያረጋገጠ ከመሆኑም በላይ፤ኢትዮጵያዊ ምሁራንን ሳይቀር ያስደነቀና ያስማማ ሆኖዋል።በተለምዶ የ3ሺ ዓመት ታሪክ እየተባለ የቆየው የኢትዮጵያ ታሪክም በዚህ  መጽሐፍ ተሽሮ የ 5ሺ8መቶ ዓመት ታሪክ ያላት አገር መሆኑዋ ተረጋግጦበታል። ይህ መጻህፍ የተጻፈው በጋዜጠኛና ደራሲ ፍስሐ ያዜ ካሳ ነው::\nጋዜጠኛና ደራሲ ፍስሐ ያዜ ካሳ በቀድሞው ራክማኖቭ የቴአትርና ስነጥበባት ኮሌጅ የጋዜጠኝነት ትምህርቱን ለ3 ዓመታት የተከታተለ ሲሆን ከዚያ በኋላ ደግሞ በአዲስ አበባ ዩንቨርስቲ በኢትዮጵያ ቋንቋዎችና ጽነ-ጽሁፍ Literature የመጀመሪያ ድግሪ (ባችለር ኦፍ አርት) ያለው ሲሆን ከ 2000 ዓ.ም ጀምሮ ባሉት ጊዜያት በተለያዩ የአማርኛ ጋዜጦችና መጽሔቶች በሰንደቅ ጋዜጣ፣ በአውራምባ ታይምስ፣ በመሰናዘሪያ፣ በአዲስ፣ ፕሬስ፣ በጎግል፣ እንዲሁም በቀድሞው ኢቲቪ2 እና በእዲስ አበባ F.m 96.3 ሬዲዮ እና በአዲስ ልሳን ጋዜጣ እንዲሁም በተለያዩ የፕሬስ ዘርፎች ለአስር ዓመታት በጋዜጠኝነት የሰራ ሲሆን በተወዳጅ እና አንቂ ጽሁፎቹና በጥልቅ ትንታኔዎቹ የሚታወቅ በርካታ አስተማሪ ሃሳቦችን እንዲሁም የኢትዮጵያን ታሪክ የሚመለከቱ አርቲክሎችን ወደ አንባቢያን ሲያደርስ የነበረ ነው::\nቀጥሎም በ2003 ዓ.ም የኢትዮጵያ የ 5ሺ ዓመት ታሪክ ከኖኅ እስከ ኢህአዴግ\" ቁጥር 1\" እና በ2004 ዓ.ም የዚሁ ተከታይ ክፍል የሆነው ቁጥር 2 \"ካልተዘመረለት ኢያሱ እስከተዘመረለት ኢህአዴግ\" የሚሉ የኢትዮጵያን የ 8 ሺ ዓመታት ታሪክን የያዙ አስደናቂ መጻህፍት ያበረከተ ነው::\nቀጥሎ በ2005 ዓ.ም \"እኔና ቹ\" ቻይናዊቷ ፍቅረኛየ\" የሚል ተወዳጅ መጽሐፍ አበርክቶዋል:: ቀጥሎ በ2007 ዓ.ም የሳጥናኤል ጎል ኢትዮጵያ ቁጥር 1. በ2009 ዓ.ም ቁጥር 2, በ2010 ዓ.ም ቁጥር 3, በ2012 ቁጥር 4 የሚሉ እጅግ ተወዳጅና መነጋገሪያ የሆኑ መጻህፍትን አበርክቶዋል::\nእነዚህ መጻህፍትም በኢትዮጵያ የመጽሐፍ ሽያጭ ታሪክ ሪከርድ የያዙና እያንዳንዳቸው 200 ሺ ኮፒዎች የታተሙለት ሲሆን በአጠቃላይ  ከ 2003 ዓ.ም እስከ 2013 ዓ.ም ድረስ ባሉት ጊዜያት ከ 10 በላይ ተወዳጅ መጻህፍትን ለኢትዮጵያ አንባቢያን  ያበረክተ ተወዳጅ የስነ-ጽሁፍ ሰው ነው::\nhttp://books.good-amharic-books.com/fiveshe-1.PDF Archived ጁላይ 10, 2016 at the Wayback Machine\n\nመደብየዛግዌ "
+},
+{
+"source": "am",
+"jev": 529,
+"text": "ገኘ ቅርስ ሲሆን፣ ኩልን ወዘተ. ለማደባለቅ ከተጠቀሙት ሠሌዳዎች አንድ ነው። የተሠራበት ዘመን 3100 ዓክልበ. አካባቢ መሆኑ ይታመናል።   ይህም በፈርዖኖች ቅድመ-ዘመን ነበረ፤ በአባይ ወንዝ ሸለቆ የነበሩት ሀገራት በአንድ የግብጽ መንግሥት ገና ሳይዋሀዱ ማለት ነው። \nበሠሌዳው ፊት ላይ፣ በሦስት መስመሮች የሚራመዱ እንስሶች (ከብት፣ አህያና ፍየል) ይታያሉ። አራተኛውም መስመር አትክልትን ያሳያል። በአንዳንድ ሊቃውንት አስተሳሰብ ዘንድ፣ በአትክልቱ አጠገብ አንዱ ምልክት "
+},
+{
+"source": "ar",
+"jev": 250,
+"text": "مانِيَّة: Gemeinde Niederroßbach) هي بَلدَة أَلمانِيَّة في مِنطَقَة ڤِيستر ڤَآلد كرآيس التَّابِعة لِمُحافظة كُوبلنز في وِلاَية رَآينٌ لَاند - بفَآلز في جُمهُوريَّة أَلمَانيَا الاِتّحاديّة بمِساحة تُقَدَّر بحَوالَي 4 كم².\n\n\n== وَصلات خارجيّة ==\nالصّفحة الرّسميّة لِبَلدَة نِيدِرُّوسّبَآخ (باللُّغَة ال"
+},
+{
+"source": "ar",
+"jev": 218,
+"text": "نجليزية: Hughroy Currie) مواليد 9 فبراير 1959(1959-02-09)، هو ملاكم محترف بريطاني سابق صنّف ضمن فئة الوزن الثقيل.\n\n\n== إحصائيات ==\nخاض خلال مسيرته 30 نزالا، فاز في 17 وتعادل في 1 وخسر في 11. فاز بالضربة القاضية في 7 نزالات.\n\n\n== مراجع ==\n\n\n== روابط خارجية ==\nهوغروي كوري على موقع بوكس ريك (الإنجليزية"
+},
+{
+"source": "ar",
+"jev": 256,
+"text": "الحزب القومي العربي كان حزبًا قوميًا عروبيًا أسسه زكي الأرسوزي في سوريا خلال العام 1939. ارتبط الأرسوزي بمفهوم القومية العربية خلال فترة ما بين الحربين. كان الحزب مرتبطًا بعصبة العمل القومي، وهو حزب سياسي تأثر بقوة بالفاشية والنازية. غادر الأرسوزي عصبة العمل القومي في العام 1939 بعد وفاة زعيمها الشعبي ثم تورط الحزب في الفوضى، حيث أسس الحزب القومي العربي في العام 1939 والذي حُل في وقت لاحق من ذلك العام.\n\n\n== مراجع =="
+},
+{
+"source": "ar",
+"jev": 219,
+"text": "صغير) (الإنجليزية: 2000 NR25)؛ هو كويكب ضمن حزام الكويكبات.\nاكتُشف هذا الجُرم الفلكي بواسطة مرصد لويل للبحث عن الأجرام القريبة من الأرض في 4 يوليو 2000، وترتيبه 32188 من حيث الاكتشاف.\n\n\n== الوصف ==\nاكتُشف 321882000NR في 4 يوليو 2000 في مرصد محطة أندرسون ميسا، الواقع في مقاطعة كوكونينو، أريزونا في ال"
+},
+{
+"source": "ar",
+"jev": 396,
+"text": "نيكولا رينافاند (الفرنسية: Nicolas Renavand) مواليد 25 يونيو 1982 في فرنسا، هو لاعب كرة مضرب فرنسي يلعب باليد اليمنى ويحتل حالياً المرتبة رقم. – في تصنيف رابطة محترفي كرة المضرب. أعلى تصنيف له في الفردي كان المركز الـ 225 في سنة 2013. أعلى تصنيف له في الزوجي كان المركز الـ 118 في سنة 2013.\n\n\n== النهائيات ==\n\n\n=== الزوجي: 7 (3–4) ===\n\n\n== مراجع ==\n\n\n== روابط خارجية ==\nنيكولا رينافاند على موقع رابطة محترفي التنس (الإنجليزية)\nنيكولا رينافاند على موقع الاتحاد الدولي لكرة المضرب (الإنجليزية)\nنيكولا رينافاند على موقع خلاصة التنس.كوم (الإنجليزية)\nنيكولا رينافاند على موقع إي إس بي إن.كوم (الإنجليزية)"
+},
+{
+"source": "ar",
+"jev": 193,
+"text": "وبأي صورة، من أجل أن يتمكّنوا من العمل بالشكل الأفضل في جميع الظروف.\nتتخذ وحده شلداغ من قاعدة بالماتشيم الجوية كمركز قيادة.\n\n\n== التسليح ==\nبشكل خاص يتسلح مقاتلي وحده شلداغ بالتالي:\n\nبندقيه.\nبندقية M4ِِA1 مزوده بقاذف رمانات نوع.\nمسدسات Glock 17 و 19.\nقناصات Mauser SR 82/66.\n\n\n== الزي الرسمي ==\nنفس ز"
+},
+{
+"source": "blob",
+"jev": 665,
+"text": "b44eb43654db3af1ef1d2e8ba23527b6a9ddf3062c52ea03a5bb59cf8268c9f27369a36882e5196e60be728a6b6be6821e4eaa1ad08506d9fa60aeb7f31f36aeb67ca2dcf346715c52936d8775c3150c5560df9879e5147045ad2bad5418a06ea75ec6408bc31c73733733078aa53ebc50f522d1f394924895cf12af706796e67e3cb3cf0b8e0d4fbaf8b16a4fa50712b87fdf51b4ca6a055b7fc5734a38c0582d887b5dd51570c61704347a9e3d5457cb60f71b64896fecceebf83d42f2f77d227a6639429737eda54ec0e500fd42a21f32ea89fbaaaf70789f39188b2e663bf57a2310f8bff05db5690d0b9a6ce789362f783124326f63be4129502ce314edeca2512ab35923651fd5e0aab39b3bf2c11cb3bf2fab3aec4932b601fb2d33eadbfca6a5b9698ba845e437c56899628bf60694f68c2d56bcb3741dbf3d0d0a0871249eea959895a86d169d91fad5faae4e90b766357823ecf013a6137e35eb4a8cd54d97a2ed1338bf0bb437e98a1013e7b3b05f0543d9241ab8"
+},
+{
+"source": "blob",
+"jev": 824,
+"text": "d6b6073b38eead5b64f46734f256d3d95dea00c4ee9a4421b3dcf5a2501a73dbbe41fcc093dbb01e279d532b20736263917b93b957a2080e8d99e07dba687192bd15bd9e2770cda51a519a8864ef786715a3f17150d2b02fcbf16003fa42a9b4d8e366298fff636a8f9a5c94e1d3674f85fb88f2d80085c609bb6cbc64f701f00677b5d67d06eac9fe3f37caeb8567525d701589bf93cfef2b129a2864315f464c552bcfb7a3e3a3ef7744040d6e91a140f1c7e392fc94f1633af4dfe30f491500564cfda635134e52c9a7a788ea8c4cdb2513115e54c9d11bad42074fdec693904a449daee2bb1965a9350859eb4dac67c5265909f684ec632d705ce53c8bcb3f42f5e633d309c374e8e3f089a7f28acacf95b3754519322e360a47eab338070bb526875110e6451f1b55b2ef83a5151bda626889faf296391d15a9809f9e0ca257106b8c27deac2fa93298810f67f98caa635508d9c73c4df5588dbcbb256397a4a8a11aa908b09ac7b6f65900a1ec4dd0ca6f6a1fd2a25417a4a6770069d23c62f871df7b96ad2aa7ca1094fc624921d3aecd4f37c39fe1e6824e62ba115082873b88695326fce8a17801c24cf22db801c35049f051f3ea4cfbd0fdc3d1d7afe37c49f32507681172b4faec"
+},
+{
+"source": "blob",
+"jev": 141,
+"text": "53724d0dd4fe37ba3a008305ae5a2ed4271cac974ec34e7b4cbc40610f7d2bcbbe415c229453802d5d01dc8fdbcc640143a5acb765863947a2e0f333efcd803025449c54e6969f1cfb9d0d2e55afcdbb74"
+},
+{
+"source": "blob",
+"jev": 301,
+"text": "4666f06b05ec58cba99067eca0c7459a00877ccb86fbd61aef5d38e37c7e0537c62ad2ae3af6f536791e4c5f5ef4d7e147f7ce8f2f28c9061ae92242d814ff4634bb1661ee501c998e1917340f6d2afed79f98ae0c5c76b6a8796857b0b740b2ff13e66749a01ea34d92ee46a8cacef213434a31ce436e3cbcef27d176a21150ace13b6830249c37f9b7849713606cf4d5a01c167a7f5e0b1c5182c954ce099e83b77dab62a4450a"
+},
+{
+"source": "blob",
+"jev": 388,
+"text": "RYY8Mebv9PVzVJeHD4AMRi5Zn1wb7l4T3TGSJGge+nuEbQn+8sTBJis4GxEoRPoc+mUsz4VGgonqNVyIoW/0cvm4QHJ+CPBEwjllrOKe1K+bUec3pmTbIV9XMvz3buXDgehqU15jdhzQqQsJUj50o6o7YDCSFJmwBFaYT/Isuepz5oodDf6XgaJnEQXe32ZXfx7nvznJkWpHs10tSxTF3YH3AjEsAevdA4w6BY1C4M4eKP+bl/3/tS2mWAHW77xyzGtFJBhhs4JU19Kaax/ow0YjFmJMM2XQq2MayFrIB0uLUCbMsleisumArMwtvIKNrjllpC681s9gl12SfTQSi+pCLCfoNFYvmL3aGWU5pmOIB/guafPAIIYEFd+iY3E7YKUrLXwrgmhy/PbpglOPTF+enbAEPpRSmZBT6glK+TPvY/xvwnaiy+h94WzzvPmlwQ4Bri7U0qMK+Jx73IyygGPLtHv8iclhCqw9T4cwC9Qs/RnZd6dKMxRp3+LPr6RlE6hRFFwa5CG58ojw8WvQjZSWstznrxDmPIip8KCeBqyIIKWFvCQ="
+},
+{
+"source": "blob",
+"jev": 306,
+"text": "cd759c1ff71b8301f3c1e162c1abe973ee2f0f5b241287b6f79cf37556f4d6d9d272b3d2782e597ee8999fa5c55413ac2daa3b68ed97b4a137ab99d1f4124c21cc3b639edc645e976cf26259e157677073ba438e55f40bb97dea4e308caa54d7de1660b8905efb3ca68b518f3db6d3bc0787a94cbbb35184f6ef23784aa817eca4e31c04bd128f1713a27b302caad92b4bd3a8ed80906384baf214b70f02fcf7f5e1d4764432ca89c6316188b5"
+},
+{
+"source": "bn",
+"jev": 223,
+"text": "-তৃতীয়াংশ জনগণ ইংরেজি ব্যবহার করতে সমর্থ। \n\n\n== জনমিতি ==\n\n\n== নদী ==\n\nজেলার প্রধান নদী হ'ল তামিরবরণী স্থানীয়ভাবে কুঝিথুরাই আড়ু (কুঝিথুরাই নদী) নামে পরিচিত। এই নদীর দু'টি বড় উপনদী রয়েছে, যথাক্রমে কোঠায়ারু এবং পারালিয়ারাু - পেচাইপাড়ী বাঁধ এবং পেরুঞ্চনি বাঁধের নির্মিত হয়েছে এই নদীদুটির ওপর।\n\n"
+},
+{
+"source": "bn",
+"jev": 247,
+"text": "য সর্বাধিক পরিচিত। তিনি ২০১৯ থেকে ২০২১ সাল পর্যন্ত লন্ডনে প্রাইডের যোগাযোগ পরিচালক ছিলেন। \nদক্ষিণ পশ্চিম লন্ডনে জন্মগ্রহণ ও বেড়ে ওঠা, অ্যাফ্লিক ১১ বছর বয়স থেকে কিংস্টন যুব কাউন্সিলে নির্বাচিত হওয়ার পর থেকে প্রচারণা চালিয়ে আসছেন। \n২০২১ সালে, অ্যাফ্লিককে ২০২১ সালের নববর্ষ সম্মাননায় লন্ডনের সম্প্র"
+},
+{
+"source": "bn",
+"jev": 470,
+"text": "আমলি (ইংরেজি: Amli) ভারতের দাদরা ও নগর হাভেলি রাজ্যের দাদরা বারো নগর হাভেলি জেলার একটি শহর ।\n\n\n== ভৌগোলিক উপাত্ত ==\nশহরটির অবস্থানের অক্ষাংশ ও দ্রাঘিমাংশ হল ২০.২৮° উত্তর ৭৩.০২° পূর্ব﻿ / 20.28; 73.02। সমুদ্র সমতল হতে এর গড় উচ্চতা হল ২৬ মিটার (৮৫ ফুট)।\n\n\n== জনসংখ্যার উপাত্ত ==\nভারতের ২০০১ সালের আদম শুমারি অনুসারে আমলি শহরের জনসংখ্যা হল ২৮,৫৬৬ জন। এর মধ্যে পুরুষ ৬১% এবং নারী ৩৯%।\nএখানে সাক্ষরতার হার ৭০%। পুরুষদের মধ্যে সাক্ষরতার হার ৭৯% এবং নারীদের মধ্যে এই হার ৫৮%। সারা ভারতের সাক্ষরতার হার ৫৯.৫%; তার চাইতে আমলি এর সাক্ষরতার হার বেশি।\nএই শহরের জনসংখ্যার ১৫% হল ৬ বছর বা তার কম বয়সী।\n\n\n== তথ্যসূত্র =="
+},
+{
+"source": "bn",
+"jev": 250,
+"text": "ে সেরা পুরুষ খেলোয়াড় (গুলডবোলেন) এবং মহিলা খেলোয়াড়দের (ডায়াম্যান্টবোলেন) পুরস্কার প্রদান করা হয়।\nএসভিএফএফের ২০০৮ সালের ৫৫৪ এমএসইকে টার্নওভার হয়েছিল।\n\n\n== কর্মকর্তা ==\n৫ সেপ্টেম্বর ২০২০ পর্যন্ত হালনাগাদকৃত।\n\n\n== তথ্যসূত্র ==\n\n\n== বহিঃসংযোগ ==\n\nদাপ্তরিক ওয়েবসাইট  (ইংরেজি)\nফিফা-এ সুয়েডীয় ফুটব"
+},
+{
+"source": "bn",
+"jev": 428,
+"text": "ভার্মিনা (পিউনিক: 𐤅𐤓𐤌𐤍𐤃) ছিলেন রাজা সিফ্যাক্সের পুত্র এবং মাসেসিলিয়ান বার্বারদের রাজা, পশ্চিম নুমিডিয়ার একটি বারবার উপজাতি, উত্তর আফ্রিকার একটি প্রাচীন বার্বার রাজ্য।\nদ্বিতীয় পিউনিক যুদ্ধের সময়, ভার্মিনা কার্থাজিনিয়ানদের পক্ষে ছিলেন, তবে জামার যুদ্ধে হ্যানিবলের পরাজয়ের পর তার বাহিনী কেবল তাকে সহায়তা করার জন্য এসেছিল, যার ফলে ভার্মিনার সেনাবাহিনী রোমানদের কাছে পরাজিত হয়েছিল।  ভার্মিনা এই যুদ্ধ থেকে পালিয়ে গেলেও, ২০০ খ্রিস্টপূর্বাব্দে তাকে রোমানদের সাথে শান্তির জন্য মামলা করতে বাধ্য করা হয়েছিল। \n\n\n== তথ্যসূত্র =="
+},
+{
+"source": "code",
+"jev": 16,
+"text": "r pfn, errorMessage in res[\"Value\"][\"Failed\"].item"
+},
+{
+"source": "code",
+"jev": 16,
+"text": "xt,font=('Helvetica', 12),key='content_textviewexp"
+},
+{
+"source": "code",
+"jev": 63,
+"text": "   which will contains the command to be executed.\n\n        Args:\n            json_data (json) : Variable with JSON data.\n\n        Returns:\n            None\n        \"\"\"\n        lista = json.loads(json_data)\n        for entry in lista:\n            self.exec_user_input(entry['command'])\n\n    def load_"
+},
+{
+"source": "code",
+"jev": 394,
+"text": " \".\" + f + \"()\")\n\t\t\t\t\tif isinstance(test, Test) is False:\n\t\t\t\t\t\tprint(f + \" is not an instance of Test!\")\n\t\t\t\t\telse:\n\t\t\t\t\t\tself._tests.append(test)\n\t\t\t\texcept BaseException as error:\n\t\t\t\t\tprint(\"Error: \", error)\n\t\t\t\t\tprint(\"Invalid test: \", f)\n\t\t\telse:\n\t\t\t\tprint(\"Not importing test: \", f)\n\n\t\t\tself._settings.set(\"Tests\", f, importtest)\n\n\tdef _getRunningTest(self):\n\t\treturn self._running\n\t\n\tdef runTest(self, test):\n\t\tif test in self._tests and not self._running:\n\t\t\tself._running = test\n\t\t\tself._running.create(self._engine, self._application)\n\t\t\tself._running.run()\n\t\n\tdef stopTest(self):\n\t\tif self._running:\n\t\t\tif self._running.isRunning():\n\t\t\t\tself._running.stop()\n\t\t\t\tself._running.destroy()\n\t\t\t\n\t\t\tself._running = None\t\n\n\tdef resetTest(self):\n\t\tif self._running:\n\t\t\tif self._running.isRunning():\n\t\t\t\tself._running.stop()\n\t\t\t\n\t\t\tself._running.destroy()\n\t\t\tself._running.create(self._engine, self._application)\n\t\t\tself._running.run()\t\t\t\t\n\t\t\n\tdef _getTests(self):\n\t\treturn self._tests\n\t\t\t\n\tdef _getTestNameList(self):\n\t\tnamelist = []\n\t\tfor t in self._tests:\n\t\t\tnamelist.append(t.getName())\n\t\t\t\n\t\treturn namelist\n\t\n\ttests = property(_getTests)\n\ttestnames = property(_getTestNameList)\n\trunningtest = property(_getRunningTest)\n\t\nclass Test(object):\n\t\"\"\" The base calss for all tests.  All tests must override these functions! \"\"\"\n\n\tdef create(self, engine, application):\n\t\traise NotImplementedError(\"Test has not implemented the init() function!\")\n\t\n\tdef destroy(self):\n\t\traise NotImplementedError(\""
+},
+{
+"source": "code",
+"jev": 64,
+"text": "icker\nimport numpy as np\nimport datetime\nfrom Bio.Seq import Seq\nif __name__ == '__main__':\n    from needleman_wunsch import needleman_wunsch\nelse:\n    from .needleman_wunsch import needleman_wunsch\n\n"
+},
+{
+"source": "code",
+"jev": 90,
+"text": " ['CU','MG','VA'], list(dbf.phases.keys()), datasets_db, {}, {}, {})\n    assert np.isclose(error, -257.41020886970756, rtol=1e-6)\n\n\ndef test_subsystem_activity_probability(datasets_db):\n    \"\"\"Test binary Cr-Ni data produces the same probability regardless of whether the main system is a binary or t"
+},
+{
+"source": "code",
+"jev": 351,
+"text": "= None\n    secret = None\n\n    def __init__(self, key, secret):\n        self.key = key\n        self.secret = secret\n\n        if self.key is None or self.secret is None:\n            raise ValueError(\"Key and secret must be set.\")\n\n    def __str__(self):\n        data = {'oauth_consumer_key': self.key,\n            'oauth_consumer_secret': self.secret}\n\n        return urllib.urlencode(data)\n\n\nclass Token(object):\n    \"\"\"An OAuth credential used to request authorization or a protected\n    resource.\n \n    Tokens in OAuth comprise a *key* and a *secret*. The key is included in\n    requests to identify the token being used, but the secret is used only in\n    the signature, to prove that the requester is who the server gave the\n    token to.\n \n    When first negotiating the authorization, the consumer asks for a *request\n    token* that the live user authorizes with the service provider. The\n    consumer then exchanges the request token for an *access token* that can\n    be used to access protected resources.\n    \"\"\"\n\n    key = None\n    secret = None\n    callback = None\n    callback_confirmed = None\n    verifier = None\n\n    def __init__(self, key, secret):\n        self.key = key\n        self.secret = secret\n\n        if self.key is None or self.secret is None:\n            raise ValueError(\"Key and secret must be set.\")\n\n    def set_callback(self, callback):\n        self.callback = callback\n        self.callback_confirmed = 'true'\n\n    def set_verifier(self, verifier=None):\n        if ve"
+},
+{
+"source": "code",
+"jev": 42,
+"text": "ng\n          if hasattr(old,'__len__'):\n            if any(old != current):\n              sameCoordinateCheck = False\n              break\n          else:\n            if old != current:\n              s"
+},
+{
+"source": "code",
+"jev": 40,
+"text": "rn True\n\n    def selbox_end(self):\n        if self.selection_drag_started:\n            for obj in self.window.selected:\n                obj.send_params()\n        self.selbox_started = False\n        se"
+},
+{
+"source": "code",
+"jev": 12,
+"text": "):\n        \"\"\"\n        Drop of obj on row that is "
+},
+{
+"source": "code",
+"jev": 51,
+"text": "= []\n    with concurrent.futures.ProcessPoolExecutor(threads) as e:\n        for fn in trace_filenames:\n            future = e.submit(validate_truth, dir_oracle, fn)\n            futures.append(future)\n"
+},
+{
+"source": "code",
+"jev": 432,
+"text": "log_det_jacobian(self, y):\n    if self.shaper is None:\n      raise ValueError(\"Jacobian cannot be computed with unknown event_ndims\")\n    _, _, event_dims = self.shaper.get_dims(y)\n    # Could also do:\n    #   ildj = math_ops.reduce_sum(y - distribution_util.softplus_inverse(y),\n    #                              reduction_indices=event_dims)\n    # but the following is more numerically stable. Ie,\n    # Y = Log[1 + exp{X}] ==> X = Log[exp{Y} - 1]\n    # ==> dX/dY = exp{Y} / (exp{Y} - 1)\n    #           = 1 / (1 - exp{-Y}),\n    # which is the most stable for large Y > 0.  For small Y, we use\n    # 1 - exp{-Y} approx Y.\n    ildj = -math_ops.reduce_sum(math_ops.log(-math_ops.expm1(-y)),\n                                reduction_indices=event_dims)\n    return distribution_util.softplus_inverse(y), ildj\n\n  def _forward_log_det_jacobian(self, x):  # pylint: disable=unused-argument\n    if self.shaper is None:\n      raise ValueError(\"Jacobian cannot be computed with unknown event_ndims\")\n    _, _, event_dims = self.shaper.get_dims(x)\n    return -math_ops.reduce_sum(\n        nn_ops.softplus(-x), reduction_indices=event_dims)\n\n\nclass SoftmaxCentered(Bijector):\n  \"\"\"Bijector which computes `Y = g(X) = exp([X 0]) / sum(exp([X 0]))`.\n\n  To implement [softmax](https://en.wikipedia.org/wiki/Softmax_function) as a\n  bijection, the forward transformation appends a value to the input and the\n  inverse removes this coordinate.  The appended coordinate represents a pivot,\n  e.g., `softmax(x) = ex"
+},
+{
+"source": "code",
+"jev": 81,
+"text": "\n                #bbox1 = (0, 0, _.width * fig.dpi, _.height * fig.dpi)\n\n                # returns in figure coordinates\n                #bbox1 = df2.get_axis_bbox(ax=ax1)\n                #if bbox1[-1] < 0:\n                #    # Weird bug\n                #    bbox1 = bbox1[1]\n                print("
+},
+{
+"source": "code",
+"jev": 392,
+"text": "pend( (NazwaOpcji, TypOpcji, self.SkryptOpcjiWithFullPAth(SkryptOpcji)) )\n                            self.list.append( NazwaOpcji )\n                myMenufile.close()\n            myIdx = self[\"list\"].getSelectionIndex()\n            if myIdx > len(self.list) -1:\n                self[\"list\"].moveToIndex(len(self.list) -1)\n            self[\"list\"].show()\n\n\n# -*- coding: utf-8 -*-\n\"\"\"Setup/installation tests for this package.\"\"\"\n\nfrom osm.buildout.testing import IntegrationTestCase\nfrom plone import api\n\n\nclass TestInstall(IntegrationTestCase):\n    \"\"\"Test installation of osm.buildout into Plone.\"\"\"\n\n    def setUp(self):\n        \"\"\"Custom shared utility setup for tests.\"\"\"\n        self.portal = self.layer['portal']\n        self.installer = api.portal.get_tool('portal_quickinstaller')\n\n    def test_product_installed(self):\n        \"\"\"Test if osm.buildout is installed with portal_quickinstaller.\"\"\"\n        self.assertTrue(self.installer.isProductInstalled('osm.buildout'))\n\n    def test_uninstall(self):\n        \"\"\"Test if osm.buildout is cleanly uninstalled.\"\"\"\n        self.installer.uninstallProducts(['osm.buildout'])\n        self.assertFalse(self.installer.isProductInstalled('osm.buildout'))\n\n    # browserlayer.xmlw\n    def test_browserlayer(self):\n        \"\"\"Test that IosmBuildoutLayer is registered.\"\"\"\n        from osm.buildout.interfaces import IosmBuildoutLayer\n        from plone.browserlayer import utils\n        self.failUnless(IosmBuildoutLayer in utils.registered_layers())"
+},
+{
+"source": "code",
+"jev": 63,
+"text": "        )\n\n    async def on_message(self, channel, body, envelope, properties):\n        log.debug(\"Got new message %s\" % body)\n        for correlation_id in list(self.messages.keys()):\n            if correlation_id == properties.correlation_id:\n                log.info(\"Response with corr_id %s from"
+},
+{
+"source": "code",
+"jev": 330,
+"text": "ard.VERB_CHANGED,\n                        'changed': True,\n                        'old_source_value': 'yse',\n                        'source_value': 'yes',\n                        'target_value': 'ja'}]}],\n            i18n_dashboard.I18nProgressDTO.DONE)\n\n    def test_progress_one_section_new_and_not_translated_is_not_started(self):\n        self._test_progress_calculation(\n            [{'data': [{'verb': i18n_dashboard.VERB_NEW,\n                        'changed': False,\n                        'source_value': 'yes',\n                        'target_value': ''}]}],\n            i18n_dashboard.I18nProgressDTO.NOT_STARTED)\n\n    def test_progress_one_section_new_and_translated_is_done(self):\n        self._test_progress_calculation(\n            [{'data': [{'verb': i18n_dashboard.VERB_NEW,\n                        'changed': False,\n                        'source_value': 'yes',\n                        'target_value': 'ja'}]}],\n            i18n_dashboard.I18nProgressDTO.NOT_STARTED)\n\n    def test_progress_one_section_current_but_changed_to_blank_unstarted(self):\n        self._test_progress_calculation(\n            [{'data': [{'verb': i18n_dashboard.VERB_CURRENT,\n                        'changed': True,\n                        'source_value': 'yes',\n                        'target_value': ''}]}],\n            i18n_dashboard.I18nProgressDTO.NOT_STARTED)\n\n    def test_progress_one_section_changed_but_changed_to_blank_unstarted(self):\n        self._test_progress_calculation(\n            [{"
+},
+{
+"source": "code",
+"jev": 332,
+"text": "iew object or a course descriptor.\n\n    Returns the course sharing url, this can be one of course's social sharing url, marketing url, or\n    lms course about url.\n    \"\"\"\n    is_social_sharing_enabled = configuration_helpers.get_value(\n        'SOCIAL_SHARING_SETTINGS',\n        getattr(settings, 'SOCIAL_SHARING_SETTINGS', {})\n    ).get('CUSTOM_COURSE_URLS')\n    if is_social_sharing_enabled and course.social_sharing_url:\n        course_about_url = course.social_sharing_url\n    elif settings.FEATURES.get('ENABLE_MKTG_SITE') and getattr(course, 'marketing_url', None):\n        course_about_url = course.marketing_url\n    else:\n        about_base = configuration_helpers.get_value_for_org(\n            course.id.org,\n            'LMS_ROOT_URL',\n            settings.LMS_ROOT_URL\n        )\n\n        course_about_url = u'{about_base_url}/courses/{course_key}/about'.format(\n            about_base_url=about_base,\n            course_key=six.text_type(course.id),\n        )\n\n    return course_about_url\n\n\ndef has_certificates_enabled(course):\n    \"\"\"\n    Arguments:\n        course: This can be either a course overview object or a course descriptor.\n    Returns a boolean if the course has enabled certificates\n    \"\"\"\n    if not settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):\n        return False\n    return course.cert_html_view_enabled\n\n\ndef should_display_grade(course_overview):\n    \"\"\"\n    Returns True or False depending upon either certificate available date\n    or course-end-date\n  "
+},
+{
+"source": "code",
+"jev": 427,
+"text": "ops.zeta(x + 1, q)\n    # TODO(b/36815900): Mark None return values as NotImplemented\n    if compat.forward_compatible(2019, 9, 14):\n      return (None,\n              array_ops.reshape(\n                  math_ops.reduce_sum(math_ops.mul_no_nan(partial_q, grad), rq),\n                  sq))\n    else:\n      return (None,\n              array_ops.reshape(math_ops.reduce_sum(partial_q * grad, rq), sq))\n\n\n@ops.RegisterGradient(\"Polygamma\")\ndef _PolygammaGrad(op, grad):\n  \"\"\"Returns gradient of psi(n, x) with respect to n and x.\"\"\"\n  # TODO(tillahoffmann): Add derivative with respect to n\n  n = op.inputs[0]\n  x = op.inputs[1]\n  # Broadcast gradients\n  sn = array_ops.shape(n)\n  sx = array_ops.shape(x)\n  unused_rn, rx = gen_array_ops.broadcast_gradient_args(sn, sx)\n  # Evaluate gradient\n  with ops.control_dependencies([grad]):\n    n = math_ops.conj(n)\n    x = math_ops.conj(x)\n    partial_x = math_ops.polygamma(n + 1, x)\n    # TODO(b/36815900): Mark None return values as NotImplemented\n    if compat.forward_compatible(2019, 9, 14):\n      return (None,\n              array_ops.reshape(\n                  math_ops.reduce_sum(math_ops.mul_no_nan(partial_x, grad), rx),\n                  sx))\n    else:\n      return (None,\n              array_ops.reshape(math_ops.reduce_sum(partial_x * grad, rx), sx))\n\n\n@ops.RegisterGradient(\"Sigmoid\")\ndef _SigmoidGrad(op, grad):\n  \"\"\"Returns grad * sigmoid(x) * (1 - sigmoid(x)).\"\"\"\n  y = op.outputs[0]  # y = sigmoid(x)\n  with ops.control_dependencies([grad]):\n "
+},
+{
+"source": "code",
+"jev": 14,
+"text": "ommand\"     (string, optional) The command to get "
+},
+{
+"source": "code",
+"jev": 439,
+"text": "rce_file = os.path.join(TEST_DATA_DIR, 'points.shp')\n        source_layer = QgsVectorLayer(source_file, 'Points', 'ogr')\n        self.assertTrue(source_layer.isValid())\n\n        options = QgsVectorFileWriter.SaveVectorOptions()\n        options.driverName = 'ESRI Shapefile'\n        options.filterExtent = QgsRectangle(-111, 26, -96, 38)\n\n        dest_file_name = os.path.join(str(QDir.tempPath()), 'extent_no_transform.shp')\n        write_result, error_message = QgsVectorFileWriter.writeAsVectorFormat(\n            source_layer,\n            dest_file_name,\n            options)\n        self.assertEqual(write_result, QgsVectorFileWriter.NoError, error_message)\n\n        # Open result and check\n        created_layer = QgsVectorLayer('{}|layerid=0'.format(dest_file_name), 'test', 'ogr')\n        features = [f for f in created_layer.getFeatures()]\n        self.assertEqual(len(features), 5)\n        for f in features:\n            self.assertTrue(f.geometry().intersects(options.filterExtent))\n\n    def testWriterWithExtentAndReprojection(self):\n        \"\"\"Check writing using extent filter with reprojection.\"\"\"\n        source_file = os.path.join(TEST_DATA_DIR, 'points.shp')\n        source_layer = QgsVectorLayer(source_file, 'Points', 'ogr')\n        self.assertTrue(source_layer.isValid())\n\n        options = QgsVectorFileWriter.SaveVectorOptions()\n        options.driverName = 'ESRI Shapefile'\n        options.filterExtent = QgsRectangle(-12511460, 3045157, -10646621, 4683497)\n        options.ct "
+},
+{
+"source": "commoncrawl",
+"jev": 1098,
+"text": "EFC;&#x5408;&#x4E45;&#x4E45;&#x65E0;&#x7801;&#x4E94;&#x5341;&#x8DEF;&#x4EBA;&#x59BB; &#x9752;&#x9752;&#x8349;&#x65E0;&#x7801;&#x56FD;&#x4EA7;&#x4E9A;&#x6D32; 50&#x5C81;&#x4E86;&#x4F9D;&#x7136;&#x98CE;&#x97F5;&#x72B9;&#x5B58; &#x897F;&#x74DC;&#x89C6;&#x9891;&#x5728;&#x7EBF;&#x770B; &#x5973;&#x4EBA;&#x8BA9;&#x7537;&#x4EBA;&#x6876;30&#x5206;&#x949F; &#x65B0;&#x91D1;&#x74F6;&#x6885;&#x7B2C;&#x4E00;&#x96C6; &#x897F;&#x65B9;&#x5927;&#x4F46;&#x4EBA;&#x6587;&#x827A;&#x672F; &#x66F0;&#x97E9;&#x7CBE;&#x54C1;&#x65E0;&#x7801;&#x4E00;&#x533A;&#x4E8C;&#x533A;&#x4E09;&#x533A;&#x89C6;&#x9891; &#x56FD;&#x4EA7;&#x6210;&#x4EBA;&#x65E0;&#x7801;&#x7CBE;&#x54C1;&#x4E45;&#x4E45;&#x4E8C;&#x533A;&#x4E09;&#x533A; &#x6700;&#x8FD1;&#x514D;&#x8D39;&#x4E2D;&#x6587;&#x5B57;&#x5E55;&#x624B;&#x673A;&#x7248; &#x6210; &#x4EBA; &#x9EC4; &#x8272; &#x7F51; &#x7AD9; &#x89C6;&#x9891; &#x5370;&#x5EA6;A&#x7EA7;&#x6BDB;&#x7247; JAPONENSIS&#x6210;&#x719F;&#x5927;&#x8C46; &#x548C;&#x670B;&#x53CB;&#x6362;&#x5A36;&#x59BB;&#x5F53;&#x9762;&#x505A;&#x5C0F;&#x4E66; &#x91CE;&#x82B1;&#x5F71;&#x89C6;&#x5927;&#x5168;&#x5728;&#x7EBF;&#x89C2;&#x770B;&#x514D;&#x8D39;&#x9AD8;&#x6E05;5 &#x6027;&#x6B27;&#x7F8E;GAYSE&#x2169; &#x4E9A;&#x6D32;AV&#x65E0;&#x7801;&#x4E13;&#x533A;&#x4E9A;&#x6D32;&#x732B;&#x54AA; &#x88AB;&#x592B;&#x306E;&#x4E0A;&#x53F8;&#x6301;&#x4E45;&#x4FB5;&#x72AF;&#x803B;&#x8FB1; &#x6B27;&#x6D32;&#x6027;&#x5F00;&#x653E;&#x8001;&#x592A;&#x5927; &#x4E45;&#x4E45;&#x65E0;&#x7801;&#x4E2D;&#x6587;&#x5B57;&#x5E55;&#x514D;&#x8D39;"
+},
+{
+"source": "commoncrawl",
+"jev": 18,
+"text": "rt girls\nen+austria+upper-austria+vocklabruck user"
+},
+{
+"source": "commoncrawl",
+"jev": 21,
+"text": " hedera仮想通貨 jpdejamfunctionlibrary CRO提案 httpslean"
+},
+{
+"source": "commoncrawl",
+"jev": 650,
+"text": " (4)\n2021 (11)\n2022 (9)\n2023 (7)\n2024 (3)\nactividades (1)\nActualidad (13)\nacuarelas (4)\nafinet (5)\nAgosto (1)\nAlcalá de Henares (74)\nalcalde (2)\nAlcine (6)\nAlegoría (1)\nAndorra (15)\nanfil (2)\nAniversario (4)\nantillas (1)\nAragón (1)\narmada (2)\nArtes del Humor (2)\narticulo (15)\nAsema (2)\nAsociación (89)\nAstilleros (1)\nAsturias (2)\nAtaud (1)\nAvance (5)\nAvilés (1)\nayuntamiento (3)\nazuqueca (1)\nBadajoz (1)\nbarco (2)\nBBelén (1)\nBlasco Ibañez (1)\nBlog (1)\nbrigadas internacionales (2)\nBuen Retiro (1)\nBuques Inteligentes (1)\nCadiz (1)\nCamino Real Guadalupe (1)\nCamino Santiago (1)\ncampaña (1)\nCanarias (1)\ncanje (1)\ncañonero (1)\nCardenal Cisneros (1)\nCarnaval (1)\ncartas (3)\nCarteles Cine (1)\nCartero (1)\nCarteros (1)\nCartofilia (1)\nCastilla León (1)\nCatalina de Aragón (1)\nCatalogo (1)\nCataluña (1)\nCaudillo (1)\nCebreros (1)\nCenicienta (1)\ncentenario (2)\nCentro (1)\nCervantes (16)\ncharlas (1)\nChile (1)\ncid (1)\nCine (4)\nCirculo Filatelico (2)\nColección (2)\nColeccionismo (19)\nCompañía de Jesús (1)\nComunidad de Madrid (1)\nconcejalia de cultura (1)\nConcurso (1)\nCondueños (1)\nConferencias (74)\nConversión (1)\ncorreo (2)\nCorreo Areo. (1)\nCorreo Campaña (1)\nCorreo Local (1)\nCorreo Submarino (2)\nCorreos (46)\nCorrespondencia (1)\nCoslada (2)\ncosmos (1)\ncovid (10)\ncruz roja (1)\ncuba (2)\nCuriosidades (1)\nDali (1)\ndestructor (1)\ndinosaurios (1)\nDirección (1)\nDon Quijote (1)\nDos Reales (1)\neco (1)\nEco Filatelico (1)\nedifil (1)\nEl Cid (1)\nElcano (2)\nEmbajador (2)\nEmisiones (19)\nEmisiones Patrioticas (1)\nEn"
+},
+{
+"source": "commoncrawl",
+"jev": 204,
+"text": "中文字幕久久| 亚洲视频中文字幕| 国产高清无密码一区二区三区| 中文字幕在线影院| 福利无遮挡喷水高潮| 亚洲熟女荡妇| 免费va国产高清不卡大片| 亚洲国内精品| 亚洲欧美日韩中文综合在线不卡| 精品久久久久久国产潘金莲| 片不卡无码久久蜜芽| 亚洲成A∧人片在线播放黑人| 亚洲午夜视频在线| 中文字幕在线看片| 精品aⅴ无码中文字字幕蜜桃91| 日韩欧美一区二区久久| 精品91精品91精品国"
+},
+{
+"source": "commoncrawl",
+"jev": 18,
+"text": "son: cawthon, Person: clement, Person: conmission,"
+},
+{
+"source": "commoncrawl",
+"jev": 12,
+"text": "ibute copies of such a program, whether gratis or "
+},
+{
+"source": "commoncrawl",
+"jev": 78,
+"text": "f use | Privacy policy\nRegister\nHome Board index\nAll times are UTC-04:00\nDelete cookies\nContact us\nPowered by phpBB® Forum Software © phpBB Limited\nPrivacy | Terms\n\n\n猎球者-猎球者(科技)股份有限公司 猎球者-JXF配电箱_配电箱-江"
+},
+{
+"source": "commoncrawl",
+"jev": 57,
+"text": "sories\nBlog\nHome\nSofa Sets\nCoffee Tables\nArm Chairs\nChairs\nDining Sets\nDining Tables\nEnd Tables\nKitchen Tables\nLove Seats\nRocking Chairs\nHome Accents & Accessories\nBlog\nHome\nAmazon Affiliate Disclaime"
+},
+{
+"source": "commoncrawl",
+"jev": 58,
+"text": "\nShowreel\nAudio\nKontakt\nImpressum\n\n\nDana Masters (UK) | Kaunas Jazz\nFollow on facebook Follow on instagram\nContacts\nKaunas Jazz Award\nAbout Kaunas Jazz\nNavigation\nProgramme\nOverview\nTickets\nPartners\nI"
+},
+{
+"source": "commoncrawl",
+"jev": 635,
+"text": "13818361166@163.com\n首页\n立式包装机\n给袋式包装机\n灌装机\n枕式包装机\n产品中心\n客户案例\n新闻中心\n走进昆布\n联系我们\nCopyright © http://www.kpack.com.cn/ 上海昆布包装机械有限公司 专业从事于 ，欢迎来电咨询！ 沪ICP备13008034号 技术支持： 苏州网站推广\n热线电话\n18701943996\n在线留言\n返回顶部\n\n\nKujawsko - Pomorska Wojewódzka Rada Bezpieczeństwa Ruchu Drogowego - Sala do wychowania komunikacyjnego w Kruszynie\nPoleć znajomemu\nAdres email znajomego:\nTwoje imię i nazwisko:\nTwój adres email:\nTemat wiadomości:\n\n\nSortiment | Verlag Dr. Thomas Balistier\n[ A-] [ A ] [ A+]\nALT |\nHilfe\n| Impressum\n| Sitemap\n| Kontakt\nStartseite\nReihe Sedones\nReiseberichte aus Hellas\nKrimi\nRoman\nLyrik\nFotoband\nAutoren\nLinks\nBestellformular\nSie befinden sich hier: Startseite > Bestellformular\nReihe Sedones\nSedones 1\nThomas Balistier\nDer Diskos von Phaistos\nZur Geschichte eines Rätsels & den Versuchen seiner Auflösung\nDie Entzifferungsgeschichte des Diskos von Phaistos, eines der bedeutendsten Fundstücke der minoischen Kultur.\nSedones 2\nThomas Balistier\nKretischer Raki - Raki-Kultur\nKreta und sein Nationalgetränk. Eine Einführung.\nDie Kultur des in den Rang eines kretischen Nationalgetränk erhobenen Weintresterschnapses Raki bzw. Tsikoudia.\nSedones 3\nFranz Wilhelm Sieber\nKreta 1817\nEin historischer Reisebericht\nDas Leben auf Kreta unter osmanischer Herrschaft im Jahre 1817\nSedones 4\nUlrich Kadelbach\nWeihrauch und Ziegenkäse\nSynkretistische Geschichten\nAlltagsgeschichten zur Orthodoxie, Liturgie und Mythologie\nSedones 5\nUlrich Kadelbach\n&#931;&#954;&#953;&#940; &#948;&#943;&#967;&#969;&#962; &#940;&#957;&#94"
+},
+{
+"source": "commoncrawl",
+"jev": 1020,
+"text": "а розетке »»» Круглая розетка »»» Квадратная розетка »» Ручки-Защелки (КНОБЫ) » Раздвижные инженерные системы в Нижнем Новгороде Паркетная доска Смесители Товары по акции\nПроизводитель:\nВсе ALBA ARCHIE Aurum doors BLUM INDUSTRY BRAVO CERBER ElPorta Ferroni GENESIS ARCHIE GROFF INTECRON MR.WOOD Pallini PROFILDOORS PUNTO Retta porte Rucetti Venezia - MADE IN ITALY VERDA Vi LARIO VIVAT zadoor Ателье \"ДВА БОБРА\" Белвуддорс Белоруссия Белорусские двери Бункер Двери СК Дверной лидер завод деревоизделий завод деревоизделий \"АРИСТОН\" КРАСНОДЕРЕВЩИК Лесма Промет ( VALBERG) Ростра РУМАКС Стальная линия Стендор СТЕНДОР (ЗАО ТОП-Комплект Торэкс ЮРКАС\nНовинка:\nВсе да нет\nСпецпредложение:\nВсе да нет\nРезультатов на странице:\n5 20 35 50 65 80 95\nЗакрыть\nНайти\nКорзина пуста\nОформить Заказ\nРасширенный поиск\nО компании\nГлавная- Интернет-магазин\nНовости и новинки\nОплата и доставка\nАдреса\nКупить в 1 клик\nF.A.Q.\nМонтаж и услуги\nО компании\nВход в кабинет\nВход в кабинет\nВход в кабинет\nЛогин или e-mail:\nПароль:\nЗабыли пароль?\nВойти\nРегистрация\nАЛБА-Двери\nИнтернет-магазин дверей и товаров для дома.\n+7 (999) 078-14-15\n+7 (910) 132-90-69\nКорзина пуста\nОформить Заказ\nРасширенный поиск\nНазвание:\nЦена (руб.):\nАртикул:\nТекст:\nВыберите категорию:\nВсе Межкомнатные двери » По материалу »» ЭкоШпон »» массив »» Шпон »» Эмаль »» Шпон FL »» ПВХ , Ламинат, грунтованный и под оксраску » ALBA - Эмалированные двери » PROFILDOORS »» Серия XN »» Серия U »» Серия Х классика »» Серия X - Модерн »» Сери ZN »» серия Z »» Се"
+},
+{
+"source": "commoncrawl",
+"jev": 14,
+"text": "\nAlert Organisms\nNS1 Protein: Useful Tool in Early"
+},
+{
+"source": "commoncrawl",
+"jev": 16,
+"text": "oll.\nDet bör noteras att RRS-undersökningen är hel"
+},
+{
+"source": "commoncrawl",
+"jev": 35,
+"text": "927;&#x5168; &#x4EBA;&#x59BB;&#x4E30;&#x6EE1;&#x71"
+},
+{
+"source": "commoncrawl",
+"jev": 12,
+"text": " battle between Wild Hunt and the Jaegers, with ca"
+},
+{
+"source": "commoncrawl",
+"jev": 11,
+"text": "t rating (both negatively and positively).\nIf you "
+},
+{
+"source": "commoncrawl",
+"jev": 93,
+"text": "log Series (51) Books and Magazines (59) Build Your Stash (3) Calvary (91) Calvary Couponers Blog News (30) Cash Back Savings (2) Challenges (12) Doodling Challenges (12) Christian Book.com (4) Christian Resources (44) Christmas (79) Clothing and Accessories (7) Contests & Giveaways (1) Cooking and "
+},
+{
+"source": "commoncrawl",
+"jev": 24,
+"text": "μένων των μονοκατοικιών οι οποίες έχουν χαρακτηρισ"
+},
+{
+"source": "commoncrawl",
+"jev": 633,
+"text": "LLER QUARTETGAMMAL SEDGAMMELSAETER, RUNHILDGAMMELSAETER, RUNHILD + LASSE MARHAUGGANG WIZARDGANONGANTZGANZERGANZMORDGAPING MAWGARLIK DE'THGARMONBOZIAGARTH ARUMGARY SUICIDAL KIDS COMMANDOGAS CHAMBERGAS MASK HORSEGASKETGASPGASP / SUFFERING LUNAGATE 9GATE TO GATEGATE TO VOIDGATESGATES OF SLUMBER, THEGATOR BAIT TENGAUCHISTEGAY BARBARIANSGEHENNAGEHENNA / BLIND TO FAITHGEHENNA / INTEGRITYGEHENNA ⁄ CALIFORNIA LOVEGEHENNA / BLEACH EVERYTHINGGEISHAGEISHA / TRACTORGEISTGELSOMINAGELSOMINA + CLOAMAGELSOMINA + NO XIVICGENERAL LEEGENERATION OF VIPERSGENERIC DEATHGENEVIEVEGENGHIS TRONGENOCIDE ORGANGERBILS, THEGERDAGERIHTGERMGERMANOTTA YOUTHGEROGERIGEGEGE, THEGERRITGERRITTGERSCH,THEGERYONGEVURAHGEZOLEENGHASTGHAST / RAPE-XGHAST / YOGAGHOLDGHOST KOMMANDOGHOST TOWERGHOSTRIDERGHOULGIALLOS FLAME, THEGIAMONGIANT SQUIDGIANT SQUID / GRAYCEONGIFFONI, CARLOSGIGANGILES COREYGINNUNGAGAPGIREGIRNU GIESMESGIRTHGIT SOMEGIVE UPGJERSTAD, FRODE + LASSE MARHAUGGLASS COFFINGLASS COFFIN / TOMBSTALKERGLASS, PHILIPGLAUKOM SYNODGLITTERPALSGLORIA DIABOLIGLORIOR BELLIGLOWGNAWGNAW THEIR TONGUESGNAW THEIR TONGUES / COREPHALLISMGNAW THEIR TONGUES + ALKERDEELGNAW THEIR TONGUES / SICK TO THE BACK TEETHGNAWEDGNODGNOMEGOATGOAT / KAZUMOTO ENDOGOAT / TEFGOAT HORNSGOAT THRONGOAT TUNNELGOAT WITCHGOATCRAFTGOATLORDGOATPENISGOATPENIS / NYOGTHAEBLISZGOATPSALMGOATSBLOODGOATSNAKEGOATVARGRGOBLINGOBLIN / KEITH EMERSONGODFLESHGODHEADSCOPEGODLESSGODS AMERICAGODS AMONG MENGODS TEMPLE OF FAMILY DELIVERANCEGODSTOMPERGODSTOMPER / HFATTMGODSTOM"
+},
+{
+"source": "csv",
+"jev": 247,
+"text": "id,name,email,amount,date\n0,pproach quantif,user59014@mail.com,355.00,2026-04-10\n1,(a) and \\[fig:o,user28185@mail.com,628.89,2026-03-14\n2,was sentenced i,user41442@mail.com,915.78,2026-06-10\n3,eping pills an,user21396@mail.com,993.23,2026-03-12\n4,lity is respons,user41302@mail.com,330.72,2026-09-19\n5,- 995231*g**2. ,user61723@mail.com,211.22,2026-09-10\n6,5 post cooldown,user10221@mail.com,392.91,2026-09-14"
+},
+{
+"source": "csv",
+"jev": 406,
+"text": "id,name,email,amount,date\n0,e question to. ,user86178@mail.com,529.70,2026-06-12\n1,a public REIT (,user24121@mail.com,555.11,2026-07-11\n2,text imaging. F,user89860@mail.com,431.38,2026-08-13\n3,n paleontology ,user15166@mail.com,165.35,2026-03-12\n4,0.41 • female (,user17293@mail.com,477.21,2026-05-19\n5,pon different c,user34776@mail.com,127.61,2026-07-16\n6,var CssScanner ,user73544@mail.com,558.58,2026-01-17\n7,truction and by,user7934@mail.com,648.89,2026-07-11\n8,l where the on,user95688@mail.com,153.48,2026-01-11\n9,are to be made ,user57964@mail.com,552.40,2026-02-11\n10,ity. Formally ,user55987@mail.com,436.58,2026-05-15\n11,inherited their,user95191@mail.com,525.46,2026-08-10"
+},
+{
+"source": "csv",
+"jev": 732,
+"text": "id,name,email,amount,date\n0,ation $k>0$ is ,user60178@mail.com,766.04,2026-09-18\n1,lpful comments ,user68224@mail.com,701.12,2026-04-11\n2,ata show a less,user76787@mail.com,386.17,2026-04-10\n3,H. Masuhara and,user5753@mail.com,937.62,2026-01-15\n4,in between Dani,user28839@mail.com,542.55,2026-03-12\n5,\\\\int\\limits^{,user19386@mail.com,928.42,2026-07-12\n6,e: AChE 1. The ,user65463@mail.com,650.61,2026-03-11\n7,and no longer w,user90904@mail.com,462.35,2026-09-18\n8,ion-photo\\/1038,user52795@mail.com,956.33,2026-07-15\n9,der balls and s,user17351@mail.com,145.12,2026-03-10\n10,.command('push',user1728@mail.com,638.72,2026-07-17\n11,href=\"/public/c,user14116@mail.com,665.75,2026-07-13\n12, the detector ,user63655@mail.com,340.38,2026-07-14\n13,IFNs) and cyto,user82522@mail.com,791.91,2026-09-15\n14,es Category:Rad,user28710@mail.com,819.13,2026-06-16\n15,ent.\" True Nort,user4562@mail.com,840.25,2026-01-18\n16,instrument pane,user43904@mail.com,341.05,2026-08-10\n17,1003720-Stuart1,user31598@mail.com,26.31,2026-02-19\n18,80% N; found 63,user28543@mail.com,654.70,2026-01-15\n19,ect: pkix.Name{,user58690@mail.com,55.91,2026-08-17\n20,s throat cut a,user26807@mail.com,228.98,2026-05-11"
+},
+{
+"source": "csv",
+"jev": 933,
+"text": "id,name,email,amount,date\n0,lts have prompt,user54959@mail.com,324.94,2026-07-11\n1,fied the malici,user78179@mail.com,226.76,2026-05-16\n2,apache.commons.,user64159@mail.com,657.54,2026-06-15\n3,to cytotoxic ag,user44692@mail.com,56.95,2026-02-13\n4,45.7 (9.9) 41.4,user42032@mail.com,129.51,2026-05-13\n5,made just media,user18108@mail.com,474.37,2026-04-11\n6,j}^{(k-1)}$$ so,user49594@mail.com,769.93,2026-04-18\n7,re more carbon ,user84797@mail.com,309.60,2026-04-10\n8,an Regional Dir,user63481@mail.com,784.93,2026-03-14\n9,cannot and do ,user61274@mail.com,950.54,2026-03-18\n10,; the Chinese o,user27733@mail.com,176.73,2026-06-12\n11,purposes of det,user28751@mail.com,130.25,2026-01-18\n12,. Alas time di,user19557@mail.com,176.97,2026-08-17\n13,when the giants,user41348@mail.com,786.08,2026-09-10\n14,}{2}\\right)^T &,user60483@mail.com,31.87,2026-06-14\n15,?\" moment this ,user20502@mail.com,445.25,2026-09-10\n16,and numerous bi,user90685@mail.com,699.96,2026-07-10\n17,blication have ,user98889@mail.com,836.29,2026-05-10\n18,clients kube.Cl,user89143@mail.com,318.95,2026-08-10\n19,Atty. Gen. Dav,user32557@mail.com,809.28,2026-07-15\n20,the students to,user89150@mail.com,664.40,2026-01-10\n21,ntimes = -1 fp ,user43655@mail.com,556.36,2026-03-13\n22,if (is_android),user55242@mail.com,376.31,2026-02-11\n23,omatic v.0.32 (,user71291@mail.com,152.82,2026-07-12\n24,undiluted by co,user87115@mail.com,893.22,2026-07-14\n25,implies that $(,user97096@mail.com,616.31,2026-05-16\n26,re elements wit,user621@mail.com,506.17,2026-07-13"
+},
+{
+"source": "csv",
+"jev": 202,
+"text": "id,name,email,amount,date\n0,Then there exi,user63559@mail.com,459.48,2026-03-13\n1,t trocar. The p,user82221@mail.com,994.89,2026-09-17\n2,This hyporeacti,user59122@mail.com,644.20,2026-07-12\n3,and gives up hi,user69405@mail.com,531.55,2026-04-18\n4,e sensitivity a,user26059@mail.com,284.67,2026-09-16\n5,ith Our Profess,user59911@mail.com,803.42,2026-08-14"
+},
+{
+"source": "csv",
+"jev": 245,
+"text": "id,name,email,amount,date\n0,1249.90 (6500,user9116@mail.com,292.58,2026-04-14\n1,</dictionary> <,user42281@mail.com,372.42,2026-07-18\n2,uccess in thera,user97308@mail.com,405.67,2026-01-14\n3,(e.g. Eclipse).,user6390@mail.com,743.73,2026-01-14\n4,umes to any con,user7879@mail.com,169.84,2026-01-18\n5,t sera. One hun,user1358@mail.com,127.61,2026-08-15\n6,. The PASS stud,user92250@mail.com,192.07,2026-07-18"
+},
+{
+"source": "de",
+"jev": 422,
+"text": "nahm sich ihrer Seele an. Zu ihren Lebzeiten war sie eine äußerst schöne Frau gewesen, aber nach ihrem Tod wurde sie in eine schreckliche und hässliche Hexe verwandelt. Matilda wurde von Arawn dazu verdammt, bis in alle Ewigkeit zu jagen.\nDie zweite Geschichte besagt, dass eine junge walisische Frau das Jagen liebte, aber ihr Verlobter nichts davon für Damen hielt. Bei ihrer Hochzeit versprach er, nie wieder zu jagen und sie willigte ebenfalls ein. Allerdings vermisste sie das Jagen sehr. Über ein Jahr lang sehnte sie sich danach, aber ihr Ehemann verbot es ihr. Als er einmal für eine Weile abwesend war, ergriff sie die Gelegenheit. Einen ganzen Tag lang ritt sie mit einer Jagdgesellschaft und zwang jeden, darüber zu schweigen. Unglücklicherweise wurde sie auf dem Rückweg vom Pferd geworfen und brach sich ein Bein. Als ihr Ehemann zurückkehrte, ahnte er sofort, was geschehen war und dass sie ihr Versprechen, nicht zu jagen, gebrochen hatte. Er stürmte aus dem Haus und befragte einen dyn hysbys (‚weisen Mann, Zauberer‘). Die beiden Männer kehrten zum Schloss zurück und stießen Verwünschungen aus, welche die junge Frau vom Boden in die Luft aufsteigen ließen und sie in den Wind warfen. Als ein Wirbelwind sie nach oben sog, wurde sie von Arawn gerettet, der sie in einen Wagen setzte, um Annwns Jagd anzuführen.\n\n\n== Verwandte Gestalten ==\nDie Gestalt der Mallt-y-Nos hat Ähnlichkeiten mit:\n\ndie Korrigan, (Bretagne)\nBlack Annis, (Leicestershire)\nBanshee und Cliodhna, (Irland)\nGwrac"
+},
+{
+"source": "de",
+"jev": 434,
+"text": "Renk ist eine Stadt im Bundesstaat Upper Nile im Nordosten des Südsudan. 2008 hatte die Stadt ca. 69.079 Einwohner.\n\n\n== Geographie ==\nRenk liegt am Ostufer des Weißen Nils als Kreisstadt des Renk County, und in der Nähe der Grenze zum Sudan. Der Weiße Nil bildet ein breites Überschwemmungsgebiet mit zahlreichen Altwässern.\nVon der Landeshauptstadt Juba ist die Stadt etwa 970 km entfernt.\nSüdlich der Stadt verläuft als Grenze der Khor Daleib (Doleib), der dort in den Weißen Nil mündet. Das Rasterförmige Straßennetz der Stadt löst sich nach Norden und Süden auf in die Siedlungen von Abbeit, Debbat Kudit und Debbat Asdak (N), sowie Mabek (S). Östlich der Stadt liegt Rom an der Düne Qoz Rom.\nSeit der Unabhängigkeit des Südsudan am 9. Juli 2011 wächst die Stadt.\n\n\n=== Verkehr ===\nDie Hauptstraße verläuft von Norden nach Süden, teilweise parallel zum Weißen Nil. Sie führt im Süden nach Malakal und im Norden nach Rabak und Kusti im Bundesstaat an-Nil al-abyad, im Sudan. In Renk gibt es auch den Renk Airport.\n\n\n== Klima ==\n\n\n== Wirtschaft ==\nDie Wirtschaft in Renk und Umgebung besteht hauptsächlich aus Subsistenzwirtschaft und nomadischer Weidewirtschaft. Es wird vor allem Gummi arabicum und Sorghum produziert. Seismologische Studien deuten jedoch darauf hin, dass bedeutende Erdöl-Vorkommen vorhanden sind.\n\n\n== Weblinks ==\nLocation of Renk. Google Maps.\nNeeds Assessment Study of Renk County In 2008. afrikansarvi.fi\n\n\n== Einzelnachweise =="
+},
+{
+"source": "de",
+"jev": 104,
+"text": "t für:\n\nein Personalpronomen (1. Person Singular im Akkusativ)\nIhn (Wallerfangen), Ortsteil der Gemeinde Wallerfangen im Landkreis Saarlouis im Saarland\nZ 14 Friedrich Ihn, Zerstörer der Kriegsmarine\nIhn ist der Familienname folgender Personen:\n\nFriedrich Ihn (1885–1916), Kapitänleutnant, Kommandant"
+},
+{
+"source": "edge",
+"jev": 520,
+"text": "مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم مرحبا بالعالم "
+},
+{
+"source": "edge:zwsp",
+"jev": 211,
+"text": "a​b‌c‍d a​b‌c‍d a​b‌c‍d a​b‌c‍d a​b‌c‍d a​b‌c‍d a​b‌c‍d a​b‌c‍d a​b‌c‍d a​b‌c‍d a​b‌c‍d a​b‌c‍d a​b‌c‍d a​b‌c‍d a​b‌c‍d a​b‌c‍d a​b‌c‍d a​b‌c‍d a​b‌c‍d a​b‌c‍d a​b‌c‍d a​b‌c‍d a​b‌c‍d a​b‌c‍d a​b‌c‍d a​b‌c‍d a​b‌c‍d a​b‌c‍d a​b‌c‍d a​b‌c‍d "
+},
+{
+"source": "edge",
+"jev": 8,
+"text": "                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    "
+},
+{
+"source": "edge",
+"jev": 960,
+"text": "3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 3.14159 2.71828 1.41421 "
+},
+{
+"source": "edge:zalgo",
+"jev": 511,
+"text": "Z̴̡̛a̵l̷g̶o̸ ̶t̴e̵x̷t̸ Z̴̡̛a̵l̷g̶o̸ ̶t̴e̵x̷t̸ Z̴̡̛a̵l̷g̶o̸ ̶t̴e̵x̷t̸ Z̴̡̛a̵l̷g̶o̸ ̶t̴e̵x̷t̸ Z̴̡̛a̵l̷g̶o̸ ̶t̴e̵x̷t̸ Z̴̡̛a̵l̷g̶o̸ ̶t̴e̵x̷t̸ Z̴̡̛a̵l̷g̶o̸ ̶t̴e̵x̷t̸ Z̴̡̛a̵l̷g̶o̸ ̶t̴e̵x̷t̸ Z̴̡̛a̵l̷g̶o̸ ̶t̴e̵x̷t̸ Z̴̡̛a̵l̷g̶o̸ ̶t̴e̵x̷t̸ Z̴̡̛a̵l̷g̶o̸ ̶t̴e̵x̷t̸ Z̴̡̛a̵l̷g̶o̸ ̶t̴e̵x̷t̸ Z̴̡̛a̵l̷g̶o̸ ̶t̴e̵x̷t̸ Z̴̡̛a̵l̷g̶o̸ ̶t̴e̵x̷t̸ Z̴̡̛a̵l̷g̶o̸ ̶t̴e̵x̷t̸ "
+},
+{
+"source": "edge:zwj_family",
+"jev": 240,
+"text": "👨‍👩‍👧‍👦 👨‍👩‍👧‍👦 👨‍👩‍👧‍👦 👨‍👩‍👧‍👦 👨‍👩‍👧‍👦 👨‍👩‍👧‍👦 👨‍👩‍👧‍👦 👨‍👩‍👧‍👦 👨‍👩‍👧‍👦 👨‍👩‍👧‍👦 👨‍👩‍👧‍👦 👨‍👩‍👧‍👦 👨‍👩‍👧‍👦 👨‍👩‍👧‍👦 👨‍👩‍👧‍👦 👨‍👩‍👧‍👦 👨‍👩‍👧‍👦 👨‍👩‍👧‍👦 👨‍👩‍👧‍👦 👨‍👩‍👧‍👦 "
+},
+{
+"source": "edge",
+"jev": 601,
+"text": "x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;x=1;"
+},
+{
+"source": "edge:bom_rtl",
+"jev": 202,
+"text": "﻿hello ‏עברית‎ world ﻿hello ‏עברית‎ world ﻿hello ‏עברית‎ world ﻿hello ‏עברית‎ world ﻿hello ‏עברית‎ world ﻿hello ‏עברית‎ world ﻿hello ‏עברית‎ world ﻿hello ‏עברית‎ world ﻿hello ‏עברית‎ world ﻿hello ‏עברית‎ world ﻿hello ‏עברית‎ world ﻿hello ‏עברית‎ world ﻿hello ‏עברית‎ world ﻿hello ‏עברית‎ world ﻿hello ‏עברית‎ world ﻿hello ‏עברית‎ world ﻿hello ‏עברית‎ world ﻿hello ‏עברית‎ world ﻿hello ‏עברית‎ world ﻿hello ‏עברית‎ world "
+},
+{
+"source": "edge:pua",
+"jev": 140,
+"text": "                    "
+},
+{
+"source": "edge",
+"jev": 440,
+"text": "日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。日本語のテキストです。"
+},
+{
+"source": "edge:math_bold",
+"jev": 460,
+"text": "𝐇𝐞𝐥𝐥𝐨 𝕎𝕠𝕣𝕝𝕕 𝓈𝒸𝓇𝒾𝓅𝓉 𝐇𝐞𝐥𝐥𝐨 𝕎𝕠𝕣𝕝𝕕 𝓈𝒸𝓇𝒾𝓅𝓉 𝐇𝐞𝐥𝐥𝐨 𝕎𝕠𝕣𝕝𝕕 𝓈𝒸𝓇𝒾𝓅𝓉 𝐇𝐞𝐥𝐥𝐨 𝕎𝕠𝕣𝕝𝕕 𝓈𝒸𝓇𝒾𝓅𝓉 𝐇𝐞𝐥𝐥𝐨 𝕎𝕠𝕣𝕝𝕕 𝓈𝒸𝓇𝒾𝓅𝓉 𝐇𝐞𝐥𝐥𝐨 𝕎𝕠𝕣𝕝𝕕 𝓈𝒸𝓇𝒾𝓅𝓉 𝐇𝐞𝐥𝐥𝐨 𝕎𝕠𝕣𝕝𝕕 𝓈𝒸𝓇𝒾𝓅𝓉 𝐇𝐞𝐥𝐥𝐨 𝕎𝕠𝕣𝕝𝕕 𝓈𝒸𝓇𝒾𝓅𝓉 𝐇𝐞𝐥𝐥𝐨 𝕎𝕠𝕣𝕝𝕕 𝓈𝒸𝓇𝒾𝓅𝓉 𝐇𝐞𝐥𝐥𝐨 𝕎𝕠𝕣𝕝𝕕 𝓈𝒸𝓇𝒾𝓅𝓉 "
+},
+{
+"source": "edge:gothic",
+"jev": 420,
+"text": "𐌰𐌱𐌲𐌳𐌴 𐌰𐌱𐌲𐌳𐌴 𐌰𐌱𐌲𐌳𐌴 𐌰𐌱𐌲𐌳𐌴 𐌰𐌱𐌲𐌳𐌴 𐌰𐌱𐌲𐌳𐌴 𐌰𐌱𐌲𐌳𐌴 𐌰𐌱𐌲𐌳𐌴 𐌰𐌱𐌲𐌳𐌴 𐌰𐌱𐌲𐌳𐌴 𐌰𐌱𐌲𐌳𐌴 𐌰𐌱𐌲𐌳𐌴 𐌰𐌱𐌲𐌳𐌴 𐌰𐌱𐌲𐌳𐌴 𐌰𐌱𐌲𐌳𐌴 𐌰𐌱𐌲𐌳𐌴 𐌰𐌱𐌲𐌳𐌴 𐌰𐌱𐌲𐌳𐌴 𐌰𐌱𐌲𐌳𐌴 𐌰𐌱𐌲𐌳𐌴 "
+},
+{
+"source": "edge:keycap",
+"jev": 240,
+"text": "1️⃣2️⃣3️⃣#️⃣1️⃣2️⃣3️⃣#️⃣1️⃣2️⃣3️⃣#️⃣1️⃣2️⃣3️⃣#️⃣1️⃣2️⃣3️⃣#️⃣1️⃣2️⃣3️⃣#️⃣1️⃣2️⃣3️⃣#️⃣1️⃣2️⃣3️⃣#️⃣1️⃣2️⃣3️⃣#️⃣1️⃣2️⃣3️⃣#️⃣1️⃣2️⃣3️⃣#️⃣1️⃣2️⃣3️⃣#️⃣1️⃣2️⃣3️⃣#️⃣1️⃣2️⃣3️⃣#️⃣1️⃣2️⃣3️⃣#️⃣"
+},
+{
+"source": "edge",
+"jev": 400,
+"text": "🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽🚀🔥👍🏽"
+},
+{
+"source": "edge",
+"jev": 401,
+"text": "Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? Привет, как дела? "
+},
+{
+"source": "edge:latin_mix",
+"jev": 141,
+"text": "Ça va très bien, où êtes-vous? Größe Straße ñandú Ça va très bien, où êtes-vous? Größe Straße ñandú Ça va très bien, où êtes-vous? Größe Straße ñandú Ça va très bien, où êtes-vous? Größe Straße ñandú Ça va très bien, où êtes-vous? Größe Straße ñandú Ça va très bien, où êtes-vous? Größe Straße ñandú Ça va très bien, où êtes-vous? Größe Straße ñandú Ça va très bien, où êtes-vous? Größe Straße ñandú Ça va très bien, où êtes-vous? Größe Straße ñandú Ça va très bien, où êtes-vous? Größe Straße ñandú "
+},
+{
+"source": "edge:cjk_punct",
+"jev": 184,
+"text": "「こんにちは」、『世界』。（テスト）【注意】・…「こんにちは」、『世界』。（テスト）【注意】・…「こんにちは」、『世界』。（テスト）【注意】・…「こんにちは」、『世界』。（テスト）【注意】・…「こんにちは」、『世界』。（テスト）【注意】・…「こんにちは」、『世界』。（テスト）【注意】・…「こんにちは」、『世界』。（テスト）【注意】・…「こんにちは」、『世界』。（テスト）【注意】・…「こんにちは」、『世界』。（テスト）【注意】・…「こんにちは」、『世界』。（テスト）【注意】・…"
+},
+{
+"source": "edge:ko_nfd",
+"jev": 171,
+"text": "한국어 텍스트입니다. 안녕하세요! 한국어 텍스트입니다. 안녕하세요! 한국어 텍스트입니다. 안녕하세요! 한국어 텍스트입니다. 안녕하세요! 한국어 텍스트입니다. 안녕하세요! 한국어 텍스트입니다. 안녕하세요! 한국어 텍스트입니다. 안녕하세요! 한국어 텍스트입니다. 안녕하세요! 한국어 텍스트입니다. 안녕하세요! 한국어 텍스트입니다. 안녕하세요! "
+},
+{
+"source": "edge",
+"jev": 100,
+"text": "\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n\t\t\n"
+},
+{
+"source": "edge:fullwidth",
+"jev": 280,
+"text": "ＡＢＣ１２３！？ａｂｃ　ＡＢＣ１２３！？ａｂｃ　ＡＢＣ１２３！？ａｂｃ　ＡＢＣ１２３！？ａｂｃ　ＡＢＣ１２３！？ａｂｃ　ＡＢＣ１２３！？ａｂｃ　ＡＢＣ１２３！？ａｂｃ　ＡＢＣ１２３！？ａｂｃ　ＡＢＣ１２３！？ａｂｃ　ＡＢＣ１２３！？ａｂｃ　ＡＢＣ１２３！？ａｂｃ　ＡＢＣ１２３！？ａｂｃ　ＡＢＣ１２３！？ａｂｃ　ＡＢＣ１２３！？ａｂｃ　ＡＢＣ１２３！？ａｂｃ　ＡＢＣ１２３！？ａｂｃ　ＡＢＣ１２３！？ａｂｃ　ＡＢＣ１２３！？ａｂｃ　ＡＢＣ１２３！？ａｂｃ　ＡＢＣ１２３！？ａｂｃ　"
+},
+{
+"source": "el",
+"jev": 266,
+"text": "όσωπα:\n\nΆρης (Αριστείδης) Γιαννακίδης (γενν. 1959), ο πρώτος αιρετός περιφερειάρχης Ανατολικής Μακεδονίας και Θράκης\nΚώστας Γιαννακίδης (γενν. 1966), δημοσιογράφος\nΜιχάλης Γιαννακίδης (γενν. 1988), καλαθοσφαιριστής\nΣτάθης Γιαννακίδης (γενν. 1985), οικονομολόγος, υφυπουργός Οικονομίας και Ανάπτυξης ("
+},
+{
+"source": "el",
+"jev": 382,
+"text": "Ο NGC 677 είναι ελλειπτικός γαλαξίας στον αστερισμό Κριό. Τον ανακάλυψε στις 25 Σεπτεμβρίου 1886 ο αστρονόμος Λιούις Α. Σουίφτ (Lewis A. Swift) και απέχει περίπου 200 εκατομμύρια έτη φωτός από τη Γη. Βρίσκεται στο κέντρο γαλαξιακού σμήνους και έχει πυρήνα LINER.\n\n\n== Παραπομπές ==\n\n\n== Αναφορές ==\nΔεδομένα για το NGC 677 στα NGC/IC Database (Αγγλικά), SIMBAD (Αγγλικά), NASA Extragalactic Database (Αγγλικά), SEDS (Αγγλικά) και VizieR Service (Αγγλικά)\nΕικόνες του NGC 677 στο Aladin (Αγγλικά) και στο SkyView (Αγγλικά)\n\n\n== Εξωτερικοί σύνδεσμοι ==\n Πολυμέσα σχετικά με το θέμα  NGC 677 στο Wikimedia Commons"
+},
+{
+"source": "el",
+"jev": 1074,
+"text": "έτησε ως βουλευτής με τη Νέα Δημοκρατία στον νομό Αργολίδας, από το 1989 ως το 1993. Στη συνέχεια η πολιτική του πορεία επισκιάστηκε από την καταδίκη του για απάτη με υποσχέσεις για διορισμούς στο Δημόσιο και την ανάμιξη του ονόματός του σε κύκλωμα πλαστών διαθηκών, κατηγορία την οποία αρνήθηκε.\n\n\n== Βιογραφία ==\nΚαταγόταν από το Κεφαλάρι.  Ήταν πτυχιούχος της Παντείου και της Νομικής Σχολής της Θεσσαλονίκης και άσκησε τη δικηγορία στην Αργολίδα..  \nΠαράλληλα ασχολήθηκε με τον αθλητισμό και ήταν μέλος διοικητικών συμβουλίων στην ΑΕΚ, στην ΕΠΟ και στην ΕΠΑΕ. Χρημάτισε επίσης πρόεδρος του Παναργειακού.\nΠολιτεύτηκε για πρώτη φορά με την Νέα Δημοκρατία το 1985 χωρίς επιτυχία. Ωστόσο, εξελέγη τον Ιούνιο του 1989 δεύτερος στον νομό λαμβάνοντας 7.534 ψήφους και το 1990 επίσης δεύτερος με 10.603 ψήφους.\nΣτις εκλογές του 1993 δεν πέτυχε να επανεκλεγεί βουλευτής και στην έδρα του αντικαταστάθηκε από την Έλσα Παπαδημητρίου.\nΟ Παπανικολάου καταδικάστηκε σε κάθειρξη 5 ετών για απάτη (την περίοδο Μαρτίου-Σεπτεμβρίου 1997 στο Ναύπλιο) και η καταδίκη του επικυρώθηκε από τον Άρειο Πάγο τον Φεβρουάριο του 2013 και του αναγνωρίστηκε το ελαφρυντικό του πρότερου εντίμου βίου. \nΤο 2017, και ενώ ήταν ήδη ασθενής, εκδόθηκε ένταλμα σύλληψης εναντίον του από τον ανακριτή για την υπόθεση ψεύτικων κληρονομιών, κατηγορία την οποία ο ίδιος αρνήθηκε.\nΤις τελευταίες ημέρες της ζωής του νοσηλευόταν στο Γενικό Κρατικό Νοσοκομείο \"Γιώργος Γεννηματάς\", όπου και κατέληξε στις 19 Ιουνίου 2018.  Η σορός του εξετέθ"
+},
+{
+"source": "el",
+"jev": 225,
+"text": " και οι κάτοικοι ήταν εύποροι έμποροι και ψαράδες. Επίσης, πιθανότατα ασχολούνταν με την επεξεργασία σφουγγαριών και πορφύρας.\nΤο 60% έως 70% του εδάφους του νησιού καλύπτεται με πεζούλες με ξερολιθιές, που είχαν δημιουργήσει οι Μινωίτες, για να μπορέσουν να καλλιεργήσουν τη γη. Αμερικανοί ερευνητές"
+},
+{
+"source": "es",
+"jev": 107,
+"text": " una densidad poblacional de 174,32 personas por km².​\n\n\n== Geografía ==\nEl municipio de Bainbridge se encuentra ubicado en las coordenadas 38°23′5″N 86°56′8″O. Según la Oficina del Censo de los Estados Unidos, el municipio tiene una superficie total de 91.9 km², de la cual 90.85 km² corresponden a "
+},
+{
+"source": "es",
+"jev": 83,
+"text": "ales, las costumbres regionales. En algunas familias, una comida no se considera completa sin un cuenco de torshi en la mesa. Por regla general se emplea como aperitivo (o meze) para acompañar el rakı, ouzo, tsipouro y rakia. \nExisten diferentes tipos de tursu; en Bulgaria son muy populares los \"Tsa"
+},
+{
+"source": "es",
+"jev": 85,
+"text": "c-de-Durèze  es una población y comuna francesa, situada en la región de Aquitania, departamento de Gironda, en el distrito de Langon y cantón de Pellegrue.\n\n\n== Demografía ==\n\n\n== Referencias ==\n\n\n== Enlaces externos ==\n\n Wikimedia Commons alberga una categoría multimedia sobre Listrac-de-Durèze.\nI"
+},
+{
+"source": "es",
+"jev": 386,
+"text": "ontenida en el rostro que no sólo emite un aire infantil (...)\" y \"es una interpretación carente de sentimentalismo que captura perfectamente la terrible soledad de una criatura que existe al margen del tiempo.\".​ James Berardinelli elogió su interpretación \"ha creado un personaje que es a la vez misterioso y atractivo\",​ mientras que Justin Lowe del Hollywood Reporter escribió \"los actores jóvenes consiguen imbuir las escenas emocionales e inquietantes con una destacada complejidad. Lina Leandersson es especialmente impresionante interpretando a la herida joven vampira que no quiere nada más que volver a ser una niña normal.\"​\nLuke Y. Thompson del LA Weekly incluso ha ido más lejos afirmando: \"Cuando se trata de preadolescentes interpretando a vampiros eternos, Kirsten Dunst en Entrevista con el Vampiro era el mejor ejemplo; en Lina Leandersson creo que tenemos a una nueva campeona.\".​\nEn marzo de 2010 Lina, en el momento de la entrega del premio Jameson Empire a la mejor película de horror, aprovechó para dedicárselo a todos los niños intimidados alrededor del mundo por tener el coraje para ir a la escuela todos los días sin superpoderes, habilidades especiales o un vampiro como el mejor amigo.​​\n\n\n== Premios ==\nOnline Film Critics Society Awards 2008\n\n\n== Otros datos ==\nEn el año 2006 fue miembro del jurado en el concurso musical sueco Lilla Melodifestivalen.\n​\n\n\n== Películas recientes ==\nPelícula Tenderness (2012) (filmando), interpreta a: Zerin\nPelícula The Arbiter (2012"
+},
+{
+"source": "fa",
+"jev": 486,
+"text": "در مکانیک دو یا چند فنر زمانی به صورت سری هستند که پشت سر هم و به صورت متوالی بسته شوند و زمانی به صورت موازی هستند که در کنار هم به یک قطعه بسته شوند.\n\nبه‌صورت کلی دو یا چند فنر وقتی در حالت سری هستند مقدار کرنش آن‌ها تحت یک بارگذاری واحد برابر مجموع کرنش‌های هر فنر به تنهایی تحت همان بارگذاری است؛ و همچنین در حالت موازی مقدار تنش وارده به مجموع فنرها تحت یک بارگذاری واحد برابر مجموع تنش‌های هر فنر به تنهایی تحت همان بارگذاری است.\nهر نوع ترکیب فنرهای هوک (رفتار-خطی) به حالت سری و موازی مانند یک فنر هوک رفتار می‌کند. فرمول‌های مشخصات فیزیکی ترکیب فنرها مشابه خازنها در ترکیب سری و موازی، مدارهای الکتریکی است.\n\n\n== فرمولها ==\n\n\n=== فنر معادل ===\nجدول زیر مقدار ثابت فنر و دیگر متغیرهای مربوط به فنر را در حالتهای سری و موازی نشان می‌دهد.\n\n\n== فرمولهای تفکیک ==\n\n\n=== اثبات ===\n\n\n== جستارهای وابسته ==\nخرپا\n\n\n== منابع ==\n\nویکی‌پدیای انگلیسی"
+},
+{
+"source": "fa",
+"jev": 322,
+"text": "میرسلاو کوبک (انگلیسی: Miroslav Koubek؛ زادهٔ ۱ سپتامبر ۱۹۵۱) بازیکن فوتبال بازنشسته و مربی کنونی اهل جمهوری چک است.\nاز باشگاه‌هایی که در آن بازی کرده است می‌توان به باشگاه فوتبال اسپارتا پراگ اشاره کرد.\n\n\n== منابع ==\n\nمیرسلاو کوبک در FootballDatabase.eu (انگلیسی)\nمیرسلاو کوبک در ترنسفرمارکت (بازیکن) (انگلیسی)\nمیرسلاو کوبک در ترنسفرمارکت (مربی) (انگلیسی)\nمیرسلاو کوبک در WorldFootball.net (انگلیسی)\nمیرسلاو کوبک در National-Football-Teams.com  (مربی) (انگلیسی)\n\n\n== پیوند به بیرون =="
+},
+{
+"source": "fa",
+"jev": 941,
+"text": " ۱۵۲ ساختمان با ۴۸۰ اتاق است که مساحتی حدود ۱۲٬۴۷۰ متر مربع (۱۳۴٬۲۰۰ فوت مربع) را پوشش می‌دهند. بلندترین سازه آن برج پناهگاه چهارطبقه‌ای (چینی: 避難樓; پین‌یین: Bìnán Lóu) است که برای پناه گرفتن در هنگام حمله طراحی شده بود، اما هرگز مورد استفاده قرار نگرفت. این عمارت دارای آرشیوی با حدود ۶۰٬۰۰۰ سند مربوط به زندگی در این عمارت طی ۴۰۰ سال دوره دودمان‌های مینگ و چینگ است.\n\n\n== تاریخچه ==\n\nاولین عمارت خاندان کونگ مربوط به دوک یانشنگ در سال ۱۰۳۸ طی دودمان سونگ ساخته شد. در سال ۱۳۷۷، عمارت به دستور هونگ‌وو منتقل و بازسازی شد. در سال ۱۵۰۳، در دوره سلطنت هونگ‌جی، مجموعه به سه ردیف ساختمان با ۵۶۰ اتاق و – مانند معبد مجاور کنفوسیوس – به نه حیاط گسترش یافت. در طول دودمان چینگ، این عمارت در سال ۱۸۳۸ بازسازی کامل شد، اما در آتش‌سوزی سال ۱۸۸۶ بخش‌های مربوط به زنان دچار آسیب شد. حتی در طول آتش‌سوزی، مردان جرات ورود به بخش زنان برای اطفای حریق را نداشتند که منجر به خسارت بیشتر به این بخش شد. بخش‌های آسیب‌دیده در سال ۱۸۸۸ بازسازی شدند و هزینه این دو بازسازی قرن نوزدهم توسط امپراتور تأمین شد. با وجود این بازسازی‌ها، عمارت خاندان کونگ همچنان بهترین مجموعه مسکونی باقی‌مانده از دوره مینگ در این اندازه است. آخرین سرپرست خاندان کونگ که در این عمارت زندگی می‌کرد، کونگ دچنگ، نسل ۷۷ نوادگان کنفوسیوس بود. کونگ دچنگ به دلیل جنگ دوم چین و ژاپن در سال ۱۹۳۷ به چونگ‌چینگ فرار کرد و دیگر به کیوفو بازنگشت و در نهایت به تایوان در طی جنگ داخلی چین مهاجرت کرد.\nعمارت دیگری از خاندان کونگ در کوجاو توسط شاخه جنوبی نوادگان کنفوسیوس ساخته شده است.\nلباس‌های سنتی هانفو دودمان مینگ که توسط امپراتوران مینگ به نجیب‌زادگان چی"
+},
+{
+"source": "fa",
+"jev": 248,
+"text": "و، رزانا آرکت، امیلی دی راوین، نیک کانن، لوداکریس، کرس ویلیامز، دانیا رامیرز، ملیسا لیو، هارولد پرینو، میکلتی ویلیامسون، رابرت ویزدم، استیو هریس، متیو سنت پاتریک و کربی بلیس بلنتون ایفای نقش کرده‌اند.\n\n\n== منابع ==\n\nمشارکت‌کنندگان ویکی‌پدیا. «Ball Don't Lie». در دانشنامهٔ ویکی‌پدیای انگلیسی، بازبینی"
+},
+{
+"source": "fa",
+"jev": 352,
+"text": "آروندل دیوید لیکی (انگلیسی: David Leakey؛ زادهٔ ۱۸ مهٔ ۱۹۵۲) فرمانده نظامی اهل بریتانیا است. او افسر سابق ارتش بریتانیا است. او مدیر کل ستاد نظامی اتحادیه اروپا در شورای اتحادیه اروپا، بروکسل بود. در سال ۲۰۱۰ به عنوان جنتلمن آشر بلک راد منصوب شد، نقشی که تا فوریه ۲۰۱۸ بر عهده داشت. وی برندهٔ جوایزی همچون نشان سلطنتی ویکتوریایی و نشان امپراتوری بریتانیا شده‌است.\n\n\n== منابع ==\n\nمشارکت‌کنندگان ویکی‌پدیا. «David Leakey». در دانشنامهٔ ویکی‌پدیای انگلیسی، بازبینی‌شده در ۱۹ فوریه ۲۰۲۲."
+},
+{
+"source": "fa",
+"jev": 786,
+"text": "جنگ چاد و نیجریه (انگلیسی:Chadian–Nigerian War) جنگی کوتاه مدت بود که بر سر کنترل جزایر دریاچه چاد درگرفت. این جنگ زمانی آغاز شد که نیرویی به رهبری ادریس دبی، رئیس ستاد ارتش چاد، به بخش‌هایی از ایالت بورنو نیجریه حمله کرد و با بیرون راندن چادی‌ها توسط نیروی نیجریه‌ای به رهبری محمدو بوهاری و حمله کوتاه مدت به خاک چاد پایان یافت. \n\n\n== حمله ==\nدر ۱۸ آوریل ۱۹۸۳، یک نیروی چادی به ۱۹ جزیره در دریاچه چاد حمله و آنها را اشغال کرد. دولت نیجریه به ریاست شهو شاگاری دستور استقرار نیروهای لشکر سوم زرهی جوس به فرماندهی محمدو بوهاری به عنوان فرمانده کل (GOC) را صادر کرد. مرز چاد و نیجریه بسته شد و نیروها به منطقه اعزام شدند. با این حال، به دلیل فشار قاچاقچیان، رئیس جمهور شهو شاگاری به بوهاری دستور داد تا مرز را بازگشایی کند. این دستور زمانی اجرا شد که رئیس ستاد ارتش، ژنرال اینوا ووشیشی، دستور رئیس جمهور را ابلاغ کرد. نیروهای نیجریه با موفقیت جزایر را بازپس گرفتند و همچنین چادی‌ها را ۵۰ کیلومتر در آن سوی مرز تعقیب کردند.\n\n\n== پیامدها ==\nاین جنگ یکی از دلایل کودتای ۱۹۸۳ نیجریه بود. این جنگ با نشان دادن ناتوانی رئیس جمهور شاگاری در برابر افسرانش، که به بوهاری اجازه داده بود آشکارا برخلاف دستورات عمل کند، تنش‌های بین ارتش و دولت غیرنظامی را برجسته کرد. در ۳۱ دسامبر ۱۹۸۳، محمدو بوهاری قدرت را در نیجریه به دست گرفت و به جمهوری دوم نیجریه پایان داد.\n\n\n== منابع =="
+},
+{
+"source": "fr",
+"jev": 221,
+"text": "Catherine van Campen, née 1970 aux Pays-Bas, est une réalisatrice et scénariste néerlandaise.\n\n\n== Biographie ==\n\n\n== Filmographie ==\n2009 : Drona & Me\n2011 : Painful Painting\n2011 :Flying Anne\n2013 : Joan’s Boys\n2016 : Garage 2.0\n2016 : Zaatari Djinn\n2018 : Mother's Balls\n\n\n== Notes et références ==\n\n\n== Voir aussi ==\n\n\n=== Liens externes ===\n\nRessource relative à l'audiovisuel : IMDb  \n\n\n== Crédit d'auteurs ==\n(nl) Cet article est partiellement ou en totalité issu de l’article de Wikipédia en néerlandais intitulé « Catherine van Campen » (voir la liste des auteurs).\n Portail du cinéma   Portail de la réalisation audiovisuelle   Portail des Pays-Bas"
+},
+{
+"source": "fr",
+"jev": 139,
+"text": "Le Karregat est un ruisseau de Belgique coulant en Région de Bruxelles-Capitale, affluent de la Woluwe, donc un sous-affluent de l'Escaut par la Senne, la Dyle et le Rupel.\nIl est, avec le Vuylbeek et le Zwanewijdebeek, l'un des cours d'eau qui forment la Woluwe.\n\n\n== Voir aussi ==\n\n\n=== Articles connexes ===\nListe des cours d'eau de Belgique\nÉtangs des Enfants Noyés\n\n\n== Notes et références ==\n\n Portail des lacs et cours d'eau   Portail de Bruxelles   Portail de la Belgique"
+},
+{
+"source": "fr",
+"jev": 164,
+"text": "Bychawka Druga-Kolonia (prononciation : [bɨˈxafka ˈdruɡa kɔˈlɔɲa]) est un village polonais de la gmina de Bychawa dans le powiat de Lublin de la voïvodie de Lublin dans l'est de la Pologne.\n\n\n== Histoire ==\nDe 1975 à 1998, le village est attaché administrativement à l'ancienne Voïvodie de Lublin.\nDepuis 1999, il fait partie de la nouvelle voïvodie de Lublin.\n\n\n== Références ==\n\n Portail de la Pologne"
+},
+{
+"source": "fr",
+"jev": 269,
+"text": "Inger Eriksdotter (vers. 1100–1157) est l'épouse d' Asser Rig,  jarl danois du Sjælland dans l' île de Seeland dans l'actuel royaume de Danemark.\n\n\n== Contexte ==\nLe père d'Inger est réputé avoir été le Jarl Eric. Sa mère la princesse Cécilia Knudsdatter, fille du roi Knud IV de Danemark et d'Adèle de Flandre.\nInger et Asser résident à Fjenneslevlille et batissent l'église de Fjenneslev. Elle donne à son époux plusieurs enfants : Absalon, futur Archevêque de Lund, Esbern Snare et Ingefred Assersdatter.\nInger est inhumée dans l'Abbaye de Sorø vers 1157.\n\n\n== Notes et références ==\n(en) Cet article est partiellement ou en totalité issu de l’article de Wikipédia en anglais intitulé « Inger Eriksdotter » (voir la liste des auteurs).\n\n Portail du Moyen Âge central   Portail du Danemark   Portail de la Suède"
+},
+{
+"source": "fr",
+"jev": 332,
+"text": "Le cabinet Stoltenberg II (Kabinett Stoltenberg II, en allemand) est le gouvernement du Land de Schleswig-Holstein entre le 26 mai 1975 et le 28 mai 1979, durant la huitième législature du Landtag.\n\n\n== Coalition et historique ==\nDirigé par le ministre-président chrétien-démocrate sortant Gerhard Stoltenberg, il est soutenu par la seule Union chrétienne-démocrate d'Allemagne (CDU), qui dispose de 37 députés sur 73 au Landtag, soit 50,7 % des sièges.\nIl a été formé à la suite des élections législatives régionales du 13 avril 1975 et succède au cabinet Stoltenberg I, constitué par la seule CDU. Le parti ayant conservé sa majorité absolue aux élections législatives régionales du 29 avril 1979, Stoltenberg a pu former son troisième cabinet.\n\n\n== Composition ==\n\n\n=== Initiale ===\n\n\n== Annexes ==\n\n\n=== Articles connexes ===\nÉlections législatives régionales de 1975 dans le Schleswig-Holstein\nCabinet Stoltenberg I ; Cabinet Stoltenberg III\n\n\n== Notes et références ==\n\n Portail de la politique   Portail du Schleswig-Holstein"
+},
+{
+"source": "he",
+"jev": 1203,
+"text": "סים מצבא ארצות הברית שנענו לקריאתו של הנשיא רוזוולט להתנדב ליחידה מיוחדת. היחידה הוקמה בינואר 1944 כרגימנט המתמחה בסיור, לוחמת ג'ונגל ופשיטה ארוכת טווח. הרגימנט, תחת שם הקוד \"גלאהד\" (Galahad), יועד לפעול במשימות חדירה ארוכות-טווח בג'ונגלים של בורמה, בעומק הקווים היפנים, בדומה לפעולותיהם של הצ'ינדיטים של הגנרל אורד צ'ארלס וינגייט.\n\n\n== פעילות ==\n\nבפברואר 1944 נכנסו שלושה גדודים של פושטים לבורמה והרגו כ-800 יפנים בקרבת ולאואובום. ב-17 במאי, כבש כוח שכלל שני גדודים של חיילים סינים, יחידה של הפושטים של מריל ולוחמי גרילה מקומיים, את שדה התעופה שבעיירה מיצ'ינה. אולם, סטילוול לא תגבר את העיירה, וב-3 באוגוסט, היא נפלה שוב לידיים יפניות לאחר מצור ממושך. אולם, עצם ההגעה למיצ'ינה סייע לאבטחת הקו האווירי בין הודו לצ'ונגצ'ינג שבסין. בשל הפעילות האינטנסיבית כמו גם בשל פגעי הג'ונגל, ובהן מחלות טפילים, סבלו הפושטים של מריל משיעור נפגעים גבוה ובאוגוסט 1944 פורק הכוח ואוחד עם רגימנט החי\"ר ה-475.\n\n\n== מורשת ==\nהיחידה נחשבת לחלק ממורשת הקרב של רגימנט הריינג'רס ה-75 אשר מספרו נבחר בשל שתי הספרות האחרונות של רגימנט החי\"ר ה-475 שבשורותיו לחמו אנשי היחידה בשלהי המלחמה. היחידה הונצחה, בין היתר, בסרט \"הפושטים של מריל\" משנת 1962.\nב-2020 עוטרה היחידה במדליית הזהב של הקונגרס.\n\n\n== ראו גם ==\nיחידת הריינג'רס של צבא ארצות הברית\nמבצע בורמה\n\n\n== לקריאה נוספת ==\nדונובן ובסטר, \"דרך בורמה\", מטר, 2006.\nברברה טוכמן, \"סטילוול, אמריקאי בסין, 1945-1911\", הוצאת דביר, 2005.\nויליאם סלים, \"מתבוסה לניצחון\", הוצאת מערכות, 1977.\n\n\n== קישורים חיצוניים ==\n\nטל טובי, להילחם מאחורי קווי האויב, מערכות, 460 (אפריל 2015), עמודים 54"
+},
+{
+"source": "he",
+"jev": 1229,
+"text": "סוכני אכיפת חוק פדרליים לקנזס סיטי כדי לסייע לרשויות המקומיות במאבק בפשע. במהלך מסיבת עיתונאים, מזכירת העיתונות בבית הלבן, קיילי מקנאני, ציטטה את הסטטיסטיקה בנושא פשע בקנזס סיטי, כולל עלייה של ארבעים אחוזים ברציחות וקבעה כי סוכני מחלקת המשפטים של ארצות הברית, לשכת החקירות הפדרלית, שירות המרשלים, המחלקה לביטחון המולדת, המינהל לאכיפת הסמים ולשכת האלכוהול, הטבק, הנשק וחומרי נפץ ייפרסו בעיר בעשרת הימים הקרובים.\n\nב-22 ביולי 2020, הכריז הנשיא טראמפ על תוכניותיו להרחיב את המבצע לאלבקרקי, שיקגו, בולטימור ופילדלפיה.\nפוליטיקו מסר כי ראשי העיר בולטימור, שיקגו ופילדלפיה לא יצרו קשר עם המחלקה לביטחון המולדת, ש\"נאבקו להוריד את חום ההפגנות\" באורגון, שם אמרו גורמים רשמיים שזרם הסוכנים הפדרליים הגביר את המתיחות. לפי רויטרס, גורם במחלקת המשפטים אמר כי המבצע אינו קשור להפעלת סוכנים פדרליים נגד הפגנות בפורטלנד, אורגון. ממלא מקום מזכיר מחלקת ביטחון המולדת וולף, דיווח על פי סוכנות הידיעות AP, ש\"יש הבחנה בין המשימה בפורטלנד – להגן על הרכוש הפדרלי – לבין הגלים בקנזס סיטי, שיקגו ואלבוקרקי כדי לסייע בהפסקת האלימות.\"\nמאוחר יותר באותו יום פרסם הבית הלבן סיכום אירועים לפיו התוכנית תתרחב לקליבלנד, דטרויט ומילווקי בשלושת השבועות הקרובים. ב-6 באוגוסט 2020 הוכרז כי המבצע ייפרס גם בסנט לואיס, מיזורי וממפיס, טנסי. ב-14 באוגוסט 2020 התוכנית שוב הורחבה וכללה את אינדיאנפוליס, אינדיאנה.\n\n\n== השפעות ==\nב-22 ביולי 2020, התובע הכללי וויליאם בר הודיע כי למעלה מ-200 אנשים נעצרו במהלך המבצע הראשוני בקנזס סיטי.\nעד 19 באוגוסט 2020, היו 217 אנשים שהואשמו בפשע פדרלי, ויותר מ-1,000 מעצרים נעשו בערי מטרופולין גדולות מאז שמחלק"
+},
+{
+"source": "he",
+"jev": 1199,
+"text": "ת הקשת נובעת מגאומטריה של לוח מעוגל המתקמט בהיכנסו מתחת למשטח מעוגל.\n\nהמקום בו מתרחש איבוד המים והחומרים הנדיפים הוא הסיבה להיווצרות קשת איים במרחק מסוים מן השקע. ההתכה החלקית מתרחשת בעומק של כ-100 ק\"מ מתחת לקשת האיים. זווית החדירה של הקרום הנוחת תשפיע על הגעתו לנקודת ההתכה, וכתוצאה מכך על מיקומה של קשת האיים:\n\nזווית נחיתה תלולה – יוצרת קשת איים הקרובה לשקע\nזווית נחיתה מתונה – יוצרת קשת איים הרחוקה מהשקע\nזווית נחיתה מתונה מאוד – לא יוצרת קשת איים מאחר שהקרום המופחת אינו חודר לעומק מספיק\n\n\n== האוקיינוס בשולי קשת האיים ==\nקשת האיים עשויה ליצור ים שולי – חלק האוקיינוס הקרוב ליבשה. בים השולי זורמים זרמי אוקיינוס הנגרמים על ידי רוחות אוקייניות. ים עשוי להחשב כים שולי של יותר מאוקיינוס אחד, ועשויים להיות לו ימים שוליים משל עצמו.\nאזור ההפחתה גורע מן הקרום האוקייני ויוצר אוקיינוס שיורי – אגן אוקייני בתהליך סגירה, המסתיים בהתקרבות יבשות ובאורוגנזה דוגמת התנגשות הלוח האירו-אסיאתי והלוח ההודי שיצרה את הרי ההימלאיה.\n\n\n== דוגמאות ==\n\nדוגמאות קלאסיות לקשתות איים הן איי מריאנה במערב האוקיינוס השקט ואזור האנטילים הקטנים בים הקריבי, במערב האוקיינוס האטלנטי. קשתות איים נוספות:\n\nקשתות איים קדומות\n\nהאיים האינסופיים\nהאיים האינטרמונטנים\n\n\n== קשת געשית ==\n\nלבד מקשתות איים מתפתחות גם קשתות יבשתיות, הנוצרות באזור הפחתה בשולי יבשת, שם חודר קרום אוקייני של לוח אחד אל מתחת לקרום יבשתי של לוח שני. היווצרותה של קשת געשית דומה להיווצרות קשת איים, בהבדל משמעותי אחד: במקום איים געשיים נוצר רכס הרים געשיים בלוח היבשתי.\nדוגמאות לקשתות יבשתיות ניתן למצוא ברכסים המערביים של אמריקה:\n\nרכס קסקייד במערב אמריקה הצפונ"
+},
+{
+"source": "he",
+"jev": 850,
+"text": "מארי ברגמן (בשוודית: Marie Bergman; נולדה ב-21 בנובמבר 1950) היא זמרת שוודית.\n\n\n== ביוגרפיה ==\nברגמן נולדה בסטוקהולם, מ-1969 ועד 1972 הייתה חברה בהרכב המוזיקלי \"Family Four\", ביחד איתם היא ייצגה את שוודיה באירוויזיון 1971 ואירוויזיון 1972. ב-1974 החלה בקריירת סולו והוציאה את האלבום הראשון שלה \"Mitt ansikte\".\nבאירוויזיון 1994 ייצגה את שוודיה ביחד עם הזמר רוגר פונטארה והם היו במקום ה-13.\nהיא דיבבה את פלגמנקוף בדיבוב השוודי של הסרט אנסטסיה.\nהיא זכתה במספר פרסי מוזיקה, היא לימדה באקדמיה למוזיקה בקופנהגן ובאורהוס.\nהיא נשואה בשנית ולה בת מבעלה הראשון.\n\n\n== קישורים חיצוניים ==\n\n אתר האינטרנט הרשמי של מארי ברגמן\n מארי ברגמן, במסד הנתונים הקולנועיים IMDb (באנגלית)\n מארי ברגמן, באתר אפל מיוזיק  (באנגלית)\n מארי ברגמן, באתר ספוטיפיי\n מארי ברגמן, באתר סאונדקלאוד (באנגלית)\n מארי ברגמן, באתר Last.fm (באנגלית)\n מארי ברגמן, באתר AllMusic (באנגלית)\n מארי ברגמן, באתר MusicBrainz (באנגלית)\n מארי ברגמן, באתר דיזר\n מארי ברגמן, באתר Yandex.Music (ברוסית)\n מארי ברגמן, באתר Discogs (באנגלית)\n מארי ברגמן, באתר Songkick (באנגלית)\nמארי ברגמן, באתר Genius\nמארי ברגמן, באתר SecondHandSongs\n מארי ברגמן, באתר טיידל (באנגלית)\n מארי ברגמן, באתר MuseScore"
+},
+{
+"source": "he",
+"jev": 842,
+"text": "מדליית השירות הכללי בהודו (באנגלית: India General Service Medal, בר\"ת: IGSM) הייתה מדליית מערכה אשר אושרה ב-11 במרץ 1854 והוענקה עבור מערכות וקרבות באזור תת-היבשת ההודית בין השנים 1895–1852. המערכות השונות עליהן ניתנה המדליה צוינו על ידי אבזמים אשר נענדו על סרט העיטור וכללו את שם המערכה. המדליה ניתנה בלווי אחד מ-24 האבזמים האפשריים. ככל הנראה, מספר האבזמים הגדול ביותר שניתנו לחייל אחד היה שבעה.\n\n\n== תיאור ==\nהמדליה היא דיסק עשוי כסף בקוטר 36 מ\"מ, אשר מצדו האחד מאויר ראשה של המלכה ויקטוריה עם המילים ויקטוריה רגינה (Victoria Regina) משני צידי האיור. מהצד השני מאוירת דמותה של ניקה אלת הניצחון, אשר מכתירה חייל ישוב בכתר עלי דפנה. מהיווסדותו של העיטור, הוא ניתן כשהוא עשוי כסף לכלל הדרגות הן לחיילים הבריטים והן לחיילים ההודים, אך החל מהמערכה בבורמה ב-1885, ניתנה גרסת ארד לתומכי לחימה מקומיים (כגון נהגים ונושאי ציוד).\nדיסק הכסף תלוי מסרט ברוחב 32 מ\"מ אדום בעל שני פסים כחולים. סרט זה הוא גם תצורתו של אות העיטור (גרסה מוקטנת של העיטור אשר נענדת לא באירועים פורמליים). \n\n\n== אבזמים ==\n\n\n== קישורים חיצוניים ==\n\nתיאור המדליה והאבזמים, כולל תמונות המציגות את פרטי המדליה באתר 'נורט' איסט מדלס'.\nפירוט המדליה והאבזמים באתר 'מדלס'."
+},
+{
+"source": "hi",
+"jev": 223,
+"text": "या गोस्वामी - अल्का\nउत्पल दत्त\nअसरानी\nप्रेमा नारायण - सुधा\nसुधा शिवपुरी\nराजू श्रेष्ठ\nमाणिक दत्त\nलक्ष्मी पटेल\nविजू खोटे\nमनमौजी - गोविंद\n\n\n== दल ==\n\n\n== संगीत ==\n\n\n== रोचक तथ्य ==\n\n\n== परिणाम ==\n\n\n=== बौक्स ऑफिस ===\n\n\n=== समीक्षाएँ ===\n\n\n== नामांकन और पुरस्कार ==\n\n\n== बाहरी कड़ियाँ ==\nहमारी बहू अलका  "
+},
+{
+"source": "hi",
+"jev": 237,
+"text": "सिनोद कुमार शाक्‍य, जिन्हें दीपू भैया के नाम से भी जाना जाता है, एक भारतीय राजनीतिज्ञ हैं। ये उत्तर प्रदेश विधानसभा में  दातागंज के दो बार विधायक रह चुके हैं। इन्होंने 2007 व  2012 उत्तर प्रदेश विधान सभा चुनाव में बहुजन समाज पार्टी के प्रत्याशी के रूप में दातागंज विधानसभा (निर्वाचन संख्या-117) से चुनाव जीता। 2022 के विधानसभा चुनाव में ये भारतीय जनता पार्टी में शामिल हो गए।\n\n\n== पद ==\n\n\n== सन्दर्भ =="
+},
+{
+"source": "hi",
+"jev": 293,
+"text": "भाटनीकोट, बागेश्वर (सदर) तहसील में भारत के उत्तराखण्ड राज्य के अन्तर्गत कुमाऊँ मण्डल के बागेश्वर जिले का एक गाँव है। \n\n\n== इन्हें भी देखें ==\nउत्तराखण्ड के जिले\nउत्तराखण्ड के नगर\nकुमाऊँ मण्डल\nगढ़वाल मण्डल\n\n\n== बाहरी कड़ियाँ ==\nउत्तराखण्ड - भारत सरकार के आधिकारिक पोर्टल पर\nउत्तराखण्ड सरकार का आधिकारिक जालपृष्ठ (अंग्रेज़ी)\nउत्तराखण्ड (उत्तराखण्ड के बारे में विस्तृत एवं प्रामाणिक जानकारी)\nउत्तरा कृषि प्रभा"
+},
+{
+"source": "hi",
+"jev": 849,
+"text": "सर मुहम्मद मुनवर अली खान केसीआईई (निधन 3 जनवरी 1903) 1889 से 1903 तक अर्कोट के चौथे राजकुमार थे।\nमुहम्मद मुनवर खान, अर्कोट के तीसरे राजकुमार इंतिज़ाम-उल-मुल्क के भतीजे थे और मई 1889 में अपने चाचा के उत्तराधिकारी बने। अर्कोट के राजकुमार मद्रास प्रेसीडेंसी के मुस्लिम समुदाय के नेता थे, और इस पद की जिम्मेदारियों को उन्होंने 'निष्ठा और तत्परता' के साथ निभाया। उन्हें 1897 डायमंड जुबली ऑनर्स में 'नाइट कमांडर ऑफ द ऑर्डर ऑफ द इंडियन एम्पायर' (केसीआईई) बनाया गया था। उन्हें दीवानी अदालतों में उपस्थित होने से छूट दी गई थी। खान ने 1903 की शुरुआत तक शासन किया। उनका निधन दिल्ली में राजा एडवर्ड सप्तम के राज्याभिषेक का जश्न मनाने के लिए आयोजित 1903 दिल्ली दरबार में भाग लेने के दौरान हुआ। उन्हें मद्रास में दफनाया गया था।\nखान के उत्तराधिकारी उनके सबसे बड़े पुत्र गुलाम मुहम्मद अली खान (1882-1952) अर्कोट के 5वें राजकुमार के रूप में बने, जिनके बाद उनके भाई गुलाम मोहिउद्दीन खान (1890-1969) अर्कोट के 6वें राजकुमार बने।\n\n\n== सन्दर्भ ==\n\"मुहम्मद मुनवर खान बहादुर (1889-1903)\". अर्कोट का शाही घराना. मूल से से 27 सितंबर 2023 को पुरालेखित।. अभिगमन तिथि: 25 मार्च 2026.\n\nJeyarāj, Vē (2005). अर्कोट नवाबों के सिक्कों पर एक तकनीकी अध्ययन (अंग्रेज़ी भाषा में). संग्रहालय निदेशक, सरकारी संग्रहालय."
+},
+{
+"source": "hi",
+"jev": 198,
+"text": "से पहले, अबाद, नाहिदी, बहरामि और अज़मौडेह को तनुमेह सीमा शिविर में भेजा गया और फिर उन्हें एस्तेखबर (सद्दाम की गुप्त एजेंसी) और अल-रशीद जेल भेजा गया। कुछ समय बाद, अबाद और उसके साथी मोसुल और अल-अनबर शिविरों में चली गई। तीन साल और छह महीने बाद, 21 अप्रैल 1983 को, अबद रिहा हुई।\nमैं अलाइव हूं, जो ईरान-इर"
+},
+{
+"source": "html",
+"jev": 385,
+"text": "<div class=\"card card-0\"><h2>schizophrenia or schizoaffective disorde</h2><p>l itself. That will only happen if Republicans take a principled and courageous stand to stop it. Ted Cruz and millions of Americ</p><a href=\"/item/6438\">more</a></div>\n<div class=\"card card-1\"><h2>assertCount(5, $test->getRecords()); $th</h2><p>↓ colon tumor incidence</p><a href=\"/item/9900\">more</a></div>\n<div class=\"card card-2\"><h2>enship by birth must declare, to the lat</h2><p>@DateOfBirth , @Address , @City , @County ,</p><a href=\"/item/9992\">more</a></div>\n<div class=\"card card-3\"><h2>Iran LI 338\\|338 (Crawford:248\\|248; Mon</h2><p>on of the dielectric susceptibility were made similarly to that done earlier in Ref. [@SKKH] and we will publish the calcul</p><a href=\"/item/674\">more</a></div>\n<div class=\"card card-4\"><h2>. Based on the findings of the present s</h2><p>purview of the religion, however, to have such things happening. 1. Field of the Invention This invention relates to device to temporarily elevate the position of eyeglasses having multifocal lenses relative to a user's eyes for proper visual and head alignment for certain activities,</p><a href=\"/item/196\">more</a></div>\n"
+},
+{
+"source": "html",
+"jev": 338,
+"text": "<div class=\"card card-0\"><h2>ove this statement we introduce a new pa</h2><p>|--fieldB |--dfB |--time |--fieldC |--fieldD After the union, the fields dfA and dfB will</p><a href=\"/item/6126\">more</a></div>\n<div class=\"card card-1\"><h2>_RamWrite(dmaAddr + i, dmabuf[i]); } res</h2><p>$L$ \\[shaded region in Fig. \\[fig:xi\\](a)\\] and should be scaled as $\\xi\\sim L$ above jamming in the quasi-static limit $\\dot{\\gamma}\\rightarrow 0$ [@pdf1; @diff_shear_md3; @nafsc2]. This means that the system size is the only relevant length scale [@nafsc0] and thus we conclude $\\xi\\sim L$ in</p><a href=\"/item/2460\">more</a></div>\n<div class=\"card card-2\"><h2>. NYY's hottest player= Derek Jeter. O's</h2><p>se from the aqueous phase. The problem with ferric iron is that either the ferric ion will preferentially load on organic solvents, such as DEPHA(di-2-ethyl hexyl phosphoric acid) or it will oxidize the active ingredient in organic solvents such a</p><a href=\"/item/7213\">more</a></div>\n"
+},
+{
+"source": "html",
+"jev": 385,
+"text": "<div class=\"card card-0\"><h2>n (minister) (1796–1875), Scottish minis</h2><p>technology. Moreover, while the technology is amenable to various modifications and alternative forms, specific embodiments have been shown by way of example in the drawings and are described in detail below. The intention, however, is not to limit the te</p><a href=\"/item/1722\">more</a></div>\n<div class=\"card card-1\"><h2>ce attracts insects to an electrical gri</h2><p>n they'd been called to a meeting.[17] Members of Shanti Bahini extorted s</p><a href=\"/item/1798\">more</a></div>\n<div class=\"card card-2\"><h2>’, and it is characterized by a lifetime</h2><p>ell as implantation techniques using venoplasty and snaring, have help</p><a href=\"/item/8923\">more</a></div>\n<div class=\"card card-3\"><h2>ptions for this app, it appears to be ab</h2><p>[\\e \\{ h(x, \\xi)\\}]^2 } | \\e \\{ {\\partial h\\over \\partial x} (x, \\xi) \\} | )\\} ] < \\infty$; - both $y \\to h(x_0, y)$ and $y \\to { \\partial \\over \\partial x} \\log h(x,y)|_{x=x_0}$ are monotone on $J$. Then $${\\d \\over \\d x} \\e \\left\\{</p><a href=\"/item/5611\">more</a></div>\n"
+},
+{
+"source": "html",
+"jev": 430,
+"text": "<div class=\"card card-0\"><h2>ctable results. For example, in one stud</h2><p>des with past due balances; and (3) bank revolving accounts with past due b</p><a href=\"/item/1034\">more</a></div>\n<div class=\"card card-1\"><h2>g on May 20, 1980. On direct appeal, the</h2><p>the networks controlling plant height. Here, we revealed that a dominant photoperiod- and thermo-sensitive dwarf mutant is caused by the active role of a mutated gene Ptd1, of which the wild-type gene encodes a non-specific lipid transfer protein (nsLTP). The Ptd1 plants show</p><a href=\"/item/6862\">more</a></div>\n<div class=\"card card-2\"><h2>or AI textbooks define the field as \"the</h2><p>tection mode. In detection mode, work distance can be calculated from the X-ray counting rate collected by SDD. Correc</p><a href=\"/item/8326\">more</a></div>\n<div class=\"card card-3\"><h2>and Progressive Party of Maldives govern</h2><p>yee in Taylor v. Mobil Corp., 248 Va. 101, 444 S.E.2d 705 (1994), because she did not inv</p><a href=\"/item/3715\">more</a></div>\n<div class=\"card card-4\"><h2>] proved that FSD distributions are unim</h2><p>al functions, such as the perception of pain and breast cancer progression, however the peptide also has a stimulatory effect on immune cell development and function ([@b18-btt-2-699]). SP was also found to stabilize IL</p><a href=\"/item/155\">more</a></div>\n"
+},
+{
+"source": "html",
+"jev": 206,
+"text": "<div class=\"card card-0\"><h2>s.scrollSpeed[1]) { var d = delta / 1000</h2><p>specimen showed numerous mites within the folliculosebaceous unit. Treatment with a single dose of oral ivermectin achieved resolution of her symptoms. The causative role of Demodex folliculorum should be considered in immunocompetent children with rosacea or</p><a href=\"/item/7410\">more</a></div>\n<div class=\"card card-1\"><h2>hen $v_{DC} = 300{\\ V}$ and $v_{AC} = 5{</h2><p>and May 19) power outages at the telescope required us to stop observing, and on one further occasion on Jan 21 a power outage af</p><a href=\"/item/3799\">more</a></div>\n"
+},
+{
+"source": "html",
+"jev": 503,
+"text": "<div class=\"card card-0\"><h2>unc imagePickerController(_ picker: UIIm</h2><p>e could be rotated between horizontal and vertical, thus allowing a tree to be f</p><a href=\"/item/1725\">more</a></div>\n<div class=\"card card-1\"><h2>surprising and really pretty spectacular</h2><p>Fluvax and Fluvax Junior, the vaccine that replaced Panvax in 2010?[The Australian News: \"10 Deaths linked to the anti flu vaccine\" http://www.theaustralian.com.au/news/health-science/deaths-linked-to-anti-flu-vaccines/story-e6frg8y6-1226441791947 ]<<‘Fluva</p><a href=\"/item/8394\">more</a></div>\n<div class=\"card card-2\"><h2>*in vivo* Ab bound: mouse Peyer\\'s patch</h2><p>m, check if the virtual objects have the same size as the</p><a href=\"/item/4563\">more</a></div>\n<div class=\"card card-3\"><h2>to multiply the responses by $0.85$ and </h2><p>ucture is the same as for Eu metal except the intensity ratio of the first exchange split lines \\[[@B48-materials-13-03111]\\]. The splitting, i.e., distance between the first five well resolved lines within the main 4d~</p><a href=\"/item/29\">more</a></div>\n<div class=\"card card-4\"><h2>ssia was now confronted on one side by t</h2><p>ower spectrum of CMB lensing maps ($M_{\\kappa}$) using $$\\begin{aligned} \\label{eq:</p><a href=\"/item/3744\">more</a></div>\n<div class=\"card card-5\"><h2>) and old (73%) groups assessed their ac</h2><p>tory, gene-density, and background levels of genetic variation. In general, we used</p><a href=\"/item/3692\">more</a></div>\n"
+},
+{
+"source": "hy",
+"jev": 1294,
+"text": "ր – Սերգեյ Օվչարով\nՍցենարիստ – Սերգեյ Օվչարով\nԿոմպոզիտոր – Անդրեյ Սիգլե\nՕպերատոր – Իվան Բագաև\nՆկարիչ-գրիմյոր – Ժաննա Ռոդիոնովա\nԲեմադրող նկարիչ – Դմիտրի Մալիչ-Կոնկով\nՊրոդյուսեր – Անդրեյ Սիգլե, Դմիտրի Սվետոզարով\nԸնկերություն – Proline-film\n\n\n== Պատմություն ==\nՖիլմի սցենարում ընդգրկվել է պիեսի ոչ ամբողջ տեքստը. դրանից բացի, սցենարը գրելիս Օվչարովն օգտագործել է Չեխովի չգրված ստեղծագործությունների վերաբերյալ նշումները, որ պահպանվել են նրա նոթատետրերում։ Տարեց ծառա Ֆիրսի դերի համար, որ բաժին է հասել Իգոր Յասուլովիչին, նախապես լսումների են մասնակցել այլ դերասաններ, այդ թվում Յուրի Յակովլևն ու Վլադիմիր Գոստյուխինը։\nՖիլմը նկարահանվել է «Լենֆիլմի» չորրորդ տաղավարում։ Քանի որ բալենիների ծաղկման շրջանի կարճատև լինելու պատճառով հնարավոր չէր դրանք նկարահանել իրականում, ստեղծվել է արհեստական այգի. ճյուղերի վրա ամրացվել են կտորից պատրաստված տերևներ։ Դրանք այնքան նման են եղել բնականին, որ տեսարաններից մեկում ձիերը սկսել են ծամել դրանք՝ համարելով իրական տերևներ։\nՖիլմի համար նկարահանված նյութի մի մասը չի ներառվել վարձույթի համար թողարկված տարբերակում։ Նախատեսվել է, որ ամբողջական հեռուստատարբերակը բաղկացած կլինի չորս մասից (ըստ այլ տարբերակի՝ վեց մասից), սակայն տարբեր պատճառներով, այդ թվում նաև ֆինանսական, այն այդպես էլ չի մոնտաժվել։\n\n\n== Գեղարվեստական առանձնահատկություններ ==\nԻնչպես նշել է ֆիլմի ռեժիսորը, նրանում առկա են վոդևիլի ու ֆարսի, ինչպես նաև իտալական «կոմեդիա դել արտեի» տարրեր. այսպես, տերերի բացակայության ընթացքում անհնազանդություն ցուցաբերող ծառաների անուններն են՝ Կոլոմբինա, Պիեռո, Առ"
+},
+{
+"source": "hy",
+"jev": 300,
+"text": "Ցրտի բևեռ, շրջան, որտեղ դիտվում է երկրագնդի կամ տվյալ կիսագնդի երկրամերձ օդի ամենից ցածր ջերմաստիճանը։\nՀյուսիսային կիսագնդում բացարձակ նվազագույն ջերմաստիճանը՝ մոտ –70 °C, դիտվում է Վերխոյանսկ–Օյմյակոնի շրջանում և Գրենլանդիայում։ Ամբողջ երկրագնդի ամենից ցածր ջերմաստիճանը՝ –88,3 °C, դիտվել է Անտարկտիդայի «Վոստոկ» սովետական կայանում։"
+},
+{
+"source": "hy",
+"jev": 269,
+"text": "ջական պտույտ է կատարում 1271,95 երկրային օրվա ընթացքում, իր ուղեծրով շարժվելով միջինում 0,283029 աստիճան/օր արագությամբ։ Աստերոիդի ուղեծրի և խավարածրի հարթությունները իրար հետ կազմում են 4,87° անկյուն։\n\n\n== Տես նաև ==\nԱստերոիդների ցանկ\nԱստերոիդների սպեկտրալ դասեր\nԱստերոիդների ընտանիքներ\nԱստերոիդների"
+},
+{
+"source": "hy",
+"jev": 750,
+"text": "Լագուատ (արաբ․՝ الأغواط‎‎, Эль-Агват)՝ քաղաք կենտրոնական Ալժիրի հյուսիսում, Լագուատ վիլաեթի վարչական կենտրոնը։\n\n\n== Աշխարհագրական դիրքը ==\nՔաղաքը գտնվում է վիլաեթի հյուսիս֊արևելյան մասում, Սահարա անապատի հյուսիսային սահմանի վրա, նույնանուն օազիսի տարածքում։ Գտնվում է ծովի մակարդակից 750 մետր բացարձակ բարձրության վրա։\nԼագուատը գտնվում է մայրաքաղաք Ալժիրից մոտ 325 կմ հարավ։\n\n\n== Ժողովրդագրություն ==\n2008 թվականի  մարդահամարի տվյալներով, բնակչությունը կազմում էր 144747 մարդ։ Քաղաքի բնակչության դինամիկան տարիներով.\n\n\n== Տրանսպորտ ==\nՔաղաքի հարավ ֊ արևելյան կողմում է գտնվում Ալժիրի ռազմաօդային ուժերի ավիաբազան, քաղաքացիական ամենամոտ օդանավակայանը գտնվում է Հասի Ռմել քաղաքում։\n\n\n== Տնտեսություն ==\nԼագուատի տնտեսության հիմքը գյուղատնտեսությունն է։ Աճեցնում են մրգեր, բանջարեղեն և ձավարեղեն։ Զարգացած է գորգագործությունը։\n\n\n== Ծանոթագրություններ =="
+},
+{
+"source": "hy",
+"jev": 507,
+"text": "Անվան այլ կիրառումների համար տե՛ս՝ Պրյամայա (այլ կիրառումներ)\n\nՊրյամայա  (ռուս.՝ Прямая ), գետ Ռուսաստանում, հոսում է Կեմերովոյի մարզում։ Գետի երկարությունը 18 կմ է։\n\n\n== Ջրային գրանցամատյանի տվյալներ ==\nՏվյալներն ըստ ջրային ռեսուրսների ֆեդերատիվ տեսչության.\nՌուսաստանի ջրային գրանցամատյանի տվյալների համաձայն՝ պատկանում է Վերին Օբի ավազանային շրջանին, գետի ջրատնտեսային տեղամասը Տոմ գետն է, գետի ենթաավազանը Տոմ գետն է։ Գետի գետային ավազանը (Վերին) Օբ գետն է՝ մինչև Իրտիշի.\n\n\n== Ծանոթագրություններ ==\n\n\n== Արտաքին հղումներ ==\nՌԴ ջրային ռեսուրսների էկոլոգիան Արխիվացված 2015-05-26  Wayback Machine"
+},
+{
+"source": "hy",
+"jev": 262,
+"text": "ում էին ռեստորան, գրախանութ, բժշկի աշխատասենյակ, տպագրական արհեստանոց։ Այստեղ վաճառվում էր բանջարեղեն և ճարպ։\nԽորհրդային տարիներին շենքում նույնպես գործել են խանութներ, գրասենյակներ և բնակվել են մարդիկ։\n2008-2009 թվականներին շենքը հիմնանորոգվել է. վերականգնվել են դեկորատիվ ճակատները, սակայն կորսվել "
+},
+{
+"source": "ja",
+"jev": 660,
+"text": "「Northern lights」（ノーザン・ライツ）は、林原めぐみの29枚目のシングル。2002年3月27日にスターチャイルドから発売された（KICM-3027）。\n\n\n== 概要 ==\n前作「brave heart」より3ヶ月ぶりのリリース。\n収録曲2曲はそれぞれ、アニメ『シャーマンキング』のオープニング、エンディングのタイアップで、2001年にリリースされた「Over Soul」、「brave heart」に続く同アニメのタイアップとなっている。\nオリコンチャートでの週間チャートでは最高3位を獲得。自己最高位を更新し、林原の全作品を通じて自己最高位でもある。また、当時のソロ声優歌手としての最高位を記録した。また、週間シングルチャートトップ10入り作品数の記録も更新した。\n2003年10月度、ゴールドディスクに認定された。2014年5月度には有料音楽配信でもゴールドディスクに認定された。\n初回仕様はデジパックになっている。\n\n\n== 収録曲 ==\n（全作詞：MEGUMI、作曲・編曲：たかはしごう）\n\nNorthern lights [3:31]\nテレビ東京系アニメ『シャーマンキング』後期オープニングテーマ\n自身のアルバム『center color』および、『シャーマンキング』のドラマCD「恐山ル・ヴォワール〜prologue to shaman〜」にはバラードバージョンが収録されており、同バージョンのインスト版が、アニメ本編の第40話と第57話で使用された。\nおもかげ [3:44]\nテレビ東京系アニメ『シャーマンキング』後期エンディングテーマ\nNorthern lights -instrumental- [3:31]\nおもかげ -instrumental- [3:42]\n\n\n== 収録アルバム ==\n\n\n== カバー ==\n\n\n== 脚注 ==\n\n\n=== 注釈 ===\n\n\n=== 出典 ==="
+},
+{
+"source": "ja",
+"jev": 309,
+"text": "に、同社所有の亜鉛精鉱専用無蓋車トキ25000形とともに使用されている。2012年時点では1日1往復で運転され、通常は本形式やタキ1200形を合わせた12両にトキ25000形6両を組成した18両編成が所定となっている。\n1987年のJR移行では20両全車がJR貨物に車籍を承継され、引き続き全車が運用されているが、製造から40年以上が経過し、長距離輸送による老朽化が目立ってきたため、2011年（平成23年）に後継となるタキ1200形の運用が開始され、本形式と混用されていたが､順次､タキ1200形と入れ代わった｡その後についてはJR貨物からは特に公表されていない。\nなお、一部の車両では台車を廃車発"
+},
+{
+"source": "ja",
+"jev": 301,
+"text": "、ケニー・ロバーツらからの厳しい批判に晒された結果、最高峰クラスである500ccクラスは1981年の開催が最後となり、1983年からはフィンランドGPそのものがロードレース世界選手権のカレンダーから外された。\nその後、イマトラでのイベントはヨーロッパ選手権の一戦として1986年まで続けられていた。\n2019年より5年間の契約で、建設中のキュミリングを開催地として復活することがドルナスポーツから発表されていたが、2019年1月現在工事は完了しておらず、2019年のカレンダーにフィンランドGPの名前もないことから復活は2020年にずれ込み、正式に決定した筈だった。しかし、新型肺炎の世界流行の影響に"
+},
+{
+"source": "ja",
+"jev": 338,
+"text": "秋山 時夫（あきやま ときお、1950年 <昭和25年> - ）は、日本の地方公務員。福島県病院局長、同県企画調整部長、同県総務部長を歴任。瑞宝小綬章受章。\n\n\n== 人物・経歴 ==\n同県田村郡小野町出身。福島県庁に入職し、2004年 (平成16年) 4月 同病院局長、2007年4月 同職を尾形幹男と交代し企画調整部長、2008年4月 同職を井上勉と交代し穴沢正行の後任として総務部長、2009年3月 赤城恵一を後任として同職退任、福島県庁辞職。\n2016年9月 公立小野町地方綜合病院企業長就任。福島県退職公務員連盟年金部長。\n\n\n== 栄典 ==\n2021年4月 令和3年春の叙勲で地方自治功労により瑞宝小綬章を受章。\n\n\n== 脚注 ==\n\n\n== 関連項目 ==\n福島県出身の人物一覧"
+},
+{
+"source": "ja",
+"jev": 271,
+"text": "メ〜テレ（中京地区）のみ、2023年3月17日の23時15分 - 翌0時15分に放送された。\n第2回（2024年）から、制作局のメ〜テレをはじめとする一部のテレビ朝日系列フルネット局にもネットされるようになった。\n制作局と同時ネット局での地上波放送後、「メモ少年」の公式YouTubeチャンネルとTVerの見逃し配信で番組本編の配信が実施される。\n下記の表に記載のないキー局のテレビ朝日と一部系列局ではネットされていない。\n\n\n=== 秋山歌謡祭2024 ===\n出典：\n\n\n=== 秋山歌謡祭2025 ===\n出典：\n\n\n=== 秋山歌謡祭2026 ===\n出典：\n\n\n== スタッフ ==\n出典："
+},
+{
+"source": "ja",
+"jev": 1061,
+"text": "長調 ないしょ話 (Confidence)\n第10番 嬰ハ短調 叱責 (Increpatio)\n第11番 変ロ長調 ため息 (Les soupirs)\n第12番 変ホ短調 小舟歌 (Barcarollette)\n第2巻\n\n第13番 ハ短調 追憶 (Ressouvenir)\n第14番 ヘ長調 小二重奏曲 (Duettino):「スカルラッティ風に」と冒頭に指定されている。\n第15番 ニ短調 古い様式による協奏曲のトゥッティ (Tutti de concerto dans le genre ancien ):バロック時代のリトルネロ形式を模した曲。\n第16番 ト長調 幻想曲 (Fantaisie)\n第17番 ホ短調 3声の小さな前奏曲 (Petit prélude à 3):「弦楽のように quasi col arco」と指定されている。\n第18番 イ長調 小リート (Liedchen):無言歌風の小品。\n第19番 嬰ヘ短調 恩寵 (Grâces)\n第20番 ロ長調 村の小さな行進曲 (Petite marche villageoise)\n第21番 嬰ト短調 死にゆく者達が貴殿に挨拶を (Morituri te salutant):題名は古代ローマの剣闘士が試合前に皇帝に告げる口上。\n第22番 変ニ長調 無垢 (Innocenzia)\n第23番 変ロ短調 木靴の男 (L'homme aux sabots)\n第24番 変ホ長調 コントルダンス (Contredanse)\n第3巻\n\n第25番 ハ長調 追跡 (La poursuite)\n第26番 ト短調 古い様式の小さな歌 (Petit air genre ancien)\n第27番 ニ長調 リゴードン (Rigaudon)\n第28番 イ短調 強情 (Inflexibilité)\n第29番 ホ長調 熱狂 (Délire)\n第30番 ロ短調 悲しき小さな歌 (Petit air dolent)\n第31番 嬰ヘ長調 四重奏の冒頭 (Début de quatuor)\n第32番 嬰ハ短調 小メヌエット (Minuettino)\n第33番 変イ長調 ねんねしな (Fais dodo)\n第34番 変ホ短調 私は衆愚を嫌い、彼らを遠ざける (Odi profanum vulgus et arceo)\n第35番 変ロ長調 軍楽 (Musique militaire)\n第36番 ヘ短調 小トッカータ (Toccatina)\n第4巻\n\n第37番 ハ短調 小さな小さなスケルツォ (Scherzettino)\n第38番 ト長調 良き願い (Les bons souhaits)\n第39番 ニ短調 ヘラクレイトスとデモクリトス (Héraclite et Démocrite)\n第40番 イ長調 待ってても行かないよ (Attendez-moi sous l'orme)\n第41番 ホ短調 異名同音 (Les enharmoniques)\n第42番 ロ長調 5声の小さな歌 (Petit air à 5 voix)\n第43番 嬰ヘ短調 小夜想曲―魅惑 (Notturnino-Innamorato)\n第44番 嬰ハ長調 有頂天 (Transports)\n第45番 嬰ト短調 小悪魔たち (Les diablotins)\n第46番 変ホ長調 初めてのラブレター (Le premier billet doux)\n第47番 変ロ短調 小スケルツォ (Scherzetto)\n第48番 ヘ長調 夢の中で (En songe)\n番号なし ハ長調 神を讃え"
+},
+{
+"source": "json",
+"jev": 190,
+"text": "[{\"id\": \"47b43390-3819-4365-830c-406e3ec63ba4\", \"user_id\": 608412028, \"created_at\": \"2026-08-09T23:30:00Z\", \"title\": \"arvel film has already been pushed back in favor of another \", \"body\": \"month spaceflight in the relative amplitudes of the 24-, 12-, 8-, and 1.5-hour components, expressed as a percentage of the MESOR, are shown in [Table 3](#tbl0020){ref-type=\\\"table\\\"} for NN intervals, β,\", \"score\": 38.542, \"tags\": [], \"active\": false}]"
+},
+{
+"source": "json",
+"jev": 337,
+"text": "[{\"id\": \"f6f24c53-7a63-4587-bc32-8b85a1755559\", \"user_id\": 721966015, \"created_at\": \"2026-02-10T14:51:00Z\", \"title\": \"อนัลด์ เฟรเดอริก แอตกินสัน (อังกฤษ: Ronald Frederick Atkinso\", \"body\": \"นเจ้าชายแห่งราชวงศ์ที่สิบแปดของอียิปต์โบราณ เป็นพระราชโอรสของฟาโรห์ทุตโมสที่สี่ พระองค์ปรากฎอยู่บนภาพสลักในหลุมฝังศพหมายเลข ทีที 64 ซึ่งเป็นหลุมฝังศพของเฮกาเรชู และพระศพของพระองค์ถูกฝังไว้ในห\", \"score\": 76.373, \"tags\": [], \"active\": true}]"
+},
+{
+"source": "json",
+"jev": 180,
+"text": "[{\"id\": \"8ec8c0ae-242e-492c-a6a0-ebfe1442b6c2\", \"user_id\": 576271538, \"created_at\": \"2026-06-07T08:23:00Z\", \"title\": \"hemistry/biochemistry (V. Kagan), cell and molecular biology\", \"body\": \"nstitute of Mental Health---D43TW009675. Competing interests {#FPar2} =================== The authors declare that they have no competing interests. Availability of data and supporting materials section {#FPar3} =========================\", \"score\": 92.454, \"tags\": [], \"active\": true}]"
+},
+{
+"source": "json",
+"jev": 569,
+"text": "[{\"id\": \"ce7f4fdc-e4a4-4ea0-afd9-2935b8bb49ec\", \"user_id\": 155185571, \"created_at\": \"2026-05-09T05:28:00Z\", \"title\": \"when it was ten paces from him and it dropped at his feet. C\", \"body\": \"Health.com? This Week's Challenge PUSHUP CHALLENGE It might sur\", \"score\": 79.104, \"tags\": [\"*2\", \"-\"], \"active\": false}, {\"id\": \"c89560a8-27a1-46f6-b8f8-b4d0f1a476d9\", \"user_id\": 397457531, \"created_at\": \"2026-03-11T21:37:00Z\", \"title\": \"ভিশন কমার্সিয়াল বাণিজ্যিক, টিভি কমার্সিয়াল, অ্যাডভার্ট, টি\", \"body\": \"ের পরাজয়ের পর তার বাহিনী কেবল তাকে সহায়তা করার জন্য এসেছিল, যার ফলে ভার্মিনার সেনাবাহিনী রোমানদের কাছে পরাজিত হয়েছিল। ভার্মিনা এই যুদ্ধ থ\", \"score\": 47.64, \"tags\": [\"s\", \"at\", \"spaced\"], \"active\": false, \"children\": [{\"id\": \"c7578558-596a-4052-9a88-0420b1f3ee86\", \"user_id\": 875287197, \"created_at\": \"2026-10-25T16:04:00Z\", \"title\": \"independent contractors. Defendant contests plaintiff's enti\", \"body\": \"on, 21st Infantry Regiment, Queen's Guard Uniform Rajchawanlop hat with b\", \"score\": 18.24, \"tags\": [\"3.47%\"], \"active\": true}]}]"
+},
+{
+"source": "json",
+"jev": 192,
+"text": "[\n  {\n    \"id\": \"16a55cc6-76e6-4688-82d0-ea8fce133d77\",\n    \"user_id\": 858793275,\n    \"created_at\": \"2026-03-24T12:27:00Z\",\n    \"title\": \"dan çok az fazladır. Vesta Alman gök\",\n    \"body\": \"asked what topics come to mind about a conversation they may have with an advisor, only 6 per cent cited debt. \\\"It can be challenging to find the money each month to put towards reducing your debt, but our poll clearly shows that many Cana\",\n    \"score\": 61.557,\n    \"tags\": [\n      \"ast,\"\n    ],\n    \"active\": true\n  }\n]"
+},
+{
+"source": "json",
+"jev": 538,
+"text": "[{\"id\": \"5e967cec-3431-4147-a098-95c2bf433d4f\", \"user_id\": 626681245, \"created_at\": \"2026-11-08T17:21:00Z\", \"title\": \"\\\\prime}o}^{nc - meta*1}}{\\\\rho_{g^{\\\\prime}o}^{group*1}};$$ $$\", \"body\": \"of hypertonic saline epinephrine solution and/or coagulation with a Coagrasper (FD-410LR; Olympus). No uncontrollable bleeding was encountered. Postoperative bleeding was seen in 3.4 % (1\", \"score\": 20.471, \"tags\": [], \"active\": true}, {\"id\": \"1b69842e-0282-4cac-9def-649f420c05ab\", \"user_id\": 648698302, \"created_at\": \"2026-07-19T04:20:00Z\", \"title\": \"na we Francji, w regionie Nowa Akwitania, w departamencie Ch\", \"body\": \"lephone]([TelephoneID],[CustomerID],[Number]) SELECT Count,CustomerID, HomePhone FROM OldCustomer Q: Elixir + Absinthe + Ecto + Dataloader – filter by multiple fields Using Elixir/Absin\", \"score\": 96.117, \"tags\": [\"ce,1951.a\"], \"active\": false}, {\"id\": \"1663f72e-c96a-4912-b15c-5686fa7593f1\", \"user_id\": 526325851, \"created_at\": \"2026-02-13T20:52:00Z\", \"title\": \"Suppose 2*r = -2, -3*n + u*n + 25 = -r. What is the least co\", \"body\": \"kwell, who runs property investment firm Prospect\", \"score\": 28.339, \"tags\": [], \"active\": true}]"
+},
+{
+"source": "json_ascii",
+"jev": 599,
+"text": "[{\"id\": \"ec2e31be-a247-49f5-9edc-52b4785b55c6\", \"user_id\": 453745719, \"created_at\": \"2026-05-24T02:40:00Z\", \"title\": \"26_50c6ced1ec_k.jpg\\\" alt=\\\"boy with ferry\\\"> <img class=\\\"right\", \"body\": \". Table [1](#Tab1){ref-type=\\\"table\\\"} presents implementation strategies i\", \"score\": 16.189, \"tags\": [\"ra\", \"notes\", \"177-81\", \"and\"], \"active\": false, \"children\": [{\"id\": \"634b07d4-bb78-4de4-bbba-7aabbfbec336\", \"user_id\": 464733567, \"created_at\": \"2026-06-01T12:59:00Z\", \"title\": \"exist. We begin with the proof of (a). Suppose that $S(G_1)$\", \"body\": \"i th\\u0103ng h\\u1ea1ng. N\\u0103m 2004, Dijon \\u0111\\u00e3 \\u0111\\u1ea1t \\u0111\\u01b0\\u1ee3c th\\u00e0nh t\\u00edch \\u0111\\u00e1ng nh\\u1edb \\u1edf Coupe de France, \\u0111\\u00e1nh b\\u1ea1i\", \"score\": 49.519, \"tags\": [], \"active\": true}]}, {\"id\": \"e553e48d-38af-4afb-9f93-29b46ad363fe\", \"user_id\": 980630714, \"created_at\": \"2026-04-02T17:49:00Z\", \"title\": \"ed appellant's punishment for the capital murder offense at \", \"body\": \"storic Places in 1987. It was built in the mid-1800s and was deemed significant as a \\\"Typical early Kentucky smokehouse in good condition.\\\" It is believed to have been built by Dolph Aluck, ow\", \"score\": 60.197, \"tags\": [\"(self,\", \"value:\", \"bool)\"], \"active\": false}]"
+},
+{
+"source": "json_ascii",
+"jev": 421,
+"text": "[{\"id\": \"92bd1bc1-477c-4cc6-b6c4-a28fa48ba717\", \"user_id\": 358434827, \"created_at\": \"2026-10-10T23:43:00Z\", \"title\": \"Marie Bergman; \\u05e0\\u05d5\\u05dc\\u05d3\\u05d4 \\u05d1-21 \\u05d1\\u05e0\\u05d5\\u05d1\\u05de\\u05d1\\u05e8 1950) \\u05d4\\u05d9\\u05d0 \\u05d6\\u05de\\u05e8\\u05ea \\u05e9\\u05d5\\u05d5\\u05d3\\u05d9\\u05ea. == \", \"body\": \"\\u05df, \\u05d1\\u05d0\\u05ea\\u05e8 \\u05e1\\u05d0\\u05d5\\u05e0\\u05d3\\u05e7\\u05dc\\u05d0\\u05d5\\u05d3 (\\u05d1\\u05d0\\u05e0\\u05d2\\u05dc\\u05d9\\u05ea) \\u05de\\u05d0\\u05e8\\u05d9 \\u05d1\\u05e8\\u05d2\\u05de\\u05df, \\u05d1\\u05d0\", \"score\": 94.108, \"tags\": [\"i)\"], \"active\": false}]"
+},
+{
+"source": "json_ascii",
+"jev": 193,
+"text": "[{\"id\": \"58386939-fa8a-4ad6-b160-ccc3a5bf639b\", \"user_id\": 293282860, \"created_at\": \"2026-06-04T13:12:00Z\", \"title\": \"sonaje principal, Oscar Eriksson, un ni\\u00f1o de doce a\\u00f1os (inte\", \"body\": \"---------------------------- A total of 325 consecutive patients (228 men, 97 women; mean age 73.7 years, range 35 -- 95) with EGCs were treated by ESD-CC at Aso Iizuka Hospital\", \"score\": 84.339, \"tags\": [], \"active\": false}]"
+},
+{
+"source": "json_ascii",
+"jev": 920,
+"text": "[{\"id\": \"b00bb123-0504-4368-a459-cbdf12159047\", \"user_id\": 883404939, \"created_at\": \"2026-12-06T14:06:00Z\", \"title\": \"at link_directories is local to the extra_lib. Now, question\", \"body\": \"rise-grade application platformand unified container and cloud\", \"score\": 67.686, \"tags\": [], \"active\": false, \"children\": [{\"id\": \"f2ad9204-c912-4e54-83f9-78edebb50cd4\", \"user_id\": 979113937, \"created_at\": \"2026-04-19T08:53:00Z\", \"title\": \"\\u0442\\u0430\\u043d\\u043e\\u043c \\u043d\\u0430 1 \\u0432\\u0435\\u0440\\u0435\\u0441\\u043d\\u044f 1946 \\u0440\\u043e\\u043a\\u0443 \\u0445\\u0443\\u0442\\u0456\\u0440 \\u0428\\u0438\\u0440\\u043e\\u043a\\u0438\\u0439 \\u0432\\u0445\\u043e\\u0434\\u0438\\u0432 \\u0434\\u043e \\u0441\\u043a\\u043b\\u0430\\u0434\\u0443 \", \"body\": \"\\u0430\\u043d\\u0446\\u044f\\u043c. \\u041d\\u0430 \\u043f\\u043e\\u0447\\u0430\\u0442\\u043a\\u0443 2005 \\u0440\\u043e\\u043a\\u0443 \\u0432\\u043e\\u043d\\u0430 \\u0437\\u043d\\u044f\\u043b\\u0430\\u0441\\u044f \\u0432 \\u043a\\u043e\\u043c\\u0435\\u0434\\u0456\\u0439\\u043d\\u043e\\u043c\\u0443 \\u0431\\u043e\\u0439\\u043e\\u0432\\u0438\\u043a\\u0443 \\u00ab\\u0412\\u043e\\u043d\\u0430 \\u043d\\u0430 \\u0441\\u043b\\u0443\\u0436\\u0431\\u0456\\u00bb, \\u043f\\u0456\\u0441\\u043b\\u044f \\u0447\\u043e\\u0433\\u043e \\u043f\\u043e\\u0432\\u0435\\u0440\\u043d\\u0443\\u043b\\u0430\\u0441\\u044f\", \"score\": 62.793, \"tags\": [\"ked\", \"out\"], \"active\": false}]}]"
+},
+{
+"source": "json_ascii",
+"jev": 339,
+"text": "[{\"id\": \"23bdf420-7a66-49eb-a085-60287481007c\", \"user_id\": 604593417, \"created_at\": \"2026-04-18T17:16:00Z\", \"title\": \"hysico-chemical and bacteriological analysis. DNA was extrac\", \"body\": \"ion: \\u2022 employers have a responsibility to protect the health of their workers and unhealthy, poor and inadequate working environments can have a detrimental impact on women\\u2019s reproductive health \\u2022 women\\u2019s labour\", \"score\": 73.664, \"tags\": [\"it\", \"depends\", \"on\"], \"active\": true}, {\"id\": \"cdb0276e-00fe-45f4-8a4d-dfd9752b0704\", \"user_id\": 561208332, \"created_at\": \"2026-05-23T10:43:00Z\", \"title\": \"a pair of Siamese cats in Paris, France but only occurs when\", \"body\": \"OH affecting the *CHECK2* region (Fig. [2](#Fig2){ref-type=\\\"fig\\\"}).Fig.\", \"score\": 91.75, \"tags\": [], \"active\": false}]"
+},
+{
+"source": "json_ascii",
+"jev": 351,
+"text": "[{\"id\": \"d8676936-f508-498d-b586-a5cd2fcbe607\", \"user_id\": 558979333, \"created_at\": \"2026-04-25T10:51:00Z\", \"title\": \"inalised' groups have different behaviours that may be prote\", \"body\": \"gement of headache**Age group in yearsVariables15 -2425 - 3435 - 4445 - 5455 - 64\\u2264 65***Presence of headache*\", \"score\": 33.062, \"tags\": [\"nd\"], \"active\": false, \"children\": [{\"id\": \"70e10ea0-46d9-41ae-ac9f-1f5e944e06c6\", \"user_id\": 544422979, \"created_at\": \"2026-03-17T17:17:00Z\", \"title\": \"sha1.c @@ -18,7 +18,7 @@ #include <string.h> #include <netin\", \"body\": \"uch_ rather log your keystrokes or hear what you're saying. The number of scenarios where having a visual would be useful would be incredibly low by comparison. P\", \"score\": 2.99, \"tags\": [\"nd\", \"yes,\", \"a\"], \"active\": false}]}]"
+},
+{
+"source": "ka",
+"jev": 259,
+"text": ", ლამაზი, ენერგიული ადამიანები არიან, რომლებიც თითქოს ჩვენ შორის ცხოვრობენ. ალბათ სწორედ ამით აიხსნება მთელ მსოფლიოში მკითხველთა უზომოდ დიდი ინტერესი ფილიპსის დეტექტივების მიმართ, რომელიც მწერლის სიკვდილის შემდეგაც არ განელებულა.\n\n\n== ლიტერატურა ==\nმსოფლიო დეტექტივების სეიფი, ტომი 5, თბილისი, 2010.\n"
+},
+{
+"source": "ka",
+"jev": 266,
+"text": "ნივერსიტეტი  საერთაშორისო სამართლის სპეციალობით. მოგვიანებით დაამთავრა ესექსის უნივერსიტეეტი ადამიანის უფლებათა საერთაშორისო სამართლის სპეციალობით.  2015-2016 წლებში იყო  საქართველოს მე-8 მოწვევის პარლამენტის წევრი (საგარეჯოს მაჟორიტარი), საარჩევნო ბლოკი: „ბიძინა ივანიშვილი — ქართული ოცნება“.\n\n\n== რ"
+},
+{
+"source": "ka",
+"jev": 397,
+"text": "ჯეიმზ ბონდის სერიის ფილმის „სფერული ელვა“ (ინგლ. Thunderball) საუნდტრეკი გამოვიდა 1965 წელს. მასში შეტანილი მუსიკის კომპოზიტორი არის  ჯონ ბარი.\nფილმის მთავარ მუსიკალურ თემას „Thunderball“. ასრულებს ტომ ჯოუნსი.\n\n\n== სიმღერების სია ==\nThunderball (Main Title) – ტომ ჯოუნსი\nChateau Flight\nThe Spa\nSwitching the Body\nThe Bomb\nCafe Martinique\nThunderball (Instrumental)\nDeath of Fiona\nBond Below Disco Volante\nSearch for the Vulcan\n007\nMr. Kiss Kiss Bang Bang\nCD-ის დამატებები\nGunbarrel/Traction Table/Gassing the Plane/Car Chase\nBond Meets Domino /Shark Tank/Lights out for Paula/For King and Country\nStreet Chase\nFinding the Plane/Underwater Ballet/Bond with SPECTRE Frogmen/Leiter to the Rescue/Bond Joins Underwater Battle\nUnderwater Mayhem/Death of Largo/End Titles\nMr. Kiss Kiss Bang Bang (მონო ვერსია)\nშენიშვნები\n\n\n== სქოლიო =="
+},
+{
+"source": "ka",
+"jev": 264,
+"text": " განტოლების ზოგადი ამონახსნების საფუძველზე საანგარიშო სქემების შედგენას; თაღების გაანგარიშების ზოგად მეთოდებს. შესრულებული აქვს მრავალი მნიშვნელოვანი სამუშაო საპროექტო და სამშენებლო დაწესებულებებში საქართველოსა და მის ფარგლებს გარეთ. \nმიღებული აქვს ივანე ჯავახიშვილის სახ. მედალი, ასევე სახელმწიფო ჯი"
+},
+{
+"source": "ko",
+"jev": 498,
+"text": "영남중학교(嶺南中學校)는 대한민국 부산광역시 사하구 장림동에 있는 사립 중학교이다.\n\n\n== 학교 연혁 ==\n1951년 11월 19일 : 재단법인 영남학원 설립 인가\n1951년 11월 19일 : 초대 이사장에 이우룡(李羽龍) 선생 취임\n1952년 6월 25일 : 동신중학교  개교\n1958년 12월 17일 : 중·고 분리\n1959년 2월 7일 : 문보374호로 교명 변경(동신중학교를 영남제일중학교로)\n1983년 10월 31일 : 관리1040-707호로 교명 변경(영남제일중학교를 영남중학교로)\n1983년 11월 9일 : 장림동 신축 교사로 이동\n1999년 3월 2일 : 부산광역시교육청 지정 과학적 사고와 창의력 개발 연구학교 운영(1년)\n2010년 7월 23일 : 제3대 이사장 임영담(학규) 스님 취임\n2019년 2월 11일 : 제65회 졸업식(5학급 125명, 총인원 25,733명)\n2024년 3월 1일 : 제23대 명휘정 교장 취임\n2024년 3월 4일 : 2024학년도 입학식 (5학급 133명)\n2025년 1월 8일 : 제71회 졸업식 (5학급 118명)\n\n\n== 학교 동문 ==\n\n\n== 참고 자료 ==\n영남중학교 - 한국교육학술정보원 학교알리미\n\n\n== 외부 링크 ==\n영남중학교 홈페이지"
+},
+{
+"source": "ko",
+"jev": 194,
+"text": "세에 산레모가요제(Sanremo Music Festival)에 Nicola Salerno가 작곡하고 Mario Panzeri가 가사를 붙인 논호레타(\"나이도 어린데\", \"Non Ho L'Età\")로 입상하였다. 1964년 같은 노래로 유로비전 송 콘테스트에 참가하여 이탈리아인으로는 처음으로 우승함으로써 일약 유명해졌다. 1979년 결혼하여 2명의 아들을 두고 은퇴, 로마로 이주하였다. 그 후 1989년에 산레모가요제에 출전하여 복귀하였다. 2009년 현재 TV Presenter, 저널리스트로 활동중이다.\n\n\n== 같이 보기 ==\n베"
+},
+{
+"source": "ko",
+"jev": 272,
+"text": "제이 존스톤(Jay Johnston, 1968년 10월 22일 ~ )은 미국의 배우, 텔레비전 배우, 각본가, 성우, 텔레비전 감독이다.\n시카고에서 태어났다.\n\n\n== 방송 ==\n밥 & 데이비드\n밥스 버거스 3\n밥스 버거스 2\n밥스 버거스 1\n사라 실버맨 프로그램\n\n\n== 영화 ==\n사라 실버맨 프로그램 (2007년)\n터네이셔스 D (2006년)\n앵커맨 (2004년)\n어레스티드 디벨롭먼트 (2003년)\n마스터 오브 디즈가이즈 (2002년)\n맨 인 블랙 2 (2002년)\n섹스 아카데미 (2001년)\n스트레인지 로이어 (2001년)\n바이센테니얼 맨 (1999년)\n잭 프로스트 (1998년)\n\n\n== 외부 링크 ==\n(영어) 제이 존스톤 - IMDb"
+},
+{
+"source": "ko",
+"jev": 610,
+"text": "8000, 8001, 8002, …, 8999는 정수들이며, 그 밖에도 여러 뜻이 있다.\n\n\n== 8000 ==\n\n\n=== 교통 ===\n한국철도공사 8000호대 전기 기관차\n서울교통공사 8000호대 전동차\n\n\n=== 역법 ===\n제8천년기, 기원전 제8천년기\n\n\n=== 지리 ===\n8000미터 봉우리\n\n\n== 8001~8999 ==\n8085\n인텔 8085: 인텔의 8비트 마이크로프로세서.\n8210\n노키아 8210: 노키아의 휴대 전화.\n8243\n아제르바이잔 항공 8243편 추락 사고\n8250\n8250 UART: 집적 회로.\n8282\n무선호출기(일명 삐삐)에서 “빨리빨리”를 의미하는 은어. 다비치의 곡 〈8282〉도 여기서 유래했다.\n8601\nISO 8601: 날짜 및 시간과 관련된 데이터 교환을 다루는 국제 표준.\n8664\n8664 캠페인: 켄터키주 루이빌의 강변을 따라 지나는 미국 주간고속도로 제64호선의 이설 관련 캠페인.\n8701\n《8701》: 미국의 가수 어셔의 정규 음반. 2001년 7월 9일 출시.\n8800: 메타 문서 참고.\n8823\n매를 뜻하는 일본어 단어 ‘하야부사(はやぶさ)’의 숫자 고로아와세.\n8888\n8888 항쟁: 1988년 8월 8일 버마(현 미얀마)에서 일어난 반군부 민주항쟁.\n8969\n《8969》(2016년): 파키스탄의 스릴러 영화.\n\n\n== 같이 보기 ==\n1000 (동음이의)\n2000 (동음이의)\n3000 (동음이의)\n4000 (동음이의)\n5000 (동음이의)\n6000 (동음이의)\n7000 (동음이의)\n9000 (동음이의)"
+},
+{
+"source": "ko",
+"jev": 175,
+"text": "3와 웹매트릭스 도구 세트의 일부로 출시되었다.\nRazor는 AspNetWebStack의 구성 요소가 되었고, ASP.NET Core의 일부가 되었다.\n\n\n== 설계 ==\nRazor 구문은 C# 프로그래밍 언어를 기반으로 한 템플릿 마크업 구문으로 프로그래머가 HTML 구성 워크플로우를 사용할 수 있도록 한다. 코드 블록을 나타내기 위해 <%= %> 기호와 함께 ASP.NET 웹 폼 (.aspx) 마크업 구문을 사용하는 대신 Razor 구문은 @ 문자로 코드 블록을 시작하며 코드 블록을 명시적으로 닫을 필요가 없다.\nRazor의 아"
+},
+{
+"source": "ko",
+"jev": 310,
+"text": "《대쥬신제국사》는 김산호가 그린 만화로, 고조선을 가리키는 쥬신이라는 단어의 출처로도 유명하다.\n대쥬신제국사는 다섯 권으로 이루어져 있으며, 1~4권은 환인으로부터 발해에 걸치는 옛 한국의 역사를, 5권은 이순신과 임진왜란을 다룬다.\n\n\n== 참고 문헌 ==\n산호, 김 (1994년 1월 1일). 《대쥬신제국사 1~3 세트 (전3권)》. 동아출판사. ISBN 978-8900021202. \n산호, 김 (1995년 11월 1일). 《대쥬신제국사 4》. 동아출판사. ISBN 978-8900045949. \n산호, 김 (1995년 11월 1일). 《대쥬신제국사 5》. 동아출판사. ISBN 978-8900045956. \n\n\n== 같이 보기 ==\n환단고기\n태왕사신기"
+},
+{
+"source": "log",
+"jev": 819,
+"text": "2026-10-09 23:55:08,252 INFO [worker-8] GET /v1/items/764492ac-516b-4318-9415-8e7ca6f9d438 200 825ms ip=47.3.252.16\n2026-10-08 00:35:36,667 INFO [worker-2] GET /v1/items/dbe25dfb-6554-4b35-b260-3ece99ff9e9a 200 223ms ip=199.121.99.238\n2026-10-05 18:58:47,556 DEBUG [worker-6] POST /v1/items/ded7e282-84f6-4e30-a46a-6d50d00f2cd8 500 615ms ip=38.177.220.101\n2026-10-11 14:08:28,612 DEBUG [api-8] GET /v1/items/29f4fd8b-28b1-4bac-b612-e1b55c481fc8 201 945ms ip=95.90.136.220\n2026-10-02 11:41:48,899 INFO [db-7] POST /v1/items/abd2dae3-0de0-4c8f-8f71-0523d4143dcf 404 478ms ip=28.190.246.236\n2026-10-10 09:00:06,188 ERROR [api-8] POST /v1/items/9459de78-37a7-41c6-b984-25aecedc6ee8 404 243ms ip=219.62.105.16\n2026-10-13 22:35:10,317 DEBUG [worker-5] POST /v1/items/1bdaef56-adde-4124-848d-11a018ac6450 200 151ms ip=191.233.83.90\n2026-10-03 22:44:05,398 ERROR [worker-6] GET /v1/items/7f3f44a9-f129-437e-a736-c1f3902fea71 500 160ms ip=86.19.115.212\n2026-10-24 19:44:26,104 DEBUG [worker-5] GET /v1/items/45236ce5-c12d-4f38-999c-762caa353cbe 201 750ms ip=59.182.170.227"
+},
+{
+"source": "log",
+"jev": 557,
+"text": "2026-10-28 17:59:58,843 INFO [db-1] POST /v1/items/416f95fa-ef78-41ff-830c-199a7692c45d 404 417ms ip=34.144.253.37\n2026-10-05 20:40:58,862 DEBUG [worker-8] GET /v1/items/518085b2-0ad5-4f50-9427-d6ec36cec9c3 404 460ms ip=92.236.30.67\n2026-10-07 13:12:26,181 WARN [api-7] POST /v1/items/2363572a-9570-4215-b508-06fa961f3d48 500 986ms ip=179.141.39.168\n2026-10-06 21:39:02,061 DEBUG [worker-5] GET /v1/items/098065e0-b58d-4ad6-b5ad-9d6147950858 201 532ms ip=172.112.124.77\n2026-10-15 05:59:04,763 ERROR [worker-5] POST /v1/items/f17a6819-9605-4c44-b520-c8207165a784 201 390ms ip=224.155.28.1\n2026-10-17 20:00:47,598 DEBUG [db-1] POST /v1/items/1b55194d-e0e9-4cb7-8876-4f3704751944 500 878ms ip=194.132.189.81"
+},
+{
+"source": "log",
+"jev": 455,
+"text": "2026-10-09 19:15:07,554 INFO [worker-9] POST /v1/items/88c9b250-dbcd-4637-842e-89639bd470a4 201 77ms ip=208.158.25.251\n2026-10-20 18:26:08,155 INFO [worker-7] POST /v1/items/67f5a4b2-f068-42fa-ab7f-ead6b45cb755 201 171ms ip=139.45.211.23\n2026-10-02 01:08:43,241 ERROR [db-4] POST /v1/items/3a8853d3-cc72-4a59-b4f4-e733efe38730 200 981ms ip=188.134.184.12\n2026-10-26 12:30:54,366 DEBUG [db-8] GET /v1/items/3bd696c6-828f-42d3-b526-8c2beb7bfdec 500 297ms ip=6.203.191.126\n2026-10-06 19:52:11,387 ERROR [db-7] POST /v1/items/37306038-9b8d-46d4-a95c-6348ec062592 404 981ms ip=95.64.130.141"
+},
+{
+"source": "log",
+"jev": 1004,
+"text": "2026-10-10 05:23:31,595 WARN [api-1] POST /v1/items/f1806913-0564-4f6d-ac33-aa19cfcf46cd 201 472ms ip=47.60.97.4\n2026-10-09 04:07:19,387 WARN [db-2] GET /v1/items/c4d876f3-0cba-4950-ab58-b749d3f6ac74 201 505ms ip=74.230.45.37\n2026-10-17 22:25:31,195 DEBUG [worker-9] POST /v1/items/35300a84-1020-4f14-92cd-29e8b12370d3 500 209ms ip=86.37.177.93\n2026-10-22 14:17:21,291 ERROR [db-7] POST /v1/items/028bc77d-7d2e-4a4f-8949-5a9f169c0520 404 753ms ip=221.135.66.71\n2026-10-22 00:12:21,397 ERROR [api-4] GET /v1/items/6f81501b-a560-4422-8f92-0de1547596ea 404 208ms ip=235.123.86.35\n2026-10-20 12:26:48,273 ERROR [api-5] POST /v1/items/749af8de-8323-4bc5-b331-dc4a70b01d83 201 566ms ip=148.40.135.60\n2026-10-21 16:40:25,849 INFO [api-5] POST /v1/items/e3e0cc4c-9e5f-4d34-b4c4-33d3600e5971 200 985ms ip=224.216.0.162\n2026-10-21 21:36:32,555 ERROR [worker-3] GET /v1/items/a079d634-98f7-4ad4-8a9b-cfa6d0f520a2 201 941ms ip=83.203.239.4\n2026-10-17 10:50:19,049 INFO [db-4] POST /v1/items/0206df3b-978e-40ff-b9a2-eb82e3938dc3 500 536ms ip=104.53.187.49\n2026-10-25 08:01:34,294 INFO [worker-3] POST /v1/items/9f9a5909-feeb-4f89-aaa7-d79591cf22ec 404 597ms ip=218.130.71.101\n2026-10-26 17:33:45,970 INFO [worker-9] GET /v1/items/6dd183a2-2175-4952-96fa-7c0c4ff0b3c0 200 433ms ip=188.204.69.140"
+},
+{
+"source": "log",
+"jev": 537,
+"text": "2026-10-23 19:42:35,943 INFO [api-5] GET /v1/items/5f81983c-a2e1-47e4-b2af-e6eb86ed4ec8 404 855ms ip=92.88.146.233\n2026-10-15 22:08:45,952 INFO [api-6] GET /v1/items/e14998f5-1e5f-4071-b1f5-4cb84cad5d14 200 309ms ip=7.149.141.72\n2026-10-04 19:53:08,879 ERROR [db-1] POST /v1/items/3c15c9df-6bb8-4465-b51e-a1024b654dc0 200 298ms ip=10.43.42.79\n2026-10-09 08:58:20,755 DEBUG [worker-8] POST /v1/items/430b319e-fbd3-41fa-a578-a5902def0bf0 404 999ms ip=177.47.112.6\n2026-10-15 19:00:21,287 ERROR [db-7] POST /v1/items/8aff21c0-d8e8-4be7-bb67-b0114368c4a2 200 372ms ip=76.153.228.26\n2026-10-13 12:04:41,229 DEBUG [worker-8] POST /v1/items/38f58d14-7d6e-48c8-a2a0-fe0f57d24d39 500 538ms ip=69.188.61.255"
+},
+{
+"source": "log",
+"jev": 1113,
+"text": "2026-10-26 20:13:02,166 ERROR [worker-8] POST /v1/items/61c88bbc-cda9-406d-9873-f958f9e3d156 201 275ms ip=80.138.130.141\n2026-10-26 09:04:44,735 INFO [worker-4] GET /v1/items/d27a4f75-f382-4346-969f-4e74c79b04b4 200 997ms ip=248.85.116.129\n2026-10-04 17:45:02,732 ERROR [api-1] POST /v1/items/2f243e5b-beec-434e-992f-712923cbeea9 201 992ms ip=236.77.101.138\n2026-10-28 11:17:46,221 ERROR [db-1] GET /v1/items/d101d451-06b8-4390-a14b-ec5fb450e1e4 500 992ms ip=180.197.235.247\n2026-10-15 03:25:34,576 INFO [api-6] POST /v1/items/c7561da1-1b44-41b8-b7eb-7f53f74bf7c7 500 282ms ip=241.114.221.101\n2026-10-05 12:03:26,147 INFO [db-5] POST /v1/items/354499fa-adc8-4a95-ab92-36b9e80e688f 201 595ms ip=210.243.58.230\n2026-10-24 21:10:39,526 ERROR [db-5] GET /v1/items/099ef1d9-69f5-4258-af11-f2b3de01c2e6 200 558ms ip=159.239.171.215\n2026-10-23 16:42:12,428 DEBUG [worker-9] POST /v1/items/b68917e4-3d51-49e0-a49b-c7d1ef509ea6 404 958ms ip=149.180.13.10\n2026-10-10 05:54:16,849 ERROR [api-8] GET /v1/items/74b25fb2-af8f-4a41-982e-3ae05cc43aa5 201 572ms ip=82.100.62.134\n2026-10-25 16:06:28,591 WARN [db-8] POST /v1/items/3d744063-14a6-4c94-8a70-61330110746b 404 66ms ip=74.94.45.247\n2026-10-04 10:46:16,067 DEBUG [db-5] POST /v1/items/9a225dfe-ad84-4206-84c7-6d6c3f94c96a 500 522ms ip=144.158.119.226\n2026-10-17 07:34:39,797 DEBUG [api-8] POST /v1/items/4e9f3eaf-a0c6-430a-8626-8d46bbc5c471 500 80ms ip=192.245.114.167"
+},
+{
+"source": "markdown",
+"jev": 120,
+"text": "# David Moore appeals from a summary judgment that h\n\nthe Trust on 24 October 1978. The chancel is entered through a finely moulded thirteenth\n\n## Steps\n- r. red A creation motif and pseudonym of Jehovah's end-time servant, who personi\n- y Defendant in this matter for discretionary review of the decision of the North\n\n```python\ndef f(x):\n    return x * 2\n```\n\nSee [docs](https://example.com/ac4c3435) and **method that gives me**."
+},
+{
+"source": "markdown",
+"jev": 340,
+"text": "# cy of all the information (the \"Content\") containe\n\n：输入文本。 > 译者注：还有一个命令模式，用于生成真 · 随机字符串（笑）。 这十分使新手头疼，因为他们试图尽可能地避免普通模式。那么这是错误的，所以现在我将给你正确的大纲来使用 vim ： ``` start vim while editing is not finished, repeat navigate to desired position in NORMAL mode enter INSERT mode by pressing i type text exit\n\n## Steps\n- ent of Contracts § 444. However, upon entry of the judgment the legal rate of in\n- n2mu }){\\mkern2mu\\underline{\\mkern-2mu\\smash{K}\\mkern-2mu}\\mkern2mu }_{\\alpha }.\n- -spacing: 0; color: black; font-size: 1em; table-layout: fixed; } div.cell_outpu\n- var p; if (this.options.scroll == window) { with(this._getWindowScroll(this.opti\n- bilizers is obtained. This entanglement-assisted paradigm for constructing QECCs\n- tegory:Alumni of Downing College, Cambridge Category:Astronomers Royal Category:\n\n```python\ndef f(x):\n    return x * 2\n```\n\nSee [docs](https://example.com/c1b282f0) and **en') < 0) { openedDr**."
+},
+{
+"source": "markdown",
+"jev": 206,
+"text": "# t line of the spectrometer in a position which is \n\nβ-1,3-galactofucan sulphate\n\n## Steps\n- the highest quality tier 90 plastic. Its slee\n- atisfied enough to make a purchase.\" 2012 Honda Accord SEUsed Cars in Peekskill,\n- nterpreted as statistically meaningful. Ethical approval was obtained from the h\n- hi ,K\\rightarrow \\hat{\\Phi},\\hat{K}$ that is compatible with power counting, glo\n- \\sum_{i=0}^{1}V_{i}^{\\dagger}V_{i}=\\mathbbm{1}_{\\mathcal{H}}$ [@Identity] and as\n\n```python\ndef f(x):\n    return x * 2\n```\n\nSee [docs](https://example.com/98c5856c) and **ooling method, altho**."
+},
+{
+"source": "markdown",
+"jev": 189,
+"text": "# ies that filled the moat around the Tower of Londo\n\nFederal Reserve, real median household income was up just 1.2 percent in October from this year’s low of $50,757 in April. The current $51,089 income level is slightly above what it was at the end of last year. Median income was $54,761 in October 2007. S\n\n## Steps\n- midiaphragm elevation. After the patient was discharged from the hospital, his c\n- ---- ------- ------------- ------- ------------- -------- ------ -\n- 06400 tz.transition 2033, 11, :o1,\n\n```python\ndef f(x):\n    return x * 2\n```\n\nSee [docs](https://example.com/2af8dbde) and **this same report: \"W**."
+},
+{
+"source": "markdown",
+"jev": 175,
+"text": "# total fatalities, were shot, primarily in escape a\n\necchi depth. Traditional bathymetric LiDAR sensors offer up to three Secchi depths, but with a footprint 20 time\n\n## Steps\n- tions, typename _StrideType> struct traits<Ref<_PlainObjectType, _Options, _Stri\n- Aetna Ins. Co. v. Commonwealth, 106 Kentucky, 864, 881; Nider v. Commonwealth, 1\n- e § 30.02 (a)$2)/ V.T.C.A. i ! 4. GROUND TWO\n\n```python\ndef f(x):\n    return x * 2\n```\n\nSee [docs](https://example.com/f95d0e8f) and **ito transmission of **."
+},
+{
+"source": "markdown",
+"jev": 163,
+"text": "# overnment to re-examine a string of unexplained de\n\nHero.” The committee chair said he is keeping\n\n## Steps\n- ademic Press, San Diego, CA, 1997. S. B. Smith, Y. Cui and C. Bustamante..Scienc\n- , MA; MAB377, 1:1,000 dilution in PBST) for 1 hour and washed three times with P\n- ill be published online. The date of the early version will be your article\\'s p\n\n```python\ndef f(x):\n    return x * 2\n```\n\nSee [docs](https://example.com/4e16ed13) and **Mediterranean Games.**."
+},
+{
+"source": "pile",
+"jev": 12,
+"text": "nformation changes somewhat infrequently, then ins"
+},
+{
+"source": "pile",
+"jev": 54,
+"text": "er remainder conditions based on estimated moments that use cross-fitting (sample splitting). We also give numerical estimators of the influence function adjustment.\n\nLR moment functions have several advantages. LR moment conditions bias correct in a way that eliminates the large biases from pluggin"
+},
+{
+"source": "pile",
+"jev": 400,
+"text": "nadmissible when “its\n\n  probative value is substantially outweighed by the danger of unfair\n\n  prejudice, confusion of the issues, or misleading the jury.” CRE\n\n  403. Similarly, evidence of “other crimes, wrongs, or acts” is\n\n  inadmissible to prove a person’s character “in order to show that he\n\n  acted in conformity therewith,” though it may be admissible for\n\n  other purposes, including proving intent. CRE 404(b).\n\n\n\n\n                                    10\n\f¶ 28   “Res gestae is a theory of relevance which recognizes that\n\n  certain evidence is relevant because of its unique relationship to the\n\n  charged crime.” People v. Greenlee, 200 P.3d 363, 368 (Colo. 2009).\n\n  However, “there is no need to consider an alternative theory of\n\n  relevance, such as res gestae, where the evidence is admissible\n\n  under general rules of relevancy.” Id.\n\n                               D. Analysis\n\n¶ 29   Trujillo contends that the evidence of the prior foreclosure\n\n  action portrayed him as a “serial defaulter” and was impermissible\n\n  under CRE 404(b) and 403. The People assert that the evidence\n\n  was admissible as “directly relevant” to Trujillo’s intent and motive.\n\n  In the alternative, the People argue that the evidence was res gestae\n\n  evidence. We agree with the People’s first argument that the\n\n  evidence was admissible under CRE 401, and was not barred by\n\n  CRE 403.1\n\n\n\n  1 During the bench conference, the trial court allowed the bank’s\n  former vice president to testify afte"
+},
+{
+"source": "pile",
+"jev": 958,
+"text": "6?\n6848\nIn base 12, what is -62 + -22a8?\n-234a\nIn base 13, what is -52a6 - -34?\n-5272\nIn base 3, what is -22212221 + 20?\n-22212201\nIn base 7, what is 5251 - 541?\n4410\nIn base 2, what is 100 + -1001111011000111?\n-1001111011000011\nIn base 13, what is 27b08 - 2?\n27b06\nIn base 7, what is -166104 - 2?\n-166106\nIn base 11, what is -221 - -3749?\n3528\nIn base 7, what is 5 + -111056?\n-111051\nIn base 15, what is 4c + -77?\n-2a\nIn base 11, what is 2829aa + 5?\n282a04\nIn base 12, what is 15a912 - 4?\n15a90a\nIn base 14, what is -3a5a + -2?\n-3a5c\nIn base 15, what is -330 + 174?\n-1ab\nIn base 6, what is -42 - -1114424?\n1114342\nIn base 13, what is -b7 + 552?\n468\nIn base 15, what is -1 - -d89a?\nd899\nIn base 5, what is -32211234 + -3?\n-32211242\nIn base 11, what is -4a299 + 0?\n-4a299\nIn base 14, what is -1139 - -29?\n-1110\nIn base 4, what is -311002 - 111?\n-311113\nIn base 4, what is -11 + 1332110?\n1332033\nIn base 7, what is -1554 - -162?\n-1362\nIn base 13, what is 7 + 1143?\n114a\nIn base 12, what is -7b6 - 25?\n-81b\nIn base 16, what is 453 - 6?\n44d\nIn base 13, what is -1957 - b1?\n-1a38\nIn base 16, what is -355 + dc?\n-279\nIn base 15, what is -5 - 2671e?\n-26724\nIn base 11, what is -109 + 753?\n645\nIn base 15, what is -9 - bd24?\n-bd2d\nIn base 14, what is 5a + -578?\n-51c\nIn base 11, what is 14165 + -5?\n14160\nIn base 4, what is 310202302 - -101?\n310203003\nIn base 3, what is -11022011 + -1101?\n-11100112\nIn base 3, what is 122 + -2111012?\n-2110120\nIn base 4, what is -2 + 201220330?\n201220322\nIn base 16, what is"
+},
+{
+"source": "pile",
+"jev": 474,
+"text": "urn \"\", errNoAdminEmail\n\t\t\t}\n\t\t\taddrs, err := ParseAddressList(addr)\n\t\t\tif err != nil {\n\t\t\t\treturn \"\", fmt.Errorf(\"invalid admin address %q: %s\", addr, err)\n\t\t\t}\n\t\t\tvalues = append(values, addrs...)\n\t\t\tcontinue\n\t\t}\n\t\tvalues = append(values, v)\n\t}\n\treturn strings.Join(values, \", \"), nil\n}\n\nfunc makeBoundary() string {\n\treturn \"Gondola-Boundary-\" + stringutil.Random(32)\n}\n\nfunc sendMail(to []string, cc []string, bcc []string, msg *Message) error {\n\tfrom := Config.DefaultFrom\n\tserver := Config.MailServer\n\tif msg.Server != \"\" {\n\t\tserver = msg.Server\n\t}\n\tif msg.From != \"\" {\n\t\tfrom = msg.From\n\t}\n\tif from == \"\" {\n\t\treturn errNoFrom\n\t}\n\tvar auth smtp.Auth\n\tcram, username, password, server := parseServer(server)\n\tif username != \"\" || password != \"\" {\n\t\tif cram {\n\t\t\tauth = smtp.CRAMMD5Auth(username, password)\n\t\t} else {\n\t\t\tauth = smtp.PlainAuth(\"\", username, password, server)\n\t\t}\n\t}\n\tvar buf bytes.Buffer\n\theaders := msg.Headers\n\tif headers == nil {\n\t\theaders = make(Headers)\n\t}\n\tif msg.Subject != \"\" {\n\t\theaders[\"Subject\"] = msg.Subject\n\t}\n\theaders[\"From\"] = from\n\tif msg.ReplyTo != \"\" {\n\t\theaders[\"Reply-To\"] = msg.ReplyTo\n\t}\n\tvar err error\n\tif len(to) > 0 {\n\t\theaders[\"To\"], err = joinAddrs(to)\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\tfor ii, v := range to {\n\t\t\tif v == Admin {\n\t\t\t\tif Config.AdminEmail == \"\" {\n\t\t\t\t\treturn errNoAdminEmail\n\t\t\t\t}\n\t\t\t\tto[ii] = Config.AdminEmail\n\t\t\t}\n\t\t}\n\t}\n\tif len(cc) > 0 {\n\t\theaders[\"Cc\"], err = joinAddrs(cc)\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t}\n\tif len(bcc) >"
+},
+{
+"source": "pile",
+"jev": 373,
+"text": "r removal of stent ranged from 9 weeks to 40 months. [Table 1](#ijerph-17-01067-t001){ref-type=\"table\"} summarises the studies included in this systematic review.\n\n3.3. Outcomes {#sec3dot3-ijerph-17-01067}\n-------------\n\nA meta-analysis was not performed due to the heterogeneity of all the included studies. Hence, meaningful interpretation of the study outcomes in the included studies required expert discussion and clinical judgement. The two main outcomes, percentage of success and presence of complications, are narratively described in [Table 2](#ijerph-17-01067-t002){ref-type=\"table\"}. The overall success outcome of the studies' interventions ranged from 41.1% to 100%. Post-operative complications were reported in 23 studies, while nine studies reported no complications. Three studies did not report the complication rate.\n\n3.4. Quality Assessment {#sec3dot4-ijerph-17-01067}\n-----------------------\n\nUsing the EPHPP global rating decision tool, four studies were assessed as being of moderate quality and 31 of weak quality (see [Table 3](#ijerph-17-01067-t003){ref-type=\"table\"}). Most of the studies were considered weak due to the study design and non-control of confounding factors. However, based on individual methodology component assessment, all studies were assessed as being of strong quality in terms of selection bias. All eligible patients in the included studies were from hospital-based samples. As clinical cases of children with nasolacrimal duct obstruction requiring"
+},
+{
+"source": "pile",
+"jev": 71,
+"text": "viruses-12-00132],[@B105-viruses-12-00132],[@B106-viruses-12-00132]\\]. The results show an interesting and unexpected positive correlation between the length of the sequence and its estimated TMRCA (["
+},
+{
+"source": "pile",
+"jev": 73,
+"text": "nd if their offer triumphs on the financial side.\n======\ngvb\n_Now B contacted me, not yet ready to give an offer, but they mentioned that\ntheir offer would likely be significantly larger if they would be able to see\nthe offer from A in writing._\n\nI see nothing but red flags here.\n\nIt also sounds lik"
+},
+{
+"source": "pile",
+"jev": 64,
+"text": "ave the street lights turn green for the vehicle so that it’s movement is not stoped for traffic lights. This mode needs to be significantly quicker than the existing buses and in needs to be on time at stops or it won’t be used.\n\nI think option 1 hits the greatest number of commuters and would prov"
+},
+{
+"source": "pile",
+"jev": 343,
+"text": "n Nova Scotia. They went\nto Ontario to marry, and returned to continue living in Nova Scotia.\nJustice Robertson declared that \"civil marriage between two persons\nof the same sex is therefore lawful and valid.\"\n\nThe couples were supported by many friends, including lawyer Sean\nForeman, the Nova Scotia Rainbow Action Project, and Safe\nHarbour Metropolitan Community Church. 3 Ron and Bryan Garnett-Doucette,\nbecame the first same-sex couple to obtain a marriage license in the\nprovince. Just hours after the court decision was handed down, they went\nto purchase a marriage license application in a storefront office in\nHalifax, \"under the glare of TV cameras and cheers of encouragement\nfrom a gaggle of friends, gay activists and lawyers.\" 6 Ron said: \"We feel\nreally, really good. It's a great day to be a Nova Scotian.\" Both\nspouses had grown up in Nova Scotia. Ron was 21 when he first met Bryan.\nHe later told the court that it was \"love at first sight.\" They\nmoved in together a few months later, and have been together since. A\nclerk explained to the engaged couple that marriage licenses cannot be\nexecuted on the same day, \"in case you change your mind.\" Bryan\nchuckled: \"I don't think that's going to happen. Not after twenty\nyears.\" 6\n\nSome reactions:\n\nHalifax advocate Jay Thordarson said: \"Nova Scotia has always\nbeen known for its conservative rant amongst the rest of the\ncountry. After all, the province still does not have Sunday\nshopping and continues to battle politically about th"
+},
+{
+"source": "pile",
+"jev": 59,
+"text": "onsole. I don't understand what stopped my above code to show the below output. Was it the return?\n#include<iostream>\nint main()\n{\nint n,t,i;\ncout<<\"input a number\"<<endl;\ncin>>n;\nfor(i=1;i<=10;++i)\n{"
+},
+{
+"source": "pile",
+"jev": 12,
+"text": "id, typically containing ethylene glycol, to trans"
+},
+{
+"source": "pile",
+"jev": 77,
+"text": "W) residues. DnaK-binding motifs were identified using a previously described algorithm (Van Durme et al. [@CR41]), and the other motifs were found through *regexp* pattern-matching using the Python Standard Library. Long-range disorder was predicted with IUPred (Dosztanyi et al. [@CR6], [@CR7]) usi"
+},
+{
+"source": "pile",
+"jev": 21,
+"text": "p_fail_auth\">你的Google帳戶無法使用。</string>\n    <string "
+},
+{
+"source": "pile",
+"jev": 63,
+"text": "e Court finds that the Plaintiffs' claim regarding the month-to-month rental term is now moot.\nAs it has determined that the federal Defendants' motion for summary judgment is meritorious, the Court need not discuss why it has concluded that the Plaintiffs' two motions for summary judgment lack meri"
+},
+{
+"source": "pile",
+"jev": 437,
+"text": "azid and improved after stopping it leading to the diagnosis of isoniazid-induced erythroderma. Prompt resolution of the lesions after withdrawal of the ATT and start of oral antihistaminics further supported the diagnosis. The patient was now prescribed rifampicin 450 mg, pyrazinamide 1500 mg, ethambutol 1000 mg, and levofloxacin 750 mg for a period of 2 months in intensive phase followed by levofloxacin 750 mg, rifampicin 450 mg for a period of 4 months in continuation phase.\n\nThe underlying pathogenesis of this hypersensitivity, whether immune-mediated and/or toxic in nature, is unclear. Predisposing factors for hypersensitivity reactions to ATT include HIV infection, polypharmacy, advanced age, autoimmune disease, and renal or liver impairment.\\[[@ref5]\\] In a large tertiary care center study on CADR with antitubercular drugs, pyrazinamide was the most common offending drug (2.38%), followed by streptomycin (1.45%), ethambutol (1.44%), rifampicin (1.23%), and isoniazid (0.98%).\\[[@ref1]\\] In contrast to the findings of the above-mentioned study, pyrazinamide, ethambutol, and rifampicin were well-tolerated by our patient; however, she developed reaction to isoniazid. There are many case reports of exfoliative dermatitis with other antitubercular drugs; but, to the best of our knowledge, only 3 cases of erythroderma induced by isoniazid alone is reported so far.\\[[@ref6][@ref7][@ref8][@ref9][@ref10][@ref11][@ref12][@ref13]\\]\n\nHigher incidence of TB and CADR in HIV-infected "
+},
+{
+"source": "pile",
+"jev": 12,
+"text": " main focus in parallelization design must be on t"
+},
+{
+"source": "pile",
+"jev": 71,
+"text": "ses and ferrous oxidases responsible for interconversion of the iron redox species +III and +II, and finally iron permeases for iron import. In this work on *T. oceanica*we were able to identify several candidate elements for the above groups. However, critical for iron-uptake kinetics is the overal"
+},
+{
+"source": "pile",
+"jev": 415,
+"text": "umor :-)\n\n------\ncodethief\nIn case anyone's looking for something a little bit more sophisticated than a\nsticker to put on his/her webcam:\n[https://soomz.io/detail/webcam_covers_a10](https://soomz.io/detail/webcam_covers_a10)\nBeen using it for a while and it works like a charm. (Though on a phone it\ndoes tend to attract a bit of dirt and the color wears off over time. If you\nkeep your phone in the pocket of your pants, that is.)\n\n------\nchrischen\nQuick question for HNers: why isn't something like the camera insicator light\nimplemented for the microphone?\n\n------\nSG-\nAnyone know what kind of laptop he uses?\n\n------\nwickedlogic\nPlease cover your webcam, it is distracting while we are trying to listen to\nwhat you are clicking on.\n\n------\nlistentojohan\nWhat I don't understand is why he has to defend it? (Yes, it might seem\nhypocritical.)\n\n------\nbobsoap\nInstead of a sticker, one could also use this clever, simple, magnetic gadget\n(not affiliated):\n\n[https://www.kickstarter.com/projects/1893116150/nope-20-live...](https://www.kickstarter.com/projects/1893116150/nope-20-live-\nfree)\n\n~~~\nbobsoap\nSeriously, downvoted without an explanation? That's quite poor. If something\nabout my post offends anyone, I'd love to know about it.\n\n------\nmangeletti\nI swear this is a true story:\n\nI worked at Staples when I was 19, and when I first started I was a \"front end\nlead\" (read: the only full-time cashier), so I would work behind the service\ncounter at the front.\n\nOnce, I was standing up front w"
+},
+{
+"source": "pile",
+"jev": 84,
+"text": "he standard recommended dosage of irinotecan, pharmacokinetic parameters of irinotecan-lactone and the active metabolite SN-38-lactone vary between individuals ([Xie *et al*, 2002](#bib18){ref-type=\"other\"}). This may be attributed to differences in the levels of the enzymes that metabolise irinotec"
+},
+{
+"source": "pl",
+"jev": 109,
+"text": "r regat Pucharu Świata Sopot Match Race.\n\n\n== Życiorys ==\nDzieciństwo spędził w Gdańsku i na Seszelach. Pochodzi z rodziny z bogatymi żeglarskimi tradycjami. Ojciec Bronisław Tarnacki to konstruktor jachtowy, mistrz Polski i uczestnik pierwszych załogowych regat dookoła świata Whitbread Round the Wo"
+},
+{
+"source": "pl",
+"jev": 204,
+"text": "Villiers-Couture – miejscowość i gmina we Francji, w regionie Nowa Akwitania, w departamencie Charente-Maritime.\nWedług danych na rok 1990 gminę zamieszkiwały 163 osoby, a gęstość zaludnienia wynosiła 19 osób/km² (wśród 1467 gmin regionu Poitou-Charentes Villiers-Couture plasuje się na 832. miejscu pod względem liczby ludności, natomiast pod względem powierzchni na miejscu 909.).\n\n\n== Bibliografia ==\nDetailed population by sex and age – Detailed data (POP1). Institut national de la statistique et des études économiques. [dostęp 2026-08-07]. (ang.)."
+},
+{
+"source": "pl",
+"jev": 112,
+"text": " Gwiazd. 8 lipca 2016 w spotkaniu z San Diego Padres na Dodger Stadium zaliczył pięć odbić na pięć podejść. Został trzecim łapaczem w historii MLB, który zaliczył przynajmniej 5 uderzeń z trzema home runami i trzecim łapaczem w historii klubu, który w jednym meczu zdobył trzy home runy.\n14 stycznia "
+},
+{
+"source": "pl",
+"jev": 522,
+"text": "e jako Cornell Barnes\nLeona Lewis jako Amber Hall (sezon 2)\nZulay Henao jako Carmen Velasquez (sezon 2)\nDilshad Vadsaria jako Anaya Gil (sezon 2)\nSebastian Zurita jako Ricardo Velasquez (sezon 2)\nErik King jako pastor Greg (sezon 2)\nRichard Burgi jako Nathan Andrews (sezon 2)\nRich Paul jako Eli Briggs (sezon 2)\nCarlos Sanz jako Ignacio Velasquez (sezon 2)\nKevin Connolly jako James Hoke (sezon 2)\n\n\n== Odcinki ==\n\n\n=== Sezon 1 (2018) ===\n\n\n=== Sezon 2 (2019) ===\n\n\n== Produkcja ==\n19 kwietnia 2017 roku, platforma Crackle zamówiła pierwszy sezon dramatu.\nW czerwcu 2017 roku, ogłoszono, że Sean Bean, Arlen Escarpeta, Ryan Kwanten i Cory Hardrict dołączyli do obsady.\nW kolejnym miesiącu poinformowano, że Katrina Law, J.J. Soria, Kwame Patterson, Elisabeth Röhm, Linda Purl, Michael Malarkey, Eve Mauro, Sarah Dumont, Billy Malone, Aaron Abrams, Robert Gossett, Isaac Keys zagrają w serialu.\nPod koniec sierpnia 2017 roku, ogłoszono, że J. Anthony Pena otrzymał rolę jako Carl Ortiz.\nW kolejnym miesiącu Isabel Arraiza dołączyła do obsady.\n25 kwietnia 2018 roku, platforma Crackle  ogłosiła przedłużenie serialu o drugi sezon.\nPod koniec czerwca 2018 roku, ogłoszono, że w drugim sezonie serialu zagrają; Christina Milian, Leona Lewis, Zulay Henao oraz Kevin Connolly.\nW kolejnym miesiącu poinformowano, że Dilshad Vadsaria, Sebastian Zurita, Erik King, J. Anthony Pena, Richard Burgi, Rich Paul i Carlos Sanz dołączyli do obsady.\n\n\n== Przypisy ==\n\n\n== Linki zewnętrzne ==\nThe Oath w bazie IMDb (a"
+},
+{
+"source": "pl",
+"jev": 171,
+"text": "Zeus capensis – gatunek morskiej ryby z rodziny piotroszowatych (Zeidae).\n\n\n== Występowanie ==\nZeus capensis występuje w wodach Oceanu Indyjskiego oraz Atlantyckiego. Zaobserwowano go wzdłuż południowego wybrzeża Afryki – u wybrzeży RPA, Mozambiku oraz Namibii. Pływa na głębokości od 35 do 400 metrów.\n\n\n== Opis ==\nOsiąga długość do około 90 cm. Zwykle występuje w kolorach szaro-srebrnych.\n\n\n== Przypisy =="
+},
+{
+"source": "pl",
+"jev": 216,
+"text": "Serafin, imię świeckie Serafim Stergiulis (ur. 27 grudnia 1950 w Wragiana) – duchowny Greckiego Kościoła Prawosławnego, od 2005 metropolita Kithiry.\n\n\n== Życiorys ==\nW 1971 został wyświęcony na diakona. Święcenia kapłańskie przyjął w 1981. Chirotonię biskupią otrzymał 2 lipca 2005.\n\n\n== Bibliografia ==\nΟ Σεβασμιώτατος Μητροπολίτης Κυθήρων κύριος Σεραφείμ. (γεν. 1950). (Εκκλησία της Ελλάδος)."
+},
+{
+"source": "ru",
+"jev": 171,
+"text": "е. Встречается также в Крыму, например на Кара-Даге.\n\n\n== Применение ==\nИспользуют в промышленности как природный фильтр газов и жидкостей. Также используется для ограничения и ликвидации разливов нефти, благодаря своей способности притягивать и удерживать некоторые химические элементы, особенно кал"
+},
+{
+"source": "ru",
+"jev": 1043,
+"text": "Клавдия Ивановна Акилова (2 ноября 1917, Унежма, Архангельская губерния — 1966, Мурманск) — советская лыжница и горнолыжница, тренер по горнолыжному спорту. Участница Великой Отечественной войны. \n\n\n== Биография ==\nКлавдия Акилова родилась 2 ноября 1917 года в деревне У́нежма Кушере́цкой волости Оне́жского уезда Архангельской губернии (сейчас в Онежском районе Архангельской области).\nОкончила в Мурманске семилетнюю школу. С 1934 года была рабочей Мурманского судоремонтного завода.\nВ 1940 году окончила курсы физкультурных работников и стала работать школьным учителем, а с 1941 года — методистом по лечебной гимнастике и массажистом.\nС 1934 года участвовала в чемпионатах СССР по горнолыжному спорту, выступала за «Локомотив». Трижды становилась чемпионкой страны в скоростном спуске (1939—1941). Участвовала в Праздниках Севера, трижды выигрывала скоростной спуск (1939—1941). Также выступала в лыжных гонках, участвовала в областных и профсоюзных соревнованиях и в Праздниках Севера.\nС августа 1941 года участвовала в Великой Отечественной войне, уйдя на фронт добровольцем. Награждена медалью «За оборону Советского Заполярья».\nС 1945 года работала в Кировске тренером по слалому, подготовила нескольких чемпионов СССР.\nВ 1948—1966 годах трудилась учителем в мурманской школе № 5.\nУмерла в 1966 году в Мурманске.\n\n\n== Примечания =="
+},
+{
+"source": "ru",
+"jev": 995,
+"text": "слую карьеру в составе «Кайсара» (ранее назывался «Мелиоратор»), дебютировал во второй союзной лиге 9 октября 1981 года, выйдя на замену в домашнем матче с «Уральцем», в возрасте 15 лет 10 месяцев и 9 дней, а уже спустя три дня, в игре с гурьевским «Прикаспийцем», забил свой первый гол на взрослых турнирах. На следующий год провел 23 игры за «Мелиоратор», а спустя год вместе с приглашением в главную команду республики — «Кайрат», получил вызов и в юношескую сборную СССР (тренеры — Сергей Мосягин и Борис Игнатьев).\nВ 1984 году Тлеухан разделил титул лучшего бомбардира дубля «Кайрата» с Юрием Найдовским (у обоих по 9 мячей). 24 марта 1985 года в первой домашней игре сезона Турмагамбетов дебютирует в высшей союзной лиге, выйдя на поле вместо Антона Шоха за пять минут до конца встречи с донецким «Шахтёром» (2:1). Всего в 1985 году Телеухан провел пять игр, при этом ни в одной из них команда не проиграла: 1:1 — в Минске, 0:0 — в Вильнюсе, 2:2 — дома с «Факелом» и 1:0 — дома с ростовским СКА.\nВ 1986 году вернулся в Кызылорду. Капитан и лучший снайпер «Кайсара» в 1988, 1989, 1990 годах. В независимом Казахстане помимо «Кайсара» играл за ряд других клубов высшей лиги, в том числе снова за «Кайрат». 15 мая 1992 года в матче шестого тура первого чемпионата страны «Кайсар» (Кызылорда) — «Металлист» (Петропавловск) 4:0, Телеухан Турмагамбетов стал автором первого хет-трика в истории национальных чемпионатов.\nВсего за карьеру забил 135 голов в первенствах СССР и Казахстана, из них 97 — за"
+},
+{
+"source": "ru",
+"jev": 335,
+"text": "Incentive Software Ltd. — британская компания, основанная в 1983 году Яном Эндрю (англ. Ian Andrew) и занимавшаяся изданием компьютерных игр. Программистами, работавшими в компании, были Шон Эллис, Стивен Норткотт и Крис Эндрю. \n\n\n== История ==\nПоздние игры базировались на движке Freescape. Компания была в дальнейшем переименована в Dimension International, а также стала заниматься разработкой движка нового поколения Superscape. \n\n\n== Игры ==\nНиже приведён список игр, изданных Incentive Software для различных платформ.\n\n\n== Примечания ==\n\n\n== Ссылки ==\nIncentive Software на сайте MobyGames\nЛегенды: Incentive Software Ltd\nIncentive Software на сайте World of Spectrum"
+},
+{
+"source": "ta",
+"jev": 270,
+"text": "கள் வாணிபம் புரிந்த தரங்கம்பாடி வட்டத்தில் நல்லாடை ஊராட்சிக்கு உட்பட்ட மிகச்சிறிய கிராமம் ஆகும். இங்கு சுமார் 420 மக்கள் வசித்து வருகிறார்கள்.\nபுதுச்சேரி மாநிலத்தைச் சேர்ந்த காரைக்காலிலிருந்து நெடுங்காடு வழியாக மயிலாடுதுறை அல்லது பொறையாரிலிருந்து சங்கரன்பந்தல் வழியாக மயிலாடுதுறை செல்லும் வழியில் நல்"
+},
+{
+"source": "ta",
+"jev": 259,
+"text": "்கிய தொலைக்காட்சி தொடர்களான ஜன்னல் மற்றும் இரண்டாம் சாணக்கியன் தொடர்களில் நடித்தார். நடிப்பின் நுணுக்கங்களைக் கற்பித்த பாலசந்தரை தனது வழிகாட்டியாகவும் குருவாகவும் சர்மிளா கருதுகிறார்.\n\n\n== தனிப்பட்ட வாழ்க்கை ==\nசர்மிளா பிராமண குடும்பத்தில் பிறந்தவர். இவர் தொலைக்காட்சி தயாரிப்பு நிர்வாகியான ஏ. எல். ம"
+},
+{
+"source": "ta",
+"jev": 305,
+"text": "வங்க கீதா (Vanga Geetha, பிறப்பு: 31 மே  1983) ஓர் இந்திய அரசியல்வாதியும், நாடாளுமன்ற உறுப்பினரும் ஆவார். இவர் ஒய். எஸ். ஆர். காங்கிரஸ் கட்சியைச் சேர்ந்தவர். 2019 ஆம் ஆண்டு காக்கிநாடா மக்களவைத் தொகுதியிலிருந்து மக்களவைக்கு ஒய். எஸ். ஆர். காங்கிரஸ் கட்சி சார்பாகத் தேர்ந்தெடுக்கப்பட்டார். தற்போது 17ஆவது மக்களவையின் உறுப்பினராக உள்ளார் \n\n\n== மேற்கோள்கள் =="
+},
+{
+"source": "ta",
+"jev": 1302,
+"text": "களை உள்துறை அமைச்சகத்தின் கண்காணிப்பு பட்டியலில் சேர்த்தது. கருணைக்கான பன்னாட்டு அறக்கட்டளை நிறுவனம், கிறிஸ்துவ மத நடவடிக்கைகளுக்காக, பதிவு செய்யப்படாத தன்னார்வ தொண்டு நிறுவனங்களுக்கு நிதியளித்ததாக குற்றம் சாட்டப்பட்டது.  இதனால் மார்ச், 2017-ஆம் ஆண்டில் இந்தியாவில் கருணைக்கான பன்னாட்டு அறக்கட்டளை தனது நடவடிக்கைகளை நிறுத்திக் கொண்டது. \n\n\n== குழந்தைகளுக்கான திட்டங்கள் ==\nகுழந்தைகளுக்கு, குறிப்பாக ஆதி வாசி குழந்தைகளுகு  உணவு, உறைவிடம், குடி நீர், மருத்துவ வசதி, கல்வி, வேலைவாய்ப்பிற்கான பயிற்சி வழங்குவதுடன் கிறிஸ்துவின் மீதான நம்பிக்கை ஏற்பட இந்த அறக்கட்டளை உள்ளூர் கிறித்துவத் திருச்சபைகள் நடத்தும் தொண்டு நிறுவனங்களுடன் இணைந்து பணியாற்றுகிறது. இந்த அறக்கட்டளை ஒரு மாதத்திற்கு ஒரு குழந்தைக்கு 38 அமெரிக்க டாலர் வீதம் செலவு செய்கிறது.\n\n\n== மதிப்பீடுகள் ==\nகிறிஸ்துவ போதனைகளை பன்னாட்டு அளவில் பரப்பும் நிதிக் குழுவில் உள்ள  இந்த அறக்கட்டளை, தனது அறக்கட்டளை நிதிகளுக்கு தரமான கணக்குகளை வைத்துள்ளது என பெட்ட பிசினஸ் பீரேவால் பாரட்டப்பட்டது.2013-இல் அரசியல் பொருளாதாரம் எனும் இதழின் அறிக்கைப்படி, கருணைகான பன்னாட்டு அறக்கட்டளை ஆதரவற்ற குழந்தைகளை கருணையுடன் வளர்ப்பதோடு, கல்வி மற்றும் வேலைவாய்ப்பும் வழங்குவதாக பாராட்டியுள்ளது. \n2016-இல் ஐக்கிய அமெரிக்க நாட்டின் கருணைக்கான பன்னாட்டு அறக்கட்டளை 799 மில்லியன் டாலர்களுடன் 15-வது பெரிய அறக்கட்டளை என போர்ஸ் இதழ் தரவரிசைப்ப்படுத்தப்பட்டுள்ளது\n\n\n== செயல்படுமிடங்கள் ==\n\n\n=== கருணைக்கான பன்னாட்டு அறக்கட்டளை (ஆஸ்திரேலியா) ===\nஆஸ்திரேலியாவில் ஆதரவற்ற  பூர்வ குடிகளின் கிறித்துவக் குழந்தைகளை வளர்க்கவும், கல்வி மற்றும் வேலை வாய்ப்பு பயிற்சி வழங்கவும் ஆஸ்திரேலி"
+},
+{
+"source": "ta",
+"jev": 442,
+"text": "பெரியமுதலியார்சாவடி கருத்தக்காட்டு ஐயனார் வகையறா கோயில் தமிழ்நாட்டில் விழுப்புரம் மாவட்டம், பெரியமுதலியார்சாவடி என்னும் ஊரில் அமைந்துள்ள ஐயனார் கோயிலாகும்.\n\n\n== வரலாறு ==\nஇக்கோயில் பத்தொன்பதாம் நூற்றாண்டைச் சேர்ந்தது.\n\n\n== கோயில் அமைப்பு ==\nஇக்கோயில் முதன்மைத் திருக்கோயில் என்ற வகைப்பாட்டில் இந்து அறநிலையத்துறையின் கட்டுப்பாட்டில் உள்ளது. வழக்கு நிலுவையில் இருப்பதால் நடைமுறை நிருவாகியால் நிர்வகிக்கப்படுகிறது.\n\n\n== பூசைகள் ==\nஇக்கோயிலில் ஒருகாலப் பூசை திட்டத்தின் கீழ் பூசை நடக்கின்றது.\n\n\n== மேற்கோள்கள் =="
+},
+{
+"source": "th",
+"jev": 330,
+"text": "อเมเนมเฮต เป็นเจ้าชายแห่งราชวงศ์ที่สิบแปดของอียิปต์โบราณ เป็นพระราชโอรสของฟาโรห์ทุตโมสที่สี่ พระองค์ปรากฎอยู่บนภาพสลักในหลุมฝังศพหมายเลข ทีที 64 ซึ่งเป็นหลุมฝังศพของเฮกาเรชู และพระศพของพระองค์ถูกฝังไว้ในหลุมฝังศพของพระราชบิดาของพระองค์ในหุบเขากษัตริย์ สุสาน เควี 43 ร่วมกับพระบิดาและพระขนิษฐาของพระองค์นามว่า เทนต์อามุน\n\n\n== อ้างอิง =="
+},
+{
+"source": "th",
+"jev": 295,
+"text": "้ทันสมัยและชวนให้ติดตาม เพื่อประโยชน์ของการเผยแพร่ข่าวสารของบริษัทฯ และผลิตภัณฑ์ต่างๆ สู่บุคคลทั่วไป และเริ่มนำระบบการจัดการสำเร็จรูป (SAP) มาใช้แทนระบบเดิม\nพ.ศ. 2547 - ร่วมลงทุนใน บจก.ไทยอันเป่า ผลิตภัณฑ์กระดาษ\nพ.ศ. 2548 - ออกผลิตภัณฑ์ใหม่คือ บะหมี่โฮลวีตกึ่งสำเร็จรูป รสหมูพริกไทยดำ, เพิ่มสัดส่วนกา"
+},
+{
+"source": "th",
+"jev": 296,
+"text": "วางที่สุด คือ ความสามารถเปลี่ยนโลหะฐานให้เป็นทองคำหรือเงิน รักษาความเจ็บป่วยทุกประเภท และต่อชีวิตได้หากบริโภคศิลานักปราชญ์ส่วนเล็ก ๆ ผสมกับไวน์ คุณสมบัติอื่นมีกล่าวถึงได้แก่ การสร้างตะเกียงที่ลุกไหม้ชั่วกัลปาวสาน การเปลี่ยนผลึกธรรมดาให้เป็นอัญมณีมีค่าและเพชร ชุบชีวิตพืชที่ตายแล้ว การสร้างแก้วที่ยืดห"
+},
+{
+"source": "th",
+"jev": 116,
+"text": "ากกว่าแนวนอน\n\n\n== อ้างอิง ==\n\n\n== บรรณานุกรม ==\nCruz-Uribe, Eugene. 2001. \"Scripts: An Overview.\" In The Oxford Encyclopedia of Ancient Egypt, edited by Donald B. Redford. Vol. 3. Oxford, New York, and Cairo: Oxford University Press and The American University in Cairo Press. 192–198 [194–195].\nDavi"
+},
+{
+"source": "th",
+"jev": 295,
+"text": "ื่อเสียงที่สุดของอังกฤษในช่วงทศวรรษที่ 90 และต้นทศวรรษ 2000\nเขาได้รับฉายาว่า เดอะแทงก์ ในระหว่างการค้าแข้งของเขา เขาเล่นให้กับออกซฟอร์ดยูไนเต็ด เป็นเวลา 12 ปี และเขายังคงครองสถิติการลงสนามให้สโมสรมากที่สุดจนถึงทุกวันนี้ที่ 560 นัด ในฐานะผู้จัดการทีม เขาคว้าแชมป์เอฟเอคัพกับแมนเชสเตอร์ยูไนเต็ด ในปี 19"
+},
+{
+"source": "tr",
+"jev": 267,
+"text": "Taişo dönemi (Japonca: 大正時代 Taishō-jidai), Japonya tarihinde 30 Temmuz 1912-25 Kasım 1926 tarihleri arasında İmparator Taişo'nun saltanatını kapsayan dönemdir. Yeni tahta çıkan imparatorun sağlık durumu zayıf olduğundan siyasi güç yaşlı devlet adamlarından oluşan oligarşik bir gruptan Diet ve demokratik partilere devredilmiştir. Bu nedenle dönem genellikle önceki kaotik Meiji dönemi ile sonrasında militarizmin yükseldiği Şova döneminin ilk bölümünden ayırt edebilmek için \"Taişo demokrasisi\" olarak bilinen liberal hareketler dönemi olarak adlandırılır.\n\n\n== Kaynakça ==\n\n\n== Dış bağlantılar ==\nMeiji Taisho 1868–1926 (Japonca), 6 Ekim 2016 tarihinde kaynağından arşivlendi23 Ağustos 2016 ."
+},
+{
+"source": "tr",
+"jev": 229,
+"text": "4 Vesta (sembolü: ) Asteroit Kuşağı'nın ikinci büyük gök cismidir. Ortalama çapı yaklaşık 530 km ve tahminî kütlesi Asteroit Kuşağı'nın toplam kütlesinin yaklaşık 9%'udur. Vesta en parlak asteroittir ve Güneş'ten en uzak olduğu nokta Ceres'in Güneş'e en yakın olan uzaklığından çok az fazladır. Vesta Alman gök bilimci Heinrich Wilhelm Olbers tarafından 29 Mart 1807'de keşfedilmiştir. Asteroidin adını tanınmış matematikçi Carl Friedrich Gauss Roma bâkire ev ve aile tanrıçası Vesta'ya ithafen vermiştir.\nVesta, 2012 yılında NASA'nın Dawn uzay aracı tarafından ziyaret edilmiştir.\n\n\n== Kaynakça ==\n\n\n== Ayrıca bakınız ==\nAsteroit Kuşağı"
+},
+{
+"source": "tr",
+"jev": 157,
+"text": "Tomás Ariel Bulat (12 Eylül 1964 - 31 Ocak 2015), Arjantinli ekonomist, gazeteci ve yazar. Arjantin'de A24 Tv kanalı için ekonomi programı sunmaktaydı. Ekonomi üzerine  La economía de tu vida ve la Economía descubierta adlı iki kitap yazmıştır. Ünlü ekonomist ve gazeteci Bulat 1964'te Buenos Aireste doğdu.\nBulat 31 Ocak 2015 tarihinde Buenos Aires'te otomobil kazası sonucu 50 yaşında öldü.\n\n\n== Kaynakça =="
+},
+{
+"source": "tr",
+"jev": 143,
+"text": "Trebišov, (Macarca: Tőketerebes; Almanca: Trebischau), Slovakya'nın Košice Bölgesinde yer alan bir kasabadır. Kasabanın nüfusu 31 Aralık 2025 tarihi itibarıyla 22.706'dir.\n\n\n== Nüfus ==\n\n\n== Kardeş şehirler ==\n Jasło, Polonya\n\n\n== Kaynakça ==\n\n\n== Dış bağlantılar ==\nKasabanın resmi web sitesi 31 Ağustos 2017 tarihinde Wayback Machine sitesinde arşivlendi."
+},
+{
+"source": "tr",
+"jev": 130,
+"text": " Ölümü ==\n1992'de geçirdiği kalp krizi sonrasında 70 yaşında öldü. Feriköy Mezarlığı'nda toprağa verildi.\n\n\n== Ayrıca bakınız ==\nTürkiye'deki film festivalleri\nYeşilçam oyuncuları\n\n\n== Kaynakça ==\n\n\n== Dış bağlantılar ==\nBeyazperde'de Cevat Kurtuluş\nIMDb'de Cevat Kurtuluş \nSinemalar.com'da Cevat Kur"
+},
+{
+"source": "uk",
+"jev": 1102,
+"text": " завдяки серіалу «Леді з гідністю», який став найрейтинговішою драмою телеканалу JTBC. 2018 року вона знялася в мелодрамі «Чи варто нам спочатку поцілуватися?» та трилері «Діти нікого».\nУ грудні 2017 року Кім покинула C-JeS Entertainment та підписала контракт з новим менеджерським агентством Good People Entertainment.\nУ січні 2025 року Кім Сун А підписала контракт з агентством Y1 Entertainment.\n\n\n== Особисте життя ==\nНа початку 2008 року Кім Сун А була втягнута в чергову публічну суперечку. Навколо На Хуна, успішного співака в жанрі трот, чия кар'єра тривала понад 40 років, почали поширюватися неправдиві чутки про те, що його нібито було кастровано якудза через роман із коханкою ватажка злочинного угруповання. У ЗМІ та серед користувачів мережі ширилися припущення щодо особи цієї жінки; серед можливих кандидаток називали, зокрема, акторок Кім Хе Су та Кім Сун А, причому обидві акторки офіційно спростували ці твердження. Зрештою На Хун провів пресконференцію, під час якої майже роздягнувся, аби наочно довести неправдивість поширюваних чуток, а також публічно зажадав від засобів масової інформації вибачень перед двома акторками за завдану їм репутаційну шкоду.\n2015 року Кім Сун А виграла судовий позов, поданий нею проти клініки пластичної хірургії в Пусані за порушення її права на публічність. Суд встановив, що клініка незаконно використовувала її ім'я та фотографії у рекламних матеріалах без її дозволу. За рішенням суду акторці було присуджено компенсацію збитків у розмірі 25 "
+},
+{
+"source": "uk",
+"jev": 427,
+"text": "Широ́ке (у минулому — хутір Широкий) — село в Україні, у Степанівській сільській громаді Роздільнянського району Одеської області. Населення становить 115 осіб.\nСтаном на 1 вересня 1946 року хутір Широкий входив до складу Велізарівської сільської Ради.\n\n\n== Населення ==\nЗгідно з переписом УРСР 1989 року чисельність наявного населення села становила 106 осіб, з яких 41 чоловік та 65 жінок.\nЗа переписом населення України 2001 року в селі мешкало 100 осіб.\n\n\n=== Мова ===\nРозподіл населення за рідною мовою за даними перепису 2001 року:\n\n\n== Примітки =="
+},
+{
+"source": "uk",
+"jev": 253,
+"text": "рілий костел).\nПерша дружина (з 1753 р.) — Аполонія Морштин (померла до 1762 р.), донька віслицького каштеляна Яна Морштина і Розалії Шембек. Діти: Антоній Юзеф (1760—1830), Юстина. Друга дружина (з 1766 р.) — княжна Анна Доброгнєва Яблоновська (1745—1782), донька новогрудського воєводи князя Юзефа "
+},
+{
+"source": "uk",
+"jev": 653,
+"text": "Пра́пор Бараші́в — офіційний символ села Бараші Ємільчинського району Житомирської області, затверджений 7 березня 2013 р. рішенням № 27 XXIII сесії Барашівської сільської ради VI скликання.\n\n\n== Опис ==\nКвадратне полотнище горизонтально поділено на три частини — синю, білу, зелену (4:3:4).\n\n\n== Значення кольорів ==\nСиній означає небо, багатство краю природною водою (річка Уж, озера, болота); зелений — Полісся, достаток та географічне розташування села; білий — чистоту, благородство, чесність мешканців села.\nАвтори — Лілія Валентинівна Варварчук, Сергій Вікторович Варварчук.\n\n\n== Див. також ==\nГерб Барашів\nБараші\n\n\n== Джерела ==\nСимволіка сучасної Ємільчинщини. / Упорядники О. В. Ващук, П. В. Скиба. — Новоград-Волинський: «НОВОград». — 2014. — 104 стор., іл.\n\n\n== Посилання ==\nУкраїнська геральдика"
+},
+{
+"source": "uk",
+"jev": 302,
+"text": "Регімантас Адомайтіс, Регімантас Вайткусович Адомайтіс (лит. Regimantas Adomaitis; 1937—2022) — литовський та радянський актор театру і кіно.\nАдомайтіс Валентин Володимирович (23 лютого 1953) — український дипломат.\nЛаймутіс Адомайтіс (лит. Laimutis Adomaitis; нар. 7 вересня 1986(19860907)) — литовський борець греко-римського стилю, бронзовий призер чемпіонату Європи."
+},
+{
+"source": "uk",
+"jev": 283,
+"text": "Чиста Рєчка (рос. Чистая Речка) — селище в Андреапольському районі Тверської області Російської Федерації.\nНаселення становить 197 осіб. Входить до складу муніципального утворення Андреапольський округ.\n\n\n== Історія ==\nВід 2006 до 2019 року входило до складу муніципального утворення Андреапольське сільське поселення.\n\n\n== Населення ==\n\n\n== Примітки =="
+},
+{
+"source": "vi",
+"jev": 129,
+"text": "Collinsia childii là một loài thực vật có hoa trong họ Mã đề. Loài này được Parry ex A.Gray mô tả khoa học đầu tiên năm 1878.\n\n\n== Chú thích ==\n\n\n== Liên kết ngoài ==\n Tư liệu liên quan tới Collinsia childii tại Wikimedia Commons\n Dữ liệu liên quan tới Collinsia childii tại Wikispecies\nVườn thực vật hoàng gia Kew; Đại học Harvard; Australian Plant Name Index (biên tập). \"Collinsia childii\". International Plant Names Index."
+},
+{
+"source": "vi",
+"jev": 146,
+"text": "Nam Ninh, Quảng Tây, Cộng hòa Nhân dân Trung Hoa.\n\n\n== Bên cạnh ==\nTổng công ty Đường sắt Trung Quốc\nĐường sắt Hành Dương - Bằng Tường\nĐường sắt Nam Ninh - Côn Minh\nĐường sắt Nam Ninh - Phòng Thành Cảng\nĐường sắt cao tốc Nam Ninh - Côn Minh\nĐường sắt Nam Ninh - Quảng Châu\nĐường sắt Liễu Châu - Nam N"
+},
+{
+"source": "vi",
+"jev": 511,
+"text": "iếng Erzya: эрзянь кель, Latinh hoá: erzänj kelj, /ˈerzʲanʲ ˈkʲelʲ/) là một ngôn ngữ Ural với chừng 37.000 người nói ở mạn bắc, đông, và tây bắc Cộng hòa Mordovia cũng như những vùng lân cận thuộc Nizhny Novgorod, Chuvashia, Penza, Samara, Saratov, Orenburg, Ulyanovsk, Tatarstan và Bashkortostan của Liên bang Nga. Những cộng đồng kiều dân nhỏ cũng có mặt ở Armenia, Estonia, Kazakhstan. Tiếng Erzya được viết bằng bảng chữ cái Kirin. Tại Mordovia, tiếng Erzya là ngôn ngữ đồng chính thức với tiếng Moksha và tiếng Nga.\nĐây là thứ tiếng nằm trong ngữ chi Mordvin của ngữ hệ Ural. Tiếng Erzya có quan hệ gần với tiếng Moksha, nhưng vẫn có đặc điểm âm vị, hình thái và khối từ vựng riêng.\n\n\n== Ngữ âm ==\n\n\n=== Phụ âm ===\n\n\n== Tham khảo ==\n\n\n== Liên kết ngoài ==\n\nFinno-Ugric Electronic Library by the Finno-Ugric Information Center in Syktyvkar, Cộng hòa Komi (interface in Russian and English, texts in Mari language, Komi language, Tiếng Udmurt, Erzya and Tiếng Moksha languages): [1]\nErzjanj Mastor – The society for preserving the Erzya language (in Erzya and Russian)\nhttps://web.archive.org/web/20061029185215/http://www.info-rm.com/er/index.php News in the Erzya and Moksha Mordvinian languages\n[2] Эрзянский язык\nErzya - Finnish/English/German/Russian dictionary (robust finite-state, open-source)\n[3] Lưu trữ ngày 13 tháng 1 năm 2017 tại Wayback Machine Erzya studies reference bibliography under construction.\nRussian-Moksha-Erzya Dictionary Lưu trữ ngày 26 tháng 4 năm 2012 tại Wayback Mach"
+},
+{
+"source": "vi",
+"jev": 531,
+"text": "Bùi Văn Khắng (sinh ngày 16 tháng 5 năm 1971) là một chính trị gia người Việt Nam. Ông hiện là Phó Bí thư Thành ủy, Chủ tịch Ủy ban nhân dân thành phố Quảng Ninh.\n\n\n== Xuất thân và giáo dục ==\nBùi Văn Khắng sinh ngày 16 tháng 5 năm 1971, quê quán ở xã An Bình, huyện Kiến Xương, tỉnh Thái Bình (nay là xã Bình Nguyên, tỉnh Hưng Yên). Ông là Cử nhân Luật, Thạc sĩ Quản lý công tại Trường Đại học Kinh tế, Đại học Quốc gia Hà Nội và có trình độ Cao cấp lý luận chính trị.\n\n\n== Sự nghiệp ==\n\n\n=== Tỉnh Quảng Ninh ===\nBùi Văn Khắng từng giữ các chức vụ Phó Cục trưởng, Tỉnh ủy viên, Cục trưởng Cục Hải quan tỉnh Quảng Ninh. Tại kỳ họp thứ 10 của Hội đồng nhân dân tỉnh Quảng Ninh khóa XIII, ông được bầu làm Phó Chủ tịch Ủy ban nhân dân tỉnh khóa XIII, nhiệm kỳ 2016–2021.\n\n\n=== Bộ Tài chính ===\nNgày 29 tháng 1 năm 2024, ông được bổ nhiệm chức vụ Thứ trưởng Bộ Tài chính.\n\n\n=== Trở lại tỉnh Quảng Ninh ===\nNgày 19 tháng 9 năm 2025, Ban Bí thư về công tác cán bộ ra quyết định chỉ định ông Bùi Văn Khắng giữ chức Phó Bí thư Tỉnh ủy Quảng Ninh nhiệm kỳ 2020–2025.\nNgày 22 tháng 9 năm 2025, Hội đồng nhân dân tỉnh Quảng Ninh đã giới thiệu và bầu ông làm Chủ tịch Ủy ban nhân dân tỉnh Quảng Ninh nhiệm kỳ 2021–2026 với tỷ lệ phiếu bầu đạt 100%. Ngày 23 tháng 9, Thủ tướng Phạm Minh Chính đã ra quyết định phê chuẩn kết quả bầu chức vụ trên.\n\n\n== Tham khảo =="
+},
+{
+"source": "vi",
+"jev": 527,
+"text": "a ông, Daniel Joseph. Mùa tiếp theo, thăng hạng đã giành chiến thắng trong trận đấu với Calais RUFC, một lần nữa vào ngày cuối cùng của mùa giải. Cùng năm đó, DFCO đã đánh bại Alès để giành danh hiệu French Amateur Pháp, danh hiệu đầu tiên của câu lạc bộ.\nHai mùa giải tiếp theo ở National rất khó khăn cho câu lạc bộ. Trong mùa giải 2000-2001, câu lạc bộ thoát khỏi sự xuống hạng. Sau sự ra đi của Daniel Joseph, đội phó Mario Relmy của anh đã tiếp quản và một lần nữa đội đã xoay xở để tránh xuống hạng. Năm 2002, Rudi Garcia đến Dijon, chuyển sang chuyên nghiệp năm 2004. Trong mùa giải đầu tiên với tư cách là huấn luyện viên, Garcia đã đưa Dijon nhanh chóng lên đỉnh giải đấu quốc gia trước khi họ kết thúc vị trí thứ 4, cách ba điểm so với thăng hạng. Năm 2004, Dijon đã đạt được thành tích đáng nhớ ở Coupe de France, đánh bại Saint-Étienne (L2), Lens (L1), Reims (L2) và Amiens (L2) trước khi thua Châteauroux (L2) trong trận bán kết. Trong cùng năm đó, DFCO đã được thăng hạng lên Ligue 2.\n\n\n=== Ligue 2 (2005 2015) ===\nViệc thăng hạng lên Ligue 2 cho phép câu lạc bộ được tách thành hai thực thể: chuyên nghiệp và nghiệp dư. Mặc dù nguồn lực hạn chế và cơ sở hạ tầng nghèo nàn, DFCO đã đạt được vị trí thứ 4 ấn tượng trong mùa đầu tiên tại Ligue 2. Câu lạc bộ cũng đã đánh bại Bordeaux ở vòng 16 Coupe de la Ligue.\nVào cuối mùa giải 2005-2006, câu lạc bộ đã xếp thứ năm. Mục tiêu của câu lạc bộ là thăng hạng lên Ligue 1. Trong mùa giải 2006-2007, Dijon đã bỏ lỡ một số cơ hội để đạt được b"
+},
+{
+"source": "zh",
+"jev": 567,
+"text": "賽音諾顏部中前旗（蒙古語：Сайн ноён аймгийн дундад дахь өмнөд хошуу），又稱伊勒登扎薩克旗（Илдэн засгийн хошуу），是清朝、博克多汗國時期的一個旗。該旗存在期間屬於齊齊爾里克盟（賽音諾顏部）。\n\n\n== 歷史 ==\n1691年（康熙三十年），素泰伊勒登參加多倫諾爾會盟，康熙帝下詔封其為扎薩克鎮國公，該旗也是在這一年設立的。原屬土謝圖汗部，1731年（雍正九年）賽音諾顏部成立後，改屬賽音諾顏部。外蒙古獨立之後，博克多汗國延續了這一建置。中華民國名義上設置蒙古地方也延續了這一建置。1923年，蒙古人民黨當局依據山川河流對全國省、縣進行改名，賽音諾顏部中前旗被更名為烏勒濟圖山旗（Өлзийт уулын хошуу）。1931年行政區劃變更被撤銷，現屬前杭愛省的呼吉爾特縣、耶森珠伊勒縣、烏勒吉特縣、桑特縣。\n\n\n== 歷任扎薩克 ==\n\n\n== 參考資料 ==\n《欽定外藩蒙古回部王公表傳 卷之七十二》\n《清史稿 卷二百一十 表五十 藩部世表二》\n光緒朝 《欽定大清會典事例三》 卷九百六十九. 中国第一历史档案馆. \nИлдэн засгийн хошуу (Сайн ноёны аймаг) （页面存档备份，存于互联网档案馆）"
+},
+{
+"source": "zh",
+"jev": 489,
+"text": "约克大主教（英語：Archbishop of York）是英国国教英格兰圣公会的最高神职人员之一。其地位仅次于坎特伯雷大主教。他管轄著约克教区和约克教省，掌管英格兰北部以及英属曼地群岛事物。依据法律职责，约克大主教同时是英国上议院（贵族院）的成员，同时被尊称为「英格兰大主教」，仅次于坎特伯雷大主教的「全英格兰大主教」称谓。约克大主教的主教座位于约克郡的约克座堂（York Minster）。府邸位于约克郊外。现任（第98任）大主教为葛得萊（Stephen Cottrell）大主教，任期从2020年7月9日开始。\n\n\n== 历史 ==\n约克主教一职从基督教发展的早期时代——中世纪时起便已出现。约克主教出现在阿尔勒和尼西亚议会的活动中。然而，这种早期的基督教社区被撒克逊人以摧毁异教为名而毁灭。\n约克教区由保利努斯——奥古斯丁的追随者于公元7世纪建立。早期最著名的约克主教是威尔弗里德（Wilfrid）。早期的主教更多的是履行牧师的常规职责而并非掌管教区教务。公元735年起，埃格伯特（Ecgbert）受到教皇格里高利三世任命建立北部教区。丹麦入侵英格兰时期，坎特伯雷大主教曾代替约克主教偶行权力。诺曼底征服英格兰之后，约克主教开始完全独立地掌管教区事务。"
+},
+{
+"source": "zh",
+"jev": 398,
+"text": "人民幣國際化（英語：Internationalization of the Renminbi）是指人民幣在中華人民共和國境外流通並成為國際計價、儲備和結算貨幣。自2000年代末以来，中华人民共和国一直在推進人民币国际化。2009年，中国開展跨境贸易人民币试点结算。2014年，香港取消了本地居民每天2万元人民币的兑换限额。截至2014年底，根据SWIFT的报告，人民币已成為全球第五大交易貨幣，占SWIFT支付總額的2.2%，仅次于日元（2.7%）、英镑（7.9%）、欧元（28.3%）和美元（44.6%）。2015年，國際貨幣組織將人民幣納入特別提款權，2016年10月1日正式生效。截至2023年5月，包括阿根廷、巴西、俄羅斯、沙烏地阿拉伯、法國等30個國家與中國大陸進行貿易時都用人民幣進行結算。 2026年1月19日，彭博社报导称，赞比亚成为首个允许中国矿业公司以人民币支付税款的非洲国家。\n\n\n== 参见 ==\n去美元化\n\n\n== 参考文献 =="
+},
+{
+"source": "zh",
+"jev": 1540,
+"text": "。\n\n\n== 生平 ==\n潘赤龍1893年生於越南南部，登基前名叫潘發生，其出生地歷來有爭議。一部分學者認為他在西貢（今胡志明市）的堤岸出身，但一些紀錄卻指他在新安出生，由於堤岸相當於越南中國城，不少人猜測潘赤龍或是中國移民的後代。 \n其父親為一名警察，潘赤龍據說最初是一個法國家庭的傭人，後來到達越南南端的七山地區和泰國，在堪輿、命理方面成為專家。\n1911年中期，他秘密結社，宣稱他是咸宜帝的後人，並得到咸宜帝生前兩名士大夫尊室説及潘廷逢支持。這兩名士大夫正是1895年越南勤王運動的發起人之一，當時他們期望驅除法人，成立以咸宜為首的獨立越南國，事敗後，法國人把咸宜帝被放逐到阿爾及利亞，並另立阮福膺禟為同慶帝。自此之後，法國人把持著越南阮朝的大統，把不聽話的皇帝一一放逐，由其他阮朝貴族取代。 \n潘赤龍除了自稱是咸宜帝後人外，亦宣稱自己跟15至16世紀越南黎朝有關，然後進一步宣稱自己跟中國明朝朱家王朝的血脈也有關連。\n在潘赤龍號召下，一些阮朝士大夫同意在宗教旗旌下，發動起義，並仿效1909年柬甫寨貢布的起義進行；該事件中，一批當地華人穿起白袍，誓言效忠一位高棉王子，發動起義，希祈推翻法國統治。潘赤龍在著手建立他的宗教派別時，一度到暹羅及柬甫寨修正巫術、魔法、火藥技術，並結合在武裝訓練之中。\n\n\n== 加冕 ==\n潘赤龍回國後，開始穿上比丘服飾，在湄公河多個省份活躍。期間，他的支持者又從堤岸找來一位老人，聲稱是活佛轉世，潘赤龍在堤岸中心區順橋（Thuan Kieu）一帶建立臨時寺廟，籌集起義經費，當中有金有釹，還有一些捐款達1500法屬印度支那元。。\n1912年2月，活佛卒逝，潘赤龍指活佛臨死前，指定潘為越南皇帝；活佛的葬禮也吸引大批信徒參加，變相令潘赤龍籌取更多經費。同年10月，潘赤龍在柬甫寨馬德望舉行一場即席加冕儀式，在大批群眾擁族提供金錢物資下，他由「潘發生」更名為「潘赤龍」，年號「紅龍」，玉壐上刻著「大明國」（Đại Minh Quốc）、「潘赤龍皇帝」、「天子」（Thiên tử）等字眼。他沒有清楚說明用「大明國」的原因，但一說是他希望以此得到當時西貢地區經濟實力雄厚的明鄉人支持；明鄉人是17世紀的明朝遺臣，他們被清兵擊退後，轉入當時由高棉王國所控制的湄三角地帶，即今天越南胡志明市一帶。他當亦配了一口寶劍，鑄著「先打昏君，後打亂臣」（Tiên đả hôn quân, hậu đả loạn thần）等字眼，自此以後，他以帝王自居，以皇帝之名發詔。\n\n\n== 起義 ==\n在柬甫寨馬德望期間，潘赤龍曾要求柬甫寨割讓部分土地，遭拒絕後，越南朱笃（Châu Đốc）一帶有農民為他建立廟宇，他轉入當地活動，以一間小餐館作起義聯絡基地，廟宇則用作軍事基地，招募義軍。 當地一些人相信，1913年3月，天子將在堤岸君臨天下。，這一說法當時在越南和柬甫寨廣為流傳。，號召人民推翻法殖政府，並指一名無名僧人將會出山帶領義軍。 \n此時法國殖民地政府在南越一帶廣徵傜役，大興土木，全國出現大大小小的抗議及暴動， 潘赤龍視為爭取支持的良機，並呼籲商人將殖民地鈔票轉成銅票，拒絕支持殖民政府的經濟政策。連串起義的消息，最終令殖民地貨幣大幅乏值，此時潘赤龍及支持者開始建造土製炸彈。\n\n\n== 失敗 ==\n正當起義準備得如火如荼，潘赤龍的主張引起法國殖民地政府的注意。1913年3月22日，他在距離西貢160公里外的潘切市被法國政府拘捕， ，但他的信眾並未得悉其被捕消息，繼續依原定起義計劃行事。3月23日晚，首枚炸彈放在西貢鬧市中，並貼上其起義主張，但沒有一個炸彈成功爆破。有說"
+},
+{
+"source": "zh",
+"jev": 749,
+"text": "上海申迪（集团）有限公司（Shendi Group）是上海市的一家市属国有企业，承担上海国际旅游度假区的开发建设，与美国华特迪士尼公司合作建设上海迪士尼乐园度假区项目，此外亦运营上海野生动物园、横沔老街、上海薰衣草公园等旅游景区。\n\n\n== 参股公司 ==\n上海国际主题乐园有限公司（57%）\n上海国际主题乐园配套设施有限公司（57%）\n上海国际主题乐园和度假区管理有限公司（30%）\n\n\n== 歷史 ==\n2010年11月5日，华特迪士尼公司与上海申迪集团签署上海迪士尼乐园项目合作协议，双方就具体合作事项达成共识，标志着上海迪士尼项目正式启动。\n2011年4月8日，上海迪士尼乐园正式动土，预计興建時間為4年。\n2014年4月29日，上海申迪集團擁有上海迪士尼樂園57%股權，迪士尼擁有43%股權。此番增資後，上述兩家股東對上海迪士尼樂園的投資總額增8億美元，至約55億美元，增資幅度17%。迪士尼方面稱，股東將按所持股份比例分擔新增投資，擴大投資不會產生第三方債務。\n2016年4月26日，迪士尼小镇和星愿公园于当日起对公众开放，商铺于5月7日试运营；5月7日，上海迪士尼乐园进入内部运营测试阶段，且仅对迪士尼演职人员及家属和相关受邀人员开放，5月下旬启动试运行。\n2016年6月16日，上海迪士尼樂園由國務院副總理汪洋、中共上海市委書記韓正以及華特迪士尼公司董事長兼首席執行官羅伯特·艾格剪綵後正式開園迎賓。中國國家主席習近平和美國總統奧巴馬在開幕儀式上分別致上賀詞和賀信。\n2016年6月30日上海市政府官网公布了《上海国际旅游度假区管理办法》，明确了上海申迪(集团)有限公司作为国际旅游度假区开发建设主体的地位。\n\n\n== 資料來源 ==\n\n\n== 外部連結 ==\n\n上海申迪集团官方网站（页面存档备份，存于互联网档案馆）"
+},
+{
+"source": "zh",
+"jev": 273,
+"text": "명역／華明驛，羅馬化：Hwamyeong yeok）是釜山地鐵2號線沿線的一座地下車站，位於韓國釜山廣域市北區華明洞。\n\n\n== 車站結構 ==\n站體為2面2線側式月台的地下車站，候車月台設有月台幕門，並有6處出口。\n\n\n=== 月台配置 ===\n\n\n== 歷史 ==\n1999年6月30日：落成啟用。\n\n\n== 車站周邊 ==\n釜山漁村民族館\n韓國電力公社\n北區衛生所\n華明高校\n華明圖書館\n樂天瑪特華明店\n友利銀行華明洞分行\n新韓銀行華明洞分行\n韩亚银行華明洞分行\n華明站（韓國鐵道公社）\n\n\n== 圖片 ==\n\n\n== 相鄰車站 ==\n釜山交通公社\n● 釜山都市铁道2号线\n水亭（234）－華明"
+}
+]
+}

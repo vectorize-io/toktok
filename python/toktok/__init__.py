@@ -9,7 +9,7 @@ encoding, get back a token count per text. Ids are never materialized.
     # [2, 4]
 
 `encoding` is one of the bundled encodings: cl100k_base, o200k_base,
-o200k_harmony.
+o200k_harmony — or 'jev', an upper-bound estimate for TypeSafe's Jev.
 
 Encodings are loaded once and cached, and counting releases the GIL and runs
 across threads, so calling this per request is fine.
@@ -20,6 +20,9 @@ from collections.abc import Iterable
 from ._toktok import BUILTIN_ENCODINGS as _BUILTIN
 from ._toktok import Tokenizer as _Tokenizer
 from ._toktok import __version__ as __version__  # re-exported
+from ._toktok import jev_count_batch as _jev_count_batch
+from ._toktok import jev_truncate as _jev_truncate
+from ._toktok import jev_truncate_batch as _jev_truncate_batch
 
 # The vocabularies are compiled into the extension module, so there are no data
 # files to find, ship or download.
@@ -31,10 +34,12 @@ def _encoding(name: str, data_dir: str = "") -> _Tokenizer:
 
     Private: the supported API is `batch_count` and `truncate`. This is here for
     tests and for anyone who knowingly wants the full encode/decode surface."""
+    if name == "jev":
+        raise KeyError("'jev' is an estimate with no ids: use batch_count / truncate")
     key = (name, data_dir)
     if key not in _CACHE:
         if not data_dir and name not in _BUILTIN:
-            raise KeyError(f"unknown encoding {name!r}; available: {', '.join(_BUILTIN)}")
+            raise KeyError(f"unknown encoding {name!r}; available: {', '.join(_BUILTIN)}, jev")
         _CACHE[key] = _Tokenizer(name, data_dir)
     return _CACHE[key]
 
@@ -51,7 +56,10 @@ def batch_count(
         texts: the strings to count.
         encoding: one of 'cl100k_base' (GPT-3.5, GPT-4, text-embedding-3),
             'o200k_base' (GPT-4o, o-series, GPT-4.1, GPT-5) or 'o200k_harmony'
-            (GPT-OSS). An unknown name raises KeyError.
+            (GPT-OSS). An unknown name raises KeyError. 'jev' (TypeSafe's
+            Jev) is an upper-bound estimate, ~12-19% over on average: safe for
+            splitting a payload under Jev's limits, not an exact count.
+            `threads` applies; `with_special` doesn't (Jev has none).
         threads: worker threads; 0 (default) uses every core. Counting releases
             the GIL, so this scales.
         with_special: if True, a special-token string such as '<|endoftext|>'
@@ -63,6 +71,8 @@ def batch_count(
         >>> toktok.batch_count(["hello world"], "o200k_base")
         [2]
     """
+    if encoding == "jev":
+        return _jev_count_batch(list(texts), threads)
     return _encoding(encoding).count_batch(list(texts), threads, with_special)
 
 
@@ -88,7 +98,12 @@ def truncate(
     boundary — which is what `decode(encode(text)[:n])` does — can leave a
     partial character that decodes to U+FFFD. This drops that partial character
     instead.
+
+    With 'jev' the counts are the upper-bound estimate, and the cut lands where
+    the kept text's estimate fits `max_tokens`.
     """
+    if encoding == "jev":
+        return _jev_truncate(text, max_tokens)
     return _encoding(encoding).truncate(text, max_tokens)
 
 
@@ -99,6 +114,8 @@ def batch_truncate(
     threads: int = 0,
 ) -> list[tuple[str, int]]:
     """`truncate` over many texts, in parallel. See `truncate` and `batch_count`."""
+    if encoding == "jev":
+        return _jev_truncate_batch(list(texts), max_tokens, threads)
     return _encoding(encoding).truncate_batch(list(texts), max_tokens, threads)
 
 

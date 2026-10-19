@@ -38,6 +38,8 @@
 //! pretokenization with token emission for ASCII text.
 
 mod builtin;
+#[cfg(feature = "embedded-data")]
+pub mod jev;
 pub mod mb;
 mod pcache;
 pub mod pretok;

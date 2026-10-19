@@ -41,17 +41,56 @@ compare within a table. Method and full results:
 
 ## Encodings
 
-Pass an encoding name — not a model name. The three bundled encodings are
-compiled into the binary, so there are no data files, downloads or runtime
-dependencies.
+Pass an encoding name — not a model name. The bundled encodings are compiled
+into the binary, so there are no data files, downloads or runtime dependencies.
 
 | encoding | used by |
 |---|---|
 | `cl100k_base` | GPT-3.5, GPT-4, GPT-4 Turbo, `text-embedding-3-*`, `text-embedding-ada-002` |
 | `o200k_base` | GPT-4o, GPT-4o mini, GPT-4.1, GPT-5, o1 / o3 / o4-mini |
 | `o200k_harmony` | GPT-OSS (o200k_base's merge ranks plus the harmony special tokens) |
+| `jev` | TypeSafe's Jev — an **upper-bound estimate**, not exact ids; see below |
 
 An unknown name raises `KeyError` listing the valid ones.
+
+### `jev` — an upper bound, not an exact count
+
+TypeSafe doesn't publish Jev's tokenizer. `jev` gives a **safe overestimate**
+instead, meant for splitting a payload under Jev's context limits:
+`batch_count`, `truncate` and `batch_truncate` take it in Python, and
+`toktok::jev::{count, count_batch, truncate, truncate_batch}` in Rust. It is a
+count only: there are no ids to encode or decode.
+
+Checked against ~1,570 texts counted by the API (English, code, 22 languages,
+JSON, Markdown, logs, CSV, HTML, emoji and odd Unicode; jev-1.13 and 1.14 count
+the same):
+
+| text | over Jev, on average |
+|---|---:|
+| English and code | 1.19× |
+| other languages | 1.19× |
+| JSON, Markdown, logs, CSV, HTML | 1.13× |
+| emoji and odd Unicode | 1.31× |
+
+None came out under. On text the fit hadn't seen, about 1 chunk in 500 came out
+under, by less than 8%. Leave that much headroom at the limit, or re-split when
+Jev answers `max_tokens_exceeded`.
+
+It splits text the way Jev does (cl100k's rules with one token per digit), then
+charges each piece by type: words by their cl100k tokens, with extra for rare
+ones, and other scripts per character. It runs at roughly half to all of plain
+cl100k's speed ([numbers](docs/BENCHMARKS.md#the-jev-estimate)).
+
+Things to know when you size a request:
+
+- The question text and some fixed wrapping count too. One short question on
+  an empty state already reports 268 input tokens.
+- A JSON object `state` counts like `json.dumps(state, indent=1)`. Count that
+  text, not your compact JSON.
+- Jev NFC-normalizes text and the estimate doesn't, so decomposed text (e.g.
+  macOS filenames) only counts higher.
+- Short texts carry a fixed cost of a few tokens each, so many tiny strings
+  overcount far more than one payload does.
 
 ## Python
 
@@ -79,7 +118,7 @@ Returns `list[int]` — one count per text, in the order given.
 | parameter | default | what it does |
 |---|---|---|
 | `texts` | — | any iterable of `str`. An empty iterable returns `[]`; an empty string counts as `0`. |
-| `encoding` | `"cl100k_base"` | which tokenizer to count with — one of the three [encodings](#encodings). Model names are not accepted; look yours up in that table. An unknown name raises `KeyError`. |
+| `encoding` | `"cl100k_base"` | which tokenizer to count with — one of the [encodings](#encodings). Model names are not accepted; look yours up in that table. An unknown name raises `KeyError`. |
 | `threads` | `0` | worker threads. `0` uses every core; `1` counts on the calling thread; any other number caps the pool. Counting releases the GIL, so this scales — including on free-threaded builds. Threads are only worth it for large batches; for a handful of short strings the pool costs more than it saves. |
 | `with_special` | `False` | how to treat special-token strings. `False` counts `<\|endoftext\|>` as the ordinary text it looks like (7 tokens); `True` counts it as the single special token it is (1). Use `True` when your text already contains rendered chat/control markup and you want the count the model will see. |
 
