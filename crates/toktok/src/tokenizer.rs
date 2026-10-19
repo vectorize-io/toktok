@@ -11,7 +11,7 @@ use crate::vocab::{Vocab, VocabError, RANK_MAX};
 use std::path::{Path, PathBuf};
 
 /// What [`Tokenizer::truncate`] found: where to cut, and what it cost.
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug, Default)]
 pub struct Truncation {
     /// Byte offset to cut the input at — always on a character boundary.
     /// Equal to the input length when nothing needed truncating.
@@ -46,10 +46,10 @@ pub struct Tokenizer {
     /// by one vocab are meaningless to another, so each instance gets its own
     /// counter value rather than reusing an address that a later instance could
     /// inherit.
-    id: u64,
+    pub(crate) id: u64,
     name: String,
     scanner: Scanner,
-    u: UClass,                    // cl100k-pattern classes (L/N/S)
+    pub(crate) u: UClass,         // cl100k-pattern classes (L/N/S)
     uo: UClassO,                  // o200k-pattern classes (L/N/S/UPPER/LOWER)
     specials: Vec<(String, u32)>, // sorted by id
 }
@@ -756,11 +756,6 @@ impl Tokenizer {
     /// reused across documents, so a counting workload allocates O(threads)
     /// instead of O(total tokens).
     pub fn count_batch(&self, texts: &[&[u8]], threads: usize, with_special: bool) -> Vec<u32> {
-        use std::sync::atomic::{AtomicUsize, Ordering};
-        let mut out = vec![0u32; texts.len()];
-        if texts.is_empty() {
-            return out;
-        }
         let count1 = |s: &[u8], buf: &mut Vec<u32>, workers: usize| -> u32 {
             buf.clear();
             if with_special {
@@ -773,20 +768,37 @@ impl Tokenizer {
             self.encode_into_workers(s, buf, workers);
             buf.len() as u32
         };
+        self.par_map(texts, threads, count1)
+    }
+
+    /// `f(text, scratch, workers)` for each text, on up to `threads` threads
+    /// (0 = every core), work-stealing over an atomic cursor. Each thread
+    /// reuses one scratch buffer across its texts.
+    pub(crate) fn par_map<T: Clone + Default + Send>(
+        &self,
+        texts: &[&[u8]],
+        threads: usize,
+        f: impl Fn(&[u8], &mut Vec<u32>, usize) -> T + Sync,
+    ) -> Vec<T> {
+        use std::sync::atomic::{AtomicUsize, Ordering};
+        let mut out = vec![T::default(); texts.len()];
+        if texts.is_empty() {
+            return out;
+        }
         let n = self.threads_for(threads, texts.len());
         if n <= 1 {
             let mut buf = Vec::with_capacity(4096);
-            for (i, t) in texts.iter().enumerate() {
-                out[i] = count1(t, &mut buf, 1);
+            for (o, t) in out.iter_mut().zip(texts) {
+                *o = f(t, &mut buf, 1);
             }
             return out;
         }
-        struct Slots(*mut u32);
-        unsafe impl Sync for Slots {}
+        struct Slots<T>(*mut T);
+        unsafe impl<T: Send> Sync for Slots<T> {}
         let slots = Slots(out.as_mut_ptr());
         let next = AtomicUsize::new(0);
         std::thread::scope(|scope| {
-            let (slots, next) = (&slots, &next);
+            let (slots, next, f) = (&slots, &next, &f);
             for _ in 0..n {
                 scope.spawn(move || {
                     let mut buf = Vec::with_capacity(4096);
@@ -795,7 +807,7 @@ impl Tokenizer {
                         if i >= texts.len() {
                             break;
                         }
-                        let c = count1(texts[i], &mut buf, n);
+                        let c = f(texts[i], &mut buf, n);
                         unsafe { *slots.0.add(i) = c };
                     }
                 });
@@ -811,41 +823,7 @@ impl Tokenizer {
         max_tokens: usize,
         threads: usize,
     ) -> Vec<Truncation> {
-        use std::sync::atomic::{AtomicUsize, Ordering};
-        let empty = Truncation {
-            bytes: 0,
-            total_tokens: 0,
-            kept_tokens: 0,
-        };
-        let mut out = vec![empty; texts.len()];
-        if texts.is_empty() {
-            return out;
-        }
-        let n = self.threads_for(threads, texts.len());
-        if n <= 1 {
-            for (i, t) in texts.iter().enumerate() {
-                out[i] = self.truncate(t, max_tokens);
-            }
-            return out;
-        }
-        struct Slots(*mut Truncation);
-        unsafe impl Sync for Slots {}
-        let slots = Slots(out.as_mut_ptr());
-        let next = AtomicUsize::new(0);
-        std::thread::scope(|scope| {
-            let (slots, next) = (&slots, &next);
-            for _ in 0..n {
-                scope.spawn(move || loop {
-                    let i = next.fetch_add(1, Ordering::Relaxed);
-                    if i >= texts.len() {
-                        break;
-                    }
-                    let t = self.truncate(texts[i], max_tokens);
-                    unsafe { *slots.0.add(i) = t };
-                });
-            }
-        });
-        out
+        self.par_map(texts, threads, |t, _, _| self.truncate(t, max_tokens))
     }
 
     /// Thread count for a batch call: `threads == 0` means hardware concurrency,

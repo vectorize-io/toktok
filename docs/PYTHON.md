@@ -6,7 +6,7 @@ offsets, `toktok._encoding(name)` returns the `Tokenizer` it uses:
 ```python
 import toktok
 
-enc = toktok._encoding("cl100k_base")     # or "o200k_base", "o200k_harmony"
+enc = toktok._encoding("cl100k_base")     # or "o200k_base", "o200k_harmony" (not "jev": no ids)
 ```
 
 It is private on purpose — a much larger surface than `batch_count`, and not

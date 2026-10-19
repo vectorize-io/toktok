@@ -109,6 +109,27 @@ ingestion pipeline burns on tokenization.
 | toktok `encode_batch()` | 151.3 MB/s | 0.2 MiB |
 | tiktoken `encode_ordinary_batch()` | 8.3 MB/s | 8.9 MiB |
 
+## The `jev` estimate
+
+`jev` splits text the way TypeSafe's Jev does and charges each piece a fitted
+cost, on top of a cl100k BPE pass, so it runs a little slower than cl100k on
+English and code. On Common Crawl it runs faster, because scripts cl100k barely
+knows are charged per character with no BPE pass. One Apple M3 Max, Python
+3.14t, `batch_count` over 20 000-character texts, best of 5:
+
+| corpus | threads | jev | cl100k_base |
+|---|---:|---:|---:|
+| pile | 1 | 130 MB/s | 216 MB/s |
+| pile | all (14) | 579 MB/s | 895 MB/s |
+| code | 1 | 125 MB/s | 276 MB/s |
+| code | all (14) | 1053 MB/s | 1475 MB/s |
+| commoncrawl | 1 | 134 MB/s | 118 MB/s |
+| commoncrawl | all (14) | 966 MB/s | 843 MB/s |
+
+It is a laptop, not the CI runner the tables above come from, so compare within
+a row. Accuracy is in the README; tests/test_jev.py checks it against counts from
+the API.
+
 ## Reproducing
 
 The **Benchmarks** workflow runs the whole set on a runner — manual dispatch,
@@ -131,6 +152,9 @@ uv run python bench/compare.py
 
 # memory, CPU and latency percentiles
 uv run python bench/profile.py --threads 8
+
+# the jev estimate next to cl100k_base
+uv run python bench/jev.py
 ```
 
 The corpora are The Pile (diverse English), GitHub code, and Common Crawl
