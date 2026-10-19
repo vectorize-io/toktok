@@ -64,6 +64,7 @@ def rank_file(enc_name):
         os.replace(tmp, path)
     return path
 
+
 # how many documents to time individually for the latency distribution
 LATENCY_DOCS = 4000
 
