@@ -10,7 +10,7 @@
 /// Names of the encodings this build can construct with [`Tokenizer::builtin`].
 ///
 /// [`Tokenizer::builtin`]: crate::Tokenizer::builtin
-pub const BUILTIN_ENCODINGS: &[&str] = &["cl100k_base", "o200k_base", "o200k_harmony"];
+pub const BUILTIN_ENCODINGS: &[&str] = &["cl100k_base", "o200k_base", "o200k_harmony", "qwen3.5"];
 
 #[cfg(feature = "embedded-data")]
 pub(crate) mod data {
@@ -19,6 +19,9 @@ pub(crate) mod data {
     pub const O200K_VOCAB: &[u8] = include_bytes!("../data/o200k.vocab");
     pub const O200K_SPECIAL: &[u8] = include_bytes!("../data/o200k.special");
     pub const O200K_HARMONY_SPECIAL: &[u8] = include_bytes!("../data/o200k_harmony.special");
+    pub const QWEN35_VOCAB: &[u8] = include_bytes!("../data/qwen35.vocab");
+    pub const QWEN35_SPECIAL: &[u8] = include_bytes!("../data/qwen35.special");
+    pub const UNICLASS_QWEN35: &[u8] = include_bytes!("../data/uniclass_qwen35.bin");
     pub const UNICLASS: &[u8] = include_bytes!("../data/uniclass.bin");
     pub const UNICLASS_O200K: &[u8] = include_bytes!("../data/uniclass_o200k.bin");
 }

@@ -49,9 +49,30 @@ into the binary, so there are no data files, downloads or runtime dependencies.
 | `cl100k_base` | GPT-3.5, GPT-4, GPT-4 Turbo, `text-embedding-3-*`, `text-embedding-ada-002` |
 | `o200k_base` | GPT-4o, GPT-4o mini, GPT-4.1, GPT-5, o1 / o3 / o4-mini |
 | `o200k_harmony` | GPT-OSS (o200k_base's merge ranks plus the harmony special tokens) |
+| `qwen3.5` | Qwen3.5's vocabulary, split the way bigpickle does — exact ids; see below |
 | `jev` | TypeSafe's Jev — an **upper-bound estimate**, not exact ids; see below |
 
 An unknown name raises `KeyError` listing the valid ones.
+
+### `qwen3.5`
+
+Exact ids, checked token for token against Hugging Face `tokenizers` on 1.1M
+single characters, 130k random strings and the three 25 MB benchmark corpora,
+and against a bigpickle server's own counts (202 texts, 145k tokens).
+
+- It follows bigpickle's tokenizer.json: Qwen3.5's vocabulary and merges with
+  Qwen2's split pattern. Qwen's own tokenizer.json keeps combining marks with
+  their letters, so Hindi, Tamil, Thai and similar text counts a few percent
+  lower there. `tools/gen_qwen35.py` builds the data from either file.
+- Text is NFC-normalized first, as Qwen's tokenizer does. Python does it for
+  you; `truncate` then returns a prefix of the NFC text. From Rust, pass NFC
+  text: `Tokenizer::unnormalized` finds the few texts in a batch that aren't.
+- A server that renders special tokens counts `<|im_start|>` or `<think>` as
+  one token. Pass `with_special=True` to match it; the default counts them as
+  text, which only ever counts more.
+- Speed: within 10–25% of `cl100k_base` on English and code, about half on
+  multilingual web text, and 70–250× faster than `tokenizers`
+  ([numbers](docs/BENCHMARKS.md#qwen35)).
 
 ### `jev` — an upper bound, not an exact count
 

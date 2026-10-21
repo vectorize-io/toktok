@@ -41,6 +41,7 @@ mod builtin;
 #[cfg(feature = "embedded-data")]
 pub mod jev;
 pub mod mb;
+pub mod nfc;
 mod pcache;
 pub mod pretok;
 pub mod pretok_o200k;

@@ -1,5 +1,6 @@
-//! Byte-exactness against tiktoken, via the fixtures in tests/vectors_*.bin
-//! (regenerate with `python tools/gen_vectors.py`).
+//! Byte-exactness against tiktoken (and Hugging Face `tokenizers` for qwen3.5),
+//! via the fixtures in tests/vectors_*.bin (regenerate with
+//! `python tools/gen_vectors.py`).
 
 use std::path::PathBuf;
 
@@ -52,6 +53,49 @@ fn cl100k_matches_tiktoken() {
 #[test]
 fn o200k_matches_tiktoken() {
     check("o200k_base");
+}
+
+#[test]
+fn qwen35_matches_hf_tokenizers() {
+    check("qwen3.5");
+}
+
+#[test]
+fn qwen35_specials_and_unmergeable_tokens() {
+    let tok = load("qwen3.5");
+    assert_eq!(tok.n_vocab(), 248077);
+    assert_eq!(
+        tok.encode_with_special("<think>hi</think>"),
+        [248068, 5834, 248069]
+    );
+    // 104328 is one of the 201 tokens no merge produces: never emitted, even
+    // for its own bytes
+    let own = tok.token_bytes(104328).unwrap().to_vec();
+    assert!(!tok.encode(&own).contains(&104328));
+    assert_eq!(tok.decode(&tok.encode(&own)), own);
+}
+
+#[test]
+fn nfc_check_flags_only_what_nfc_could_change() {
+    use toktok::nfc::maybe_unnormalized as maybe;
+    for s in [
+        "",
+        "hello",
+        "naïve café",
+        "日本語",
+        "한국어",
+        "🚀",
+        "’quotes’",
+    ] {
+        assert!(!maybe(s.as_bytes()), "{s:?}");
+    }
+    // a combining mark, a jamo that composes, a singleton NFC replaces
+    for s in ["cafe\u{301}", "\u{1100}\u{1161}", "\u{212B}", "x\u{1D15E}"] {
+        assert!(maybe(s.as_bytes()), "{s:?}");
+    }
+    let tok = load("qwen3.5");
+    let texts: Vec<&[u8]> = vec![b"ok", "e\u{301}".as_bytes(), b"fine"];
+    assert_eq!(tok.unnormalized(&texts, 0), [1]);
 }
 
 #[test]
@@ -235,7 +279,7 @@ fn unknown_encoding_errors() {
 /// checks that a warm cache answers exactly like a cold one.
 #[test]
 fn pretoken_cache_matches_a_cold_encode() {
-    for encoding in ["cl100k_base", "o200k_base"] {
+    for encoding in ["cl100k_base", "o200k_base", "qwen3.5"] {
         let tok = load(encoding);
         let mut pieces: Vec<String> = Vec::new();
         for n in 1..=40usize {

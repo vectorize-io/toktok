@@ -31,6 +31,9 @@ pub enum Scanner {
     Cl100k,
     /// o200k_base grammar (GPT-4o, GPT-OSS harmony)
     O200k,
+    /// Qwen grammar: cl100k's alternatives with single digits and Llama-3
+    /// whitespace (whether `\p{M}` joins letters is up to the class table)
+    Qwen,
 }
 
 /// Monotonic source for [`Tokenizer::id`].
@@ -114,11 +117,16 @@ impl Tokenizer {
                 data::O200K_HARMONY_SPECIAL,
                 Scanner::O200k,
             ),
+            "qwen3.5" => (data::QWEN35_VOCAB, data::QWEN35_SPECIAL, Scanner::Qwen),
             _ => return Err(unknown_encoding(encoding)),
         };
         let (u, uo) = match scanner {
             Scanner::Cl100k => (
                 UClass::from_bytes(data::UNICLASS, "uniclass.bin")?,
+                UClassO::empty(),
+            ),
+            Scanner::Qwen => (
+                UClass::from_bytes(data::UNICLASS_QWEN35, "uniclass_qwen35.bin")?,
                 UClassO::empty(),
             ),
             Scanner::O200k => (
@@ -142,22 +150,26 @@ impl Tokenizer {
     /// Built-in: `cl100k_base`, `o200k_base`, `o200k_harmony`.
     pub fn load_dir(dir: impl AsRef<Path>, encoding: &str) -> Result<Tokenizer, VocabError> {
         let dir: PathBuf = dir.as_ref().to_path_buf();
-        let (vocab_file, uni_o200k, specials_file, scanner) = match encoding {
-            "cl100k_base" => ("cl100k.vocab", false, "cl100k.special", Scanner::Cl100k),
-            "o200k_base" => ("o200k.vocab", true, "o200k.special", Scanner::O200k),
+        let (vocab_file, specials_file, scanner) = match encoding {
+            "cl100k_base" => ("cl100k.vocab", "cl100k.special", Scanner::Cl100k),
+            "o200k_base" => ("o200k.vocab", "o200k.special", Scanner::O200k),
             // GPT-OSS harmony: identical pattern AND merge ranks to o200k_base (so it
             // reuses o200k.vocab and the o200k scanner) — only the specials differ.
-            "o200k_harmony" => ("o200k.vocab", true, "o200k_harmony.special", Scanner::O200k),
+            "o200k_harmony" => ("o200k.vocab", "o200k_harmony.special", Scanner::O200k),
+            "qwen3.5" => ("qwen35.vocab", "qwen35.special", Scanner::Qwen),
             _ => return Err(unknown_encoding(encoding)),
         };
         let v = Vocab::load(&dir.join(vocab_file))?;
-        let (u, uo) = if uni_o200k {
-            (
+        let (u, uo) = match scanner {
+            Scanner::Cl100k => (UClass::load(&dir.join("uniclass.bin"))?, UClassO::empty()),
+            Scanner::O200k => (
                 UClass::empty(),
                 UClassO::load(&dir.join("uniclass_o200k.bin"))?,
-            )
-        } else {
-            (UClass::load(&dir.join("uniclass.bin"))?, UClassO::empty())
+            ),
+            Scanner::Qwen => (
+                UClass::load(&dir.join("uniclass_qwen35.bin"))?,
+                UClassO::empty(),
+            ),
         };
         Ok(Tokenizer {
             v,
@@ -259,8 +271,9 @@ impl Tokenizer {
         // The pretoken cache is borrowed once here and threaded down, so the
         // hot loop pays no thread-local lookup per pretoken.
         crate::pcache::with_cache(self.id, workers, |pc| match self.scanner {
-            Scanner::Cl100k => self.encode_core_cl100k(text, out, pc),
+            Scanner::Cl100k => self.encode_core_cl100k::<false>(text, out, pc),
             Scanner::O200k => self.encode_core_o200k(text, out, pc),
+            Scanner::Qwen => self.encode_core_cl100k::<true>(text, out, pc),
         })
     }
 
@@ -421,7 +434,14 @@ impl Tokenizer {
         }
     }
 
-    fn encode_core_cl100k(&self, t: &[u8], out: &mut Vec<u32>, pc: &mut PretokenCache) {
+    /// cl100k's machine; `QWEN` swaps in Qwen's two differences — one digit
+    /// per piece, and the whitespace cascade `\s*[\r\n]+ | \s+(?!\S) | \s+`.
+    fn encode_core_cl100k<const QWEN: bool>(
+        &self,
+        t: &[u8],
+        out: &mut Vec<u32>,
+        pc: &mut PretokenCache,
+    ) {
         let l = t.len();
         let mut p = 0usize;
         while p < l {
@@ -473,6 +493,12 @@ impl Tokenizer {
                         adv = we - p;
                         break 'blk;
                     }
+                    if a_dig(b0) && QWEN {
+                        // \p{N}
+                        self.emit(t, p, 1, out, pc);
+                        adv = 1;
+                        break 'blk;
+                    }
                     if a_dig(b0) {
                         // \p{N}{1,3}
                         let (mut q, mut c) = (p + 1, 1);
@@ -513,7 +539,9 @@ impl Tokenizer {
                             fb = true;
                             break 'blk;
                         }
-                        let plen = if e2 == l {
+                        let plen = if QWEN && lastnl != usize::MAX {
+                            lastnl + 1 - p
+                        } else if e2 == l {
                             e2 - p
                         } else if lastnl != usize::MAX {
                             lastnl + 1 - p
@@ -530,7 +558,7 @@ impl Tokenizer {
                 }
             }
             if fb {
-                let mut len = pretok::pretok_next(&self.u, t, p, l);
+                let mut len = pretok::pretok_next_impl::<QWEN, QWEN>(&self.u, t, p, l);
                 if len == 0 {
                     len = 1;
                 }
@@ -769,6 +797,14 @@ impl Tokenizer {
             buf.len() as u32
         };
         self.par_map(texts, threads, count1)
+    }
+
+    /// Indices of the `texts` that NFC normalization might change (see
+    /// [`crate::nfc`]), checked in parallel. `qwen3.5` expects NFC input:
+    /// normalize these and pass the rest as they are.
+    pub fn unnormalized(&self, texts: &[&[u8]], threads: usize) -> Vec<usize> {
+        let flags = self.par_map(texts, threads, |t, _, _| crate::nfc::maybe_unnormalized(t));
+        (0..texts.len()).filter(|&i| flags[i]).collect()
     }
 
     /// `f(text, scratch, workers)` for each text, on up to `threads` threads

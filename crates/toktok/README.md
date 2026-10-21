@@ -6,7 +6,7 @@ to [tiktoken](https://github.com/openai/tiktoken)**, and encoding is
 **3.4–20× faster than [`tiktoken-rs`](https://crates.io/crates/tiktoken-rs)**.
 
 - **Zero dependencies**, and the vocabularies are embedded in the binary — nothing to download or ship alongside your program.
-- `cl100k_base` (GPT-3.5/GPT-4), `o200k_base` (GPT-4o), `o200k_harmony` (GPT-OSS).
+- `cl100k_base` (GPT-3.5/GPT-4), `o200k_base` (GPT-4o), `o200k_harmony` (GPT-OSS), and `qwen3.5` (Qwen3.5's vocabulary, ids identical to Hugging Face `tokenizers`; pass NFC text).
 - `toktok::jev`: an upper-bound token count for TypeSafe's Jev, which publishes no tokenizer — ~1.2× over on average, for splitting payloads under its limits.
 - Thread-safe: load once, encode from every core.
 

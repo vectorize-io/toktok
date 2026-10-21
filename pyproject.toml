@@ -10,7 +10,7 @@ requires-python = ">=3.11"
 license = "MIT"
 license-files = ["LICENSE", "NOTICE", "LICENSE-quicktok-upstream"]
 authors = [{ name = "vectorize-io" }]
-keywords = ["tokenizer", "bpe", "tiktoken", "cl100k", "o200k", "gpt", "gpt-oss", "harmony"]
+keywords = ["tokenizer", "bpe", "tiktoken", "cl100k", "o200k", "gpt", "gpt-oss", "harmony", "qwen"]
 classifiers = [
   "Programming Language :: Rust",
   "Programming Language :: Python :: 3",

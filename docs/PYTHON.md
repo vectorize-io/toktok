@@ -6,7 +6,7 @@ offsets, `toktok._encoding(name)` returns the `Tokenizer` it uses:
 ```python
 import toktok
 
-enc = toktok._encoding("cl100k_base")     # or "o200k_base", "o200k_harmony" (not "jev": no ids)
+enc = toktok._encoding("cl100k_base")     # or "o200k_base", "o200k_harmony", "qwen3.5" (not "jev": no ids)
 ```
 
 It is private on purpose — a much larger surface than `batch_count`, and not
@@ -29,6 +29,7 @@ can be promoted.
 | `count(text)` / `count_batch(texts, threads=0, with_special=False)` | token counts, no ids built |
 | `truncate(text, max_tokens)` | `(text, total_tokens)` — see `toktok.truncate` |
 | `truncate_batch(texts, max_tokens, threads=0)` | the same, in parallel |
+| `unnormalized(texts, threads=0)` | indices of the texts NFC could change. `qwen3.5` expects NFC input, and this `Tokenizer` doesn't normalize: `batch_count` does it for you |
 
 `encode_to_numpy` and the batch paths avoid building a `list[int]`, which is
 where most of the time and memory goes on large inputs — a Python list costs

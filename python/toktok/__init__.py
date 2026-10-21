@@ -9,13 +9,14 @@ encoding, get back a token count per text. Ids are never materialized.
     # [2, 4]
 
 `encoding` is one of the bundled encodings: cl100k_base, o200k_base,
-o200k_harmony — or 'jev', an upper-bound estimate for TypeSafe's Jev.
+o200k_harmony, qwen3.5 — or 'jev', an upper-bound estimate for TypeSafe's Jev.
 
 Encodings are loaded once and cached, and counting releases the GIL and runs
 across threads, so calling this per request is fine.
 """
 
 from collections.abc import Iterable
+from unicodedata import is_normalized, normalize
 
 from ._toktok import BUILTIN_ENCODINGS as _BUILTIN
 from ._toktok import Tokenizer as _Tokenizer
@@ -44,6 +45,19 @@ def _encoding(name: str, data_dir: str = "") -> _Tokenizer:
     return _CACHE[key]
 
 
+def _nfc(text: str) -> str:
+    # Qwen's tokenizer NFC-normalizes first; the Rust core doesn't, so do it here
+    return text if is_normalized("NFC", text) else normalize("NFC", text)
+
+
+def _nfc_batch(texts: Iterable[str], threads: int) -> list[str]:
+    # the core finds the few texts NFC could change, in parallel
+    texts = list(texts)
+    for i in _encoding("qwen3.5").unnormalized(texts, threads):
+        texts[i] = _nfc(texts[i])
+    return texts
+
+
 def batch_count(
     texts: Iterable[str],
     encoding: str = "cl100k_base",
@@ -55,8 +69,10 @@ def batch_count(
     Args:
         texts: the strings to count.
         encoding: one of 'cl100k_base' (GPT-3.5, GPT-4, text-embedding-3),
-            'o200k_base' (GPT-4o, o-series, GPT-4.1, GPT-5) or 'o200k_harmony'
-            (GPT-OSS). An unknown name raises KeyError. 'jev' (TypeSafe's
+            'o200k_base' (GPT-4o, o-series, GPT-4.1, GPT-5), 'o200k_harmony'
+            (GPT-OSS) or 'qwen3.5' (Qwen3.5's vocab as bigpickle uses it;
+            text is NFC-normalized first). An unknown name raises
+            KeyError. 'jev' (TypeSafe's
             Jev) is an upper-bound estimate, ~12-19% over on average: safe for
             splitting a payload under Jev's limits, not an exact count.
             `threads` applies; `with_special` doesn't (Jev has none).
@@ -73,6 +89,8 @@ def batch_count(
     """
     if encoding == "jev":
         return _jev_count_batch(list(texts), threads)
+    if encoding == "qwen3.5":
+        texts = _nfc_batch(texts, threads)
     return _encoding(encoding).count_batch(list(texts), threads, with_special)
 
 
@@ -100,10 +118,13 @@ def truncate(
     instead.
 
     With 'jev' the counts are the upper-bound estimate, and the cut lands where
-    the kept text's estimate fits `max_tokens`.
+    the kept text's estimate fits `max_tokens`. With 'qwen3.5' the text is
+    NFC-normalized first, so the kept text is a prefix of its NFC form.
     """
     if encoding == "jev":
         return _jev_truncate(text, max_tokens)
+    if encoding == "qwen3.5":
+        text = _nfc(text)
     return _encoding(encoding).truncate(text, max_tokens)
 
 
@@ -116,6 +137,8 @@ def batch_truncate(
     """`truncate` over many texts, in parallel. See `truncate` and `batch_count`."""
     if encoding == "jev":
         return _jev_truncate_batch(list(texts), max_tokens, threads)
+    if encoding == "qwen3.5":
+        texts = _nfc_batch(texts, threads)
     return _encoding(encoding).truncate_batch(list(texts), max_tokens, threads)
 
 

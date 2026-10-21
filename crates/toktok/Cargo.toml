@@ -1,6 +1,6 @@
 [package]
 name = "toktok-rs"
-description = "Fast, exact BPE tokenizer for OpenAI encodings (cl100k_base, o200k_base, o200k_harmony) — tiktoken-identical ids, plus a token-count bound for TypeSafe's Jev, no dependencies"
+description = "Fast, exact BPE tokenizer for OpenAI encodings and Qwen3.5 (cl100k_base, o200k_base, o200k_harmony, qwen3.5) — tiktoken-identical ids, plus a token-count bound for TypeSafe's Jev, no dependencies"
 documentation = "https://docs.rs/toktok-rs"
 keywords = ["tokenizer", "bpe", "tiktoken", "gpt", "llm"]
 categories = ["text-processing", "algorithms"]

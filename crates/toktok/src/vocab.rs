@@ -81,6 +81,10 @@ pub struct Vocab {
     pub tnode_tok: Vec<u32>, // per trie node: token id ending here, or RANK_MAX
     npm: Vec<u32>,        // next_prefix_match
     split: Vec<(u32, u32)>,
+    /// Merge priority per id, when it isn't the id itself (empty otherwise):
+    /// Qwen3.5 has merges whose parts form after the token they make, and those
+    /// fire as soon as the later part exists.
+    order: Vec<u32>,
     // pair_lookup, flat open-addressing, ONE u64/slot: ((t1<<18|t2)+1)<<19 | rank
     plk: Vec<u64>,
     plmask: u32,
@@ -308,31 +312,41 @@ impl Vocab {
         res
     }
 
+    #[inline(always)]
+    fn order(&self, id: u32) -> u32 {
+        if self.order.is_empty() {
+            id
+        } else {
+            self.order[id as usize]
+        }
+    }
+
     fn ivtp_slow(&self, t1: u32, t2: u32) -> bool {
         let (mut t1, mut t2) = (t1, t2);
         let mut limit = RANK_MAX;
         loop {
             let c = self.pl_get(((t1 as u64) << 18) | t2 as u64);
-            if c != RANK_MAX && c < limit {
+            if c != RANK_MAX && self.order(c) < limit {
                 return false;
             }
-            if t1 > t2 {
-                limit = t1;
-                t1 = unsafe { self.split.get_unchecked(t1 as usize).1 };
-                if t1 == limit {
-                    limit = t2 + 1;
-                    t2 = unsafe { self.split.get_unchecked(t2 as usize).0 };
-                    if t2 + 1 == limit {
+            let (o1, o2) = (t1, t2);
+            if self.order(o1) > self.order(o2) {
+                limit = self.order(o1);
+                t1 = unsafe { self.split.get_unchecked(o1 as usize).1 };
+                if t1 == o1 {
+                    limit = self.order(o2) + 1;
+                    t2 = unsafe { self.split.get_unchecked(o2 as usize).0 };
+                    if t2 == o2 {
                         return true;
                     }
                 }
             } else {
-                limit = t2 + 1;
-                t2 = unsafe { self.split.get_unchecked(t2 as usize).0 };
-                if t2 + 1 == limit {
-                    limit = t1;
-                    t1 = unsafe { self.split.get_unchecked(t1 as usize).1 };
-                    if t1 == limit {
+                limit = self.order(o2) + 1;
+                t2 = unsafe { self.split.get_unchecked(o2 as usize).0 };
+                if t2 == o2 {
+                    limit = self.order(o1);
+                    t1 = unsafe { self.split.get_unchecked(o1 as usize).1 };
+                    if t1 == o1 {
                         return true;
                     }
                 }
@@ -461,6 +475,7 @@ impl Vocab {
             ("tnode_tok", v(&self.tnode_tok)),
             ("otab (odd tokens)", v(&self.otab)),
             ("split", v(&self.split)),
+            ("order", v(&self.order)),
             ("npm", v(&self.npm)),
             (
                 "token bytes",
@@ -491,6 +506,7 @@ impl Vocab {
             + v(&self.tnode_tok)
             + v(&self.npm)
             + v(&self.split)
+            + v(&self.order)
             + v(&self.plk)
             + v(&self.ivm)
             + v(&self.ivmw)
@@ -618,9 +634,18 @@ impl Vocab {
             seen[r] = true;
             tb[r] = bytes;
         }
+        // Optional merge section: `SPL1` then one byte per id, the length of the
+        // left part of that token's merge (0 = no merge). Vocabs whose merge list
+        // isn't the one rank order implies (Qwen3.5) ship it, and a token with
+        // no merge is one their BPE can never produce, so it is never matched.
+        let mut hsplit: Option<&[u8]> = None;
         if p != raw.len() {
-            return Err(fail("trailing bytes"));
+            if raw.len() - p != 4 + n_us || &raw[p..p + 4] != b"SPL1" {
+                return Err(fail("trailing bytes"));
+            }
+            hsplit = Some(&raw[p + 4..]);
         }
+        let reachable = |id: usize| hsplit.map_or(true, |h| h[id] != 0 || tb[id].len() == 1);
 
         let mut v = Vocab {
             all: Vec::new(),
@@ -637,6 +662,7 @@ impl Vocab {
             tnode_tok: Vec::new(),
             npm: Vec::new(),
             split: Vec::new(),
+            order: Vec::new(),
             plk: Vec::new(),
             plmask: 0,
             ivm: Vec::new(),
@@ -673,7 +699,9 @@ impl Vocab {
             for &b in tb[id] {
                 node = v.edge_build(node, b);
             }
-            v.tnode_tok[node as usize] = id as u32;
+            if reachable(id) {
+                v.tnode_tok[node as usize] = id as u32;
+            }
         }
         // 2-level direct table: node + deepest-token after the first <=2 bytes
         v.r2node = vec![0u32; 65536];
@@ -761,7 +789,7 @@ impl Vocab {
                     }
                     d += 2;
                 }
-                if l >= 3 && (l & 1) == 1 {
+                if l >= 3 && (l & 1) == 1 && reachable(id) {
                     // token ends at odd depth: side-table entry from its even parent
                     let k = ((path[l - 1] as u64) << 8) | t[l - 1] as u64;
                     let mut h = (k.wrapping_mul(HMUL) >> 40) as u32 & v.omask;
@@ -879,6 +907,22 @@ impl Vocab {
         v.split.reserve(n_us);
         for id in 0..n_us {
             let t = tb[id];
+            if let Some(h) = hsplit {
+                let l1 = h[id] as usize;
+                let (a, b) = if l1 == 0 || l1 >= t.len() {
+                    (id as u32, id as u32)
+                } else {
+                    (v.find_id(&t[..l1]), v.find_id(&t[l1..]))
+                };
+                if a == RANK_MAX || b == RANK_MAX {
+                    return Err(fail("bad merge"));
+                }
+                if a != id as u32 {
+                    v.pl_put(((a as u64) << 18) | b as u64, id as u32);
+                }
+                v.split.push((a, b));
+                continue;
+            }
             let mut token1 = v.npm[id];
             let mut done = false;
             while token1 != RANK_MAX {
@@ -899,6 +943,9 @@ impl Vocab {
             if !done {
                 v.split.push((id as u32, id as u32));
             }
+        }
+        if hsplit.is_some() {
+            v.order = merge_order(&v.split);
         }
         // is_valid_token_pair is only PURE once split/pair_lookup are complete;
         // construction-time calls populated the memo with stale results. Clear it.
@@ -958,4 +1005,44 @@ impl Vocab {
         v.emask = 0;
         Ok(v)
     }
+}
+
+/// Each token's merge priority, as a BPE that applies the lowest-ranked merge
+/// first sees it. A merge ranked below one of its parts can only fire once that
+/// part exists, and then fires straight away, ahead of anything ranked higher —
+/// so it is ordered right after its later part. Identity when no merge is like
+/// that.
+fn merge_order(split: &[(u32, u32)]) -> Vec<u32> {
+    use std::cmp::Reverse;
+    use std::collections::BinaryHeap;
+    let n = split.len();
+    let mut order = vec![RANK_MAX; n];
+    let mut waiting: HashMap<u32, Vec<u32>> = HashMap::new();
+    let mut ready = BinaryHeap::new();
+    let mut next = 0u32;
+    for id in 0..n as u32 {
+        if order[id as usize] != RANK_MAX {
+            continue;
+        }
+        ready.push(Reverse(id));
+        while let Some(Reverse(t)) = ready.pop() {
+            if order[t as usize] != RANK_MAX {
+                continue;
+            }
+            let (a, b) = split[t as usize];
+            let pending = [a, b]
+                .into_iter()
+                .find(|&p| p != t && order[p as usize] == RANK_MAX);
+            if let Some(p) = pending {
+                waiting.entry(p).or_default().push(t);
+                continue;
+            }
+            order[t as usize] = next;
+            next += 1;
+            if let Some(w) = waiting.remove(&t) {
+                ready.extend(w.into_iter().map(Reverse));
+            }
+        }
+    }
+    order
 }

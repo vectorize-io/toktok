@@ -264,6 +264,23 @@ impl PyTokenizer {
             .collect()
     }
 
+    /// Indices of the texts NFC normalization might change; the rest are NFC
+    /// already. Borrows the strings, so a batch is never copied for this.
+    #[pyo3(signature = (texts, threads = 0))]
+    fn unnormalized(
+        &self,
+        py: Python<'_>,
+        texts: Vec<Bound<'_, PyString>>,
+        threads: usize,
+    ) -> PyResult<Vec<usize>> {
+        let strs = texts
+            .iter()
+            .map(|t| t.to_str())
+            .collect::<PyResult<Vec<&str>>>()?;
+        let refs: Vec<&[u8]> = strs.iter().map(|s| s.as_bytes()).collect();
+        Ok(py.detach(|| self.inner.unnormalized(&refs, threads)))
+    }
+
     fn count(&self, py: Python<'_>, text: &str) -> usize {
         py.detach(|| self.inner.count(text.as_bytes()))
     }

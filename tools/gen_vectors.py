@@ -6,14 +6,21 @@ byte-identical to it. Run from the repo root:
 
     python tools/gen_vectors.py
 
+qwen3.5's reference is Hugging Face `tokenizers` with bigpickle's
+tokenizer.json; pass its path:
+
+    python tools/gen_vectors.py path/to/tokenizer.json
+
 Format of tests/vectors_<encoding>.bin (all little-endian):
     u32 n_cases
     per case: u32 text_len, text bytes, u32 n_ids, n_ids * u32
 """
 
 import os
+import random
 import struct
 import sys
+import unicodedata
 
 CASES = [
     "",
@@ -84,24 +91,58 @@ CASES = [
 ]
 
 
-def main():
-    import tiktoken
+# Scripts whose combining marks the Qwen2 and Qwen3.5 split patterns treat
+# differently, plus a fuzz over the characters that trip BPE and splitting.
+QWEN_CASES = [
+    "हिन्दी पाठ नमस्ते दुनिया",
+    "தமிழ் உரை சோதனை",
+    "ภาษาไทยมีสระและวรรณยุกต์",
+    "বাংলা ভাষা",
+    "ქართული ენა",
+    "Tiếng Việt có dấu",
+]
+FUZZ = "abcXYZ 0123\n\t\r.,!?'-/_:;()[]{}éü中日あ한\U0001f600\u0301\u093f\u0e31\u00a0\u3000"
 
+
+def write(path, cases, encode):
+    blob = bytearray(struct.pack("<I", len(cases)))
+    for s in cases:
+        b = s.encode("utf-8")
+        ids = encode(s)
+        blob += struct.pack("<I", len(b)) + b
+        blob += struct.pack("<I", len(ids)) + struct.pack(f"<{len(ids)}I", *ids)
+    with open(path, "wb") as f:
+        f.write(blob)
+    print(f"{path}: {len(cases)} cases, {len(blob)} bytes", file=sys.stderr)
+
+
+def main():
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     out_dir = os.path.join(root, "tests")
     os.makedirs(out_dir, exist_ok=True)
+    if len(sys.argv) > 1:
+        from tokenizers import Tokenizer
+
+        hf = Tokenizer.from_file(sys.argv[1])
+        rng = random.Random(35)
+        fuzz = ["".join(rng.choice(FUZZ) for _ in range(rng.randint(1, 60))) for _ in range(2000)]
+        # the Rust core takes NFC text and splits no special strings
+        cases = [unicodedata.normalize("NFC", s) for s in CASES + QWEN_CASES + fuzz]
+        cases = [s for s in cases if "<|" not in s]
+        write(
+            os.path.join(out_dir, "vectors_qwen3.5.bin"),
+            cases,
+            lambda s: hf.encode(s, add_special_tokens=False).ids,
+        )
+        return
+    import tiktoken
+
     for enc in ("cl100k_base", "o200k_base"):
-        tk = tiktoken.get_encoding(enc)
-        blob = bytearray(struct.pack("<I", len(CASES)))
-        for s in CASES:
-            b = s.encode("utf-8")
-            ids = tk.encode_ordinary(s)
-            blob += struct.pack("<I", len(b)) + b
-            blob += struct.pack("<I", len(ids)) + struct.pack(f"<{len(ids)}I", *ids)
-        path = os.path.join(out_dir, f"vectors_{enc}.bin")
-        with open(path, "wb") as f:
-            f.write(blob)
-        print(f"{path}: {len(CASES)} cases, {len(blob)} bytes", file=sys.stderr)
+        write(
+            os.path.join(out_dir, f"vectors_{enc}.bin"),
+            CASES,
+            tiktoken.get_encoding(enc).encode_ordinary,
+        )
 
 
 if __name__ == "__main__":

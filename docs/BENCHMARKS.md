@@ -130,6 +130,25 @@ It is a laptop, not the CI runner the tables above come from, so compare within
 a row. Accuracy is in the README; tests/test_jev.py checks it against counts from
 the API.
 
+## `qwen3.5`
+
+Against Hugging Face `tokenizers`, the reference it matches; ids are checked
+identical before timing. Same machine and setup as the `jev` table:
+
+| corpus | threads | qwen3.5 | tokenizers | cl100k_base |
+|---|---:|---:|---:|---:|
+| pile | 1 | 221 MB/s | 3.1 MB/s | 255 MB/s |
+| pile | all (14) | 765 MB/s | 15.9 MB/s | 968 MB/s |
+| code | 1 | 223 MB/s | 0.9 MB/s | 254 MB/s |
+| code | all (14) | 744 MB/s | 13.2 MB/s | 1006 MB/s |
+| commoncrawl | 1 | 57 MB/s | 2.5 MB/s | 106 MB/s |
+| commoncrawl | all (14) | 195 MB/s | 15.1 MB/s | 567 MB/s |
+
+ASCII runs through the same fused loop as cl100k. Common Crawl is slower for
+two reasons: Qwen's larger vocabulary makes non-Latin pieces cost more (o200k
+shows the same), and about 1 text in 20 there really needs NFC, which Python's
+`unicodedata` does.
+
 ## Reproducing
 
 The **Benchmarks** workflow runs the whole set on a runner — manual dispatch,
@@ -155,6 +174,9 @@ uv run python bench/profile.py --threads 8
 
 # the jev estimate next to cl100k_base
 uv run python bench/jev.py
+
+# qwen3.5 against tokenizers (needs bigpickle's tokenizer.json)
+uv run --with tokenizers python bench/qwen.py path/to/tokenizer.json
 ```
 
 The corpora are The Pile (diverse English), GitHub code, and Common Crawl
