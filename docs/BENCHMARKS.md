@@ -152,17 +152,18 @@ shows the same), and about 1 text in 20 there really needs NFC, which Python's
 ## `embeddinggemma-2`
 
 Against Hugging Face `tokenizers`, the reference it matches; ids are checked
-identical before timing. Apple M-series laptop, 14 cores, with other work
-running (load average 11–15), so compare within a row:
+identical before timing. From the **Benchmarks** workflow (GitHub's
+`ubuntu-latest` runner, Python 3.14, `batch_count` over 20 000-character texts,
+best of 5):
 
 | corpus | threads | embeddinggemma-2 | tokenizers | cl100k_base |
 |---|---:|---:|---:|---:|
-| pile | 1 | 221 MB/s | 4.1 MB/s | 265 MB/s |
-| pile | all (14) | 896 MB/s | 19.9 MB/s | 1004 MB/s |
-| code | 1 | 172 MB/s | 4.1 MB/s | 264 MB/s |
-| code | all (14) | 898 MB/s | 25.0 MB/s | 1351 MB/s |
-| commoncrawl | 1 | 80 MB/s | 4.9 MB/s | 110 MB/s |
-| commoncrawl | all (14) | 490 MB/s | 35.5 MB/s | 620 MB/s |
+| pile | 1 | 176 MB/s | 4.1 MB/s | 218 MB/s |
+| pile | all | 255 MB/s | 11.3 MB/s | 344 MB/s |
+| code | 1 | 135 MB/s | 4.4 MB/s | 225 MB/s |
+| code | all | 305 MB/s | 11.7 MB/s | 415 MB/s |
+| commoncrawl | 1 | 61 MB/s | 5.4 MB/s | 94 MB/s |
+| commoncrawl | all | 168 MB/s | 15.0 MB/s | 238 MB/s |
 
 Gemma has no split pattern, so the core cuts text wherever no token can cross:
 between two bytes no token holds side by side. Pieces come out about as short as

@@ -93,7 +93,7 @@ EmbeddingGemma 2 server (311 texts, 290k tokens).
   the model; pass `with_special=True` to count them that way.
 - `▁` (U+2581) counts as a space, because that's how Gemma reads it.
   `truncate` still returns a prefix of the text you passed.
-- Speed: 0.65–0.85× of `cl100k_base`, and 16–54× faster than `tokenizers`
+- Speed: 0.6–0.8× of `cl100k_base`, and 11–43× faster than `tokenizers`
   ([numbers](docs/BENCHMARKS.md#embeddinggemma-2)). `tools/gen_embeddinggemma2.py`
   builds the data from the model's tokenizer.json.
 
