@@ -34,6 +34,9 @@ pub enum Scanner {
     /// Qwen grammar: cl100k's alternatives with single digits and Llama-3
     /// whitespace (whether `\p{M}` joins letters is up to the class table)
     Qwen,
+    /// Gemma (embeddinggemma-2): no split pattern. Text is cut only before a
+    /// space that follows a non-space, which no token straddles.
+    Gemma,
 }
 
 /// Monotonic source for [`Tokenizer::id`].
@@ -55,6 +58,7 @@ pub struct Tokenizer {
     pub(crate) u: UClass,         // cl100k-pattern classes (L/N/S)
     uo: UClassO,                  // o200k-pattern classes (L/N/S/UPPER/LOWER)
     specials: Vec<(String, u32)>, // sorted by id
+    cut: Vec<u64>,                // Gemma: byte pairs no token joins (Vocab::cut_table)
 }
 
 fn load_specials(path: &Path) -> Result<Vec<(String, u32)>, VocabError> {
@@ -97,8 +101,9 @@ impl Tokenizer {
     /// Construct a bundled encoding from the tables embedded in the binary — no
     /// data directory, no download, no network.
     ///
-    /// Names: `cl100k_base` (GPT-3.5/GPT-4), `o200k_base` (GPT-4o), and
-    /// `o200k_harmony` (GPT-OSS). Requires the default `embedded-data` feature.
+    /// Names: `cl100k_base` (GPT-3.5/GPT-4), `o200k_base` (GPT-4o),
+    /// `o200k_harmony` (GPT-OSS), `qwen3.5` and `embeddinggemma-2`. Requires the
+    /// default `embedded-data` feature.
     ///
     /// ```
     /// let tok = toktok::Tokenizer::builtin("cl100k_base").unwrap();
@@ -118,6 +123,7 @@ impl Tokenizer {
                 Scanner::O200k,
             ),
             "qwen3.5" => (data::QWEN35_VOCAB, data::QWEN35_SPECIAL, Scanner::Qwen),
+            "embeddinggemma-2" => (data::EG2_VOCAB, data::EG2_SPECIAL, Scanner::Gemma),
             _ => return Err(unknown_encoding(encoding)),
         };
         let (u, uo) = match scanner {
@@ -133,9 +139,16 @@ impl Tokenizer {
                 UClass::empty(),
                 UClassO::from_bytes(data::UNICLASS_O200K, "uniclass_o200k.bin")?,
             ),
+            Scanner::Gemma => (UClass::empty(), UClassO::empty()),
         };
+        let v = Vocab::from_bytes(vocab, encoding)?;
         Ok(Tokenizer {
-            v: Vocab::from_bytes(vocab, encoding)?,
+            cut: if scanner == Scanner::Gemma {
+                v.cut_table()
+            } else {
+                Vec::new()
+            },
+            v,
             id: next_tokenizer_id(),
             name: encoding.to_string(),
             scanner,
@@ -147,7 +160,8 @@ impl Tokenizer {
 
     /// Load a bundled encoding from a data directory.
     ///
-    /// Built-in: `cl100k_base`, `o200k_base`, `o200k_harmony`.
+    /// Built-in: `cl100k_base`, `o200k_base`, `o200k_harmony`, `qwen3.5`,
+    /// `embeddinggemma-2`.
     pub fn load_dir(dir: impl AsRef<Path>, encoding: &str) -> Result<Tokenizer, VocabError> {
         let dir: PathBuf = dir.as_ref().to_path_buf();
         let (vocab_file, specials_file, scanner) = match encoding {
@@ -157,6 +171,7 @@ impl Tokenizer {
             // reuses o200k.vocab and the o200k scanner) — only the specials differ.
             "o200k_harmony" => ("o200k.vocab", "o200k_harmony.special", Scanner::O200k),
             "qwen3.5" => ("qwen35.vocab", "qwen35.special", Scanner::Qwen),
+            "embeddinggemma-2" => ("eg2.vocab", "eg2.special", Scanner::Gemma),
             _ => return Err(unknown_encoding(encoding)),
         };
         let v = Vocab::load(&dir.join(vocab_file))?;
@@ -170,8 +185,14 @@ impl Tokenizer {
                 UClass::load(&dir.join("uniclass_qwen35.bin"))?,
                 UClassO::empty(),
             ),
+            Scanner::Gemma => (UClass::empty(), UClassO::empty()),
         };
         Ok(Tokenizer {
+            cut: if scanner == Scanner::Gemma {
+                v.cut_table()
+            } else {
+                Vec::new()
+            },
             v,
             id: next_tokenizer_id(),
             name: encoding.to_string(),
@@ -274,6 +295,15 @@ impl Tokenizer {
             Scanner::Cl100k => self.encode_core_cl100k::<false>(text, out, pc),
             Scanner::O200k => self.encode_core_o200k(text, out, pc),
             Scanner::Qwen => self.encode_core_cl100k::<true>(text, out, pc),
+            Scanner::Gemma => {
+                let start = out.len();
+                if !self.encode_core_gemma(text, out, pc) {
+                    // a literal U+2581: fold it to the space it means, start over
+                    out.truncate(start);
+                    let t = gemma_spaces(text).unwrap_or_else(|| text.to_vec());
+                    self.encode_core_gemma(&t, out, pc);
+                }
+            }
         })
     }
 
@@ -287,6 +317,14 @@ impl Tokenizer {
     ///
     /// See [`Tokenizer::truncate`].
     pub fn truncate(&self, text: &[u8], max_tokens: usize) -> Truncation {
+        if self.scanner == Scanner::Gemma {
+            if let Some(t) = gemma_spaces(text) {
+                // cut the folded text, then find the same spot in the original
+                let mut r = self.truncate(&t, max_tokens);
+                r.bytes = unfold_offset(text, r.bytes);
+                return r;
+            }
+        }
         crate::scratch::with_ids(|ids| {
             ids.clear();
             self.encode_into(text, ids);
@@ -342,6 +380,11 @@ impl Tokenizer {
         for &id in &ids {
             off += self.v.token_len(id);
             bounds.push(off);
+        }
+        if self.scanner == Scanner::Gemma && gemma_spaces(text).is_some() {
+            for b in bounds.iter_mut() {
+                *b = unfold_offset(text, *b as usize) as u32;
+            }
         }
         (ids, bounds)
     }
@@ -432,6 +475,82 @@ impl Tokenizer {
         } else {
             pc.emit(&self.v, piece, out);
         }
+    }
+
+    /// Gemma has no split pattern, so cut wherever no token can straddle: between
+    /// two bytes no producible token holds side by side (`self.cut`). That is
+    /// before almost every space (`>▁</` is the one token with a space after its
+    /// first character), around newlines, and between most punctuation and
+    /// letters, so pieces come out about as short as cl100k's and the pretoken
+    /// cache works.
+    ///
+    /// A piece holding a long run of one whitespace character takes the exact
+    /// merge-by-merge encoder: Gemma's run merges sit at the top of its list,
+    /// listed longest first, and once a run outgrows its longest token (31) the
+    /// backtracking check misjudges how the leftovers pair up. Runs up to 30
+    /// never go wrong (checked against `tokenizers` in every context tried), so
+    /// 24 leaves a margin and keeps most code indentation on the fast path.
+    ///
+    /// Returns false, part way, on meeting a literal U+2581 (E2 96 81).
+    fn encode_core_gemma(&self, t: &[u8], out: &mut Vec<u32>, pc: &mut PretokenCache) -> bool {
+        const EXACT_RUN: u32 = 24;
+        let (mut s, mut prev, mut run, mut exact) = (0usize, 0u8, 0u32, false);
+        for (i, &b) in t.iter().enumerate() {
+            if b == 0x81 && prev == 0x96 && i >= 2 && t[i - 2] == 0xE2 {
+                return false;
+            }
+            let k = (prev as usize) << 8 | b as usize;
+            // SAFETY: cut has 1024 words and k < 65536
+            if i > s && unsafe { *self.cut.get_unchecked(k >> 6) } >> (k & 63) & 1 != 0 {
+                self.gemma_piece(&t[s..i], exact, out, pc);
+                (s, exact) = (i, false);
+            }
+            run = if b == prev { run + 1 } else { 1 };
+            exact |= run >= EXACT_RUN && matches!(b, b' ' | b'\n' | b'\t');
+            prev = b;
+        }
+        if s < t.len() {
+            self.gemma_piece(&t[s..], exact, out, pc);
+        }
+        true
+    }
+
+    #[inline(always)]
+    fn gemma_piece(&self, piece: &[u8], exact: bool, out: &mut Vec<u32>, pc: &mut PretokenCache) {
+        if exact {
+            self.exact_memo(piece, out);
+        } else {
+            self.merge_piece(piece, out, pc);
+        }
+    }
+
+    /// `encode_exact`, remembered per thread: code repeats the same long
+    /// indentation + keyword pieces over and over.
+    #[cold]
+    fn exact_memo(&self, piece: &[u8], out: &mut Vec<u32>) {
+        use std::cell::RefCell;
+        use std::collections::HashMap;
+        type Memo = (u64, HashMap<Box<[u8]>, Box<[u32]>>);
+        thread_local!(static MEMO: RefCell<Memo> = RefCell::new((0, HashMap::new())));
+        // ponytail: cleared when full instead of LRU; 4096 pieces covers a
+        // codebase's indentation patterns, raise it if profiles say otherwise
+        const CAP: usize = 4096;
+        MEMO.with(|m| {
+            let (id, map) = &mut *m.borrow_mut();
+            if *id != self.id {
+                (*id, *map) = (self.id, HashMap::new());
+            }
+            if let Some(ids) = map.get(piece) {
+                out.extend_from_slice(ids);
+                return;
+            }
+            let start = out.len();
+            self.v.encode_exact(piece, out);
+            if map.len() >= CAP {
+                map.clear();
+            }
+            map.insert(piece.into(), out[start..].into());
+        })
     }
 
     /// cl100k's machine; `QWEN` swaps in Qwen's two differences — one digit
@@ -738,6 +857,42 @@ impl Tokenizer {
 fn at(t: &[u8], i: usize) -> u8 {
     debug_assert!(i < t.len());
     unsafe { *t.get_unchecked(i) }
+}
+
+/// Gemma reads U+2581 (`▁`, E2 96 81) as a space: it turns spaces into it
+/// before BPE. The vocab stores spaces, so fold the rare literal one the same
+/// way; `None` when there is none.
+fn gemma_spaces(t: &[u8]) -> Option<Vec<u8>> {
+    let hit = |i: usize| t[i] == 0xE2 && t[i + 1] == 0x96 && t[i + 2] == 0x81;
+    if t.len() < 3 || !(0..t.len() - 2).any(hit) {
+        return None;
+    }
+    let mut o = Vec::with_capacity(t.len());
+    let mut i = 0;
+    while i < t.len() {
+        if i + 2 < t.len() && hit(i) {
+            o.push(b' ');
+            i += 3;
+        } else {
+            o.push(t[i]);
+            i += 1;
+        }
+    }
+    Some(o)
+}
+
+/// Offset `off` in `gemma_spaces(t)`, as an offset in `t`.
+fn unfold_offset(t: &[u8], off: usize) -> usize {
+    let (mut i, mut j) = (0usize, 0usize);
+    while j < off {
+        i += if i + 2 < t.len() && t[i] == 0xE2 && t[i + 1] == 0x96 && t[i + 2] == 0x81 {
+            3
+        } else {
+            1
+        };
+        j += 1;
+    }
+    i
 }
 
 fn unknown_encoding(encoding: &str) -> VocabError {

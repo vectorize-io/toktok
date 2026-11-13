@@ -2,7 +2,7 @@
 //!
 //! `Tokenizer::builtin("cl100k_base")` needs no data directory, no download and
 //! no network — the vocab, special-token and Unicode-class tables are compiled
-//! in (about 4 MB of `.rodata`, shared across every process that loads them).
+//! in (about 13 MB of `.rodata`, shared across every process that loads them).
 //!
 //! Turn the `embedded-data` feature off to drop them and load from a directory
 //! with [`Tokenizer::load_dir`] instead.
@@ -10,7 +10,13 @@
 /// Names of the encodings this build can construct with [`Tokenizer::builtin`].
 ///
 /// [`Tokenizer::builtin`]: crate::Tokenizer::builtin
-pub const BUILTIN_ENCODINGS: &[&str] = &["cl100k_base", "o200k_base", "o200k_harmony", "qwen3.5"];
+pub const BUILTIN_ENCODINGS: &[&str] = &[
+    "cl100k_base",
+    "o200k_base",
+    "o200k_harmony",
+    "qwen3.5",
+    "embeddinggemma-2",
+];
 
 #[cfg(feature = "embedded-data")]
 pub(crate) mod data {
@@ -22,6 +28,8 @@ pub(crate) mod data {
     pub const QWEN35_VOCAB: &[u8] = include_bytes!("../data/qwen35.vocab");
     pub const QWEN35_SPECIAL: &[u8] = include_bytes!("../data/qwen35.special");
     pub const UNICLASS_QWEN35: &[u8] = include_bytes!("../data/uniclass_qwen35.bin");
+    pub const EG2_VOCAB: &[u8] = include_bytes!("../data/eg2.vocab");
+    pub const EG2_SPECIAL: &[u8] = include_bytes!("../data/eg2.special");
     pub const UNICLASS: &[u8] = include_bytes!("../data/uniclass.bin");
     pub const UNICLASS_O200K: &[u8] = include_bytes!("../data/uniclass_o200k.bin");
 }

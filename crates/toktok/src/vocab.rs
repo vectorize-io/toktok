@@ -22,6 +22,10 @@ use std::io::Read;
 use std::sync::atomic::{AtomicU16, AtomicU32, Ordering};
 
 pub const RANK_MAX: u32 = u32::MAX;
+// pair_lookup value width: a token id, or a merge rank (embeddinggemma-2 has
+// 514,906 merges plus its starting symbols, past 19 bits)
+const PL_VALBITS: u32 = 20;
+const PL_VALMASK: u64 = (1 << PL_VALBITS) - 1;
 
 // memo capacity. 2^20 peak on M1; x86 wants 2^21 for the wide-id memo.
 const IVBITS: u32 = 20;
@@ -85,7 +89,20 @@ pub struct Vocab {
     /// Qwen3.5 has merges whose parts form after the token they make, and those
     /// fire as soon as the later part exists.
     order: Vec<u32>,
-    // pair_lookup, flat open-addressing, ONE u64/slot: ((t1<<18|t2)+1)<<19 | rank
+    /// Pair table holds each merge's own firing rank, not the merged token
+    /// (embeddinggemma-2: one token can be built by several merges, each with
+    /// its own priority). `order` then holds each token's building merge rank.
+    pair_rank: bool,
+    // with pair_rank, plk maps a pair to its merge's firing rank (what
+    // is_valid_token_pair compares); per firing rank - nbase, the merge's list
+    // index (the exact encoder's priority) and the token it makes
+    fraw: Vec<u32>,
+    fout: Vec<u32>,
+    // starting symbols, for the exact encoder: a byte's fallback token, and how
+    // many ids rank as starting symbols (order[id] < nbase)
+    byte_tok: Vec<u32>,
+    nbase: u32,
+    // pair_lookup, flat open-addressing, ONE u64/slot: ((t1<<18|t2)+1)<<20 | rank
     plk: Vec<u64>,
     plmask: u32,
     // dense direct-mapped memo for is_valid_token_pair: u16/slot,
@@ -131,27 +148,27 @@ impl Vocab {
     #[inline(always)]
     fn pl_get(&self, key: u64) -> u32 {
         let mut i = (key.wrapping_mul(HMUL) >> 40) as u32 & self.plmask;
-        let want = (key + 1) << 19;
+        let want = (key + 1) << PL_VALBITS;
         loop {
             let s = unsafe { *self.plk.get_unchecked(i as usize) };
             if s == 0 {
                 return RANK_MAX;
             }
-            if s & !0x7FFFF == want {
-                return (s & 0x7FFFF) as u32;
+            if s & !PL_VALMASK == want {
+                return (s & PL_VALMASK) as u32;
             }
             i = (i + 1) & self.plmask;
         }
     }
     fn pl_put(&mut self, key: u64, val: u32) {
         let mut i = (key.wrapping_mul(HMUL) >> 40) as u32 & self.plmask;
-        let want = (key + 1) << 19;
+        let want = (key + 1) << PL_VALBITS;
         loop {
             let s = self.plk[i as usize];
             if s == 0 {
                 break;
             }
-            if s & !0x7FFFF == want {
+            if s & !PL_VALMASK == want {
                 self.plk[i as usize] = want | val as u64;
                 return;
             }
@@ -326,7 +343,7 @@ impl Vocab {
         let mut limit = RANK_MAX;
         loop {
             let c = self.pl_get(((t1 as u64) << 18) | t2 as u64);
-            if c != RANK_MAX && self.order(c) < limit {
+            if c != RANK_MAX && (if self.pair_rank { c } else { self.order(c) }) < limit {
                 return false;
             }
             let (o1, o2) = (t1, t2);
@@ -351,6 +368,101 @@ impl Vocab {
                     }
                 }
             }
+        }
+    }
+
+    /// Byte pairs no producible token contains, as a 256x256 bit table
+    /// (`prev << 8 | next`): BPE can never merge across one, so text can be cut
+    /// there and each side encoded alone. Only for vocabs with a merge list.
+    pub fn cut_table(&self) -> Vec<u64> {
+        let mut joined = vec![0u64; 1024];
+        for id in 0..self.n as usize {
+            if self.order[id] == RANK_MAX {
+                continue; // never produced
+            }
+            for w in self.token_bytes(id as u32).windows(2) {
+                let k = (w[0] as usize) << 8 | w[1] as usize;
+                joined[k >> 6] |= 1 << (k & 63);
+            }
+        }
+        joined.iter().map(|w| !w).collect()
+    }
+
+    /// Hugging Face's BPE, merge by merge: lowest list rank first, leftmost on
+    /// ties, starting from characters with byte fallback. Only for vocabs with
+    /// a merge list (`MRG1`); embeddinggemma-2 sends long whitespace runs here,
+    /// where many equal merges race and the backtracking check can't tell.
+    pub fn encode_exact(&self, text: &[u8], out: &mut Vec<u32>) {
+        use std::cmp::Reverse;
+        use std::collections::BinaryHeap;
+        debug_assert!(self.pair_rank);
+        // (id, prev, next); a merged-away symbol gets id RANK_MAX
+        let mut sym: Vec<(u32, u32, u32)> = Vec::with_capacity(text.len());
+        let mut i = 0;
+        while i < text.len() {
+            if text[i] < 0x80 {
+                // the character's token, or its byte's when the vocab lacks it
+                sym.push((self.byte_tok[text[i] as usize], 0, 0));
+                i += 1;
+                continue;
+            }
+            let l = utf8_len(&text[i..]);
+            let id = self.find_id(&text[i..i + l]);
+            if id != RANK_MAX && self.order[id as usize] < self.nbase {
+                sym.push((id, 0, 0));
+            } else {
+                for &b in &text[i..i + l] {
+                    sym.push((self.byte_tok[b as usize], 0, 0));
+                }
+            }
+            i += l;
+        }
+        let n = sym.len() as u32;
+        for (k, s) in sym.iter_mut().enumerate() {
+            s.1 = (k as u32).wrapping_sub(1);
+            s.2 = k as u32 + 1;
+        }
+        // list index of the merge (a, b): its priority here
+        let rank = |a: u32, b: u32| match self.pl_get(((a as u64) << 18) | b as u64) {
+            RANK_MAX => RANK_MAX,
+            f => self.fraw[(f - self.nbase) as usize],
+        };
+        let mut heap = BinaryHeap::new();
+        for k in 0..n.saturating_sub(1) {
+            let r = rank(sym[k as usize].0, sym[k as usize + 1].0);
+            if r != RANK_MAX {
+                heap.push(Reverse((r, k)));
+            }
+        }
+        while let Some(Reverse((r, k))) = heap.pop() {
+            let (a, _, nx) = sym[k as usize];
+            if a == RANK_MAX || nx >= n || rank(a, sym[nx as usize].0) != r {
+                continue; // stale: a side was merged since this was queued
+            }
+            let nn = sym[nx as usize].2;
+            let f = self.pl_get(((a as u64) << 18) | sym[nx as usize].0 as u64);
+            sym[k as usize].0 = self.fout[(f - self.nbase) as usize];
+            sym[k as usize].2 = nn;
+            sym[nx as usize].0 = RANK_MAX;
+            if nn < n {
+                sym[nn as usize].1 = k;
+                let r2 = rank(sym[k as usize].0, sym[nn as usize].0);
+                if r2 != RANK_MAX {
+                    heap.push(Reverse((r2, k)));
+                }
+            }
+            let pv = sym[k as usize].1;
+            if pv < n {
+                let r2 = rank(sym[pv as usize].0, sym[k as usize].0);
+                if r2 != RANK_MAX {
+                    heap.push(Reverse((r2, pv)));
+                }
+            }
+        }
+        let mut k = 0u32;
+        while k < n {
+            out.push(sym[k as usize].0);
+            k = sym[k as usize].2;
         }
     }
 
@@ -476,6 +588,7 @@ impl Vocab {
             ("otab (odd tokens)", v(&self.otab)),
             ("split", v(&self.split)),
             ("order", v(&self.order)),
+            ("merge list", v(&self.fraw) + v(&self.fout)),
             ("npm", v(&self.npm)),
             (
                 "token bytes",
@@ -507,6 +620,8 @@ impl Vocab {
             + v(&self.npm)
             + v(&self.split)
             + v(&self.order)
+            + v(&self.fraw)
+            + v(&self.fout)
             + v(&self.plk)
             + v(&self.ivm)
             + v(&self.ivmw)
@@ -638,14 +753,32 @@ impl Vocab {
         // left part of that token's merge (0 = no merge). Vocabs whose merge list
         // isn't the one rank order implies (Qwen3.5) ship it, and a token with
         // no merge is one their BPE can never produce, so it is never matched.
+        // Then optionally `MRG1`, u32 count, and per merge in list order one
+        // u32: merged id | left part's byte length << 24. Merges then rank by
+        // that list, not by id (embeddinggemma-2), and SPL1's 255 marks a
+        // starting symbol (a character, which can be several bytes).
         let mut hsplit: Option<&[u8]> = None;
+        let mut prk: Option<&[u8]> = None;
         if p != raw.len() {
-            if raw.len() - p != 4 + n_us || &raw[p..p + 4] != b"SPL1" {
+            if raw.len() - p < 4 + n_us || &raw[p..p + 4] != b"SPL1" {
                 return Err(fail("trailing bytes"));
             }
-            hsplit = Some(&raw[p + 4..]);
+            hsplit = Some(&raw[p + 4..p + 4 + n_us]);
+            let q = p + 4 + n_us;
+            if q != raw.len() {
+                if raw.len() - q < 8 || &raw[q..q + 4] != b"MRG1" {
+                    return Err(fail("trailing bytes"));
+                }
+                let cnt = u32::from_le_bytes(raw[q + 4..q + 8].try_into().unwrap()) as usize;
+                if raw.len() - q - 8 != cnt * 4 || cnt + n_us > PL_VALMASK as usize {
+                    return Err(fail("bad merge list"));
+                }
+                prk = Some(&raw[q + 8..]);
+            }
         }
-        let reachable = |id: usize| hsplit.map_or(true, |h| h[id] != 0 || tb[id].len() == 1);
+        let base = |id: usize| prk.is_some() && hsplit.is_some_and(|h| h[id] == 255);
+        let reachable =
+            |id: usize| hsplit.map_or(true, |h| h[id] != 0 || (prk.is_none() && tb[id].len() == 1));
 
         let mut v = Vocab {
             all: Vec::new(),
@@ -663,6 +796,11 @@ impl Vocab {
             npm: Vec::new(),
             split: Vec::new(),
             order: Vec::new(),
+            pair_rank: prk.is_some(),
+            fraw: Vec::new(),
+            fout: Vec::new(),
+            byte_tok: Vec::new(),
+            nbase: 0,
             plk: Vec::new(),
             plmask: 0,
             ivm: Vec::new(),
@@ -683,7 +821,12 @@ impl Vocab {
         for id in 0..n_us {
             v.all.extend_from_slice(tb[id]);
             v.tstart.push(v.all.len() as u32);
-            v.b2id.insert(tb[id].to_vec().into_boxed_slice(), id as u32);
+            // two ids can share bytes (a byte token and the character it is);
+            // the one BPE produces wins
+            let key = tb[id].to_vec().into_boxed_slice();
+            if reachable(id) || !v.b2id.contains_key(&key) {
+                v.b2id.insert(key, id as u32);
+            }
         }
         v.tlen = (0..n_us)
             .map(|id| (v.tstart[id + 1] - v.tstart[id]) as u8)
@@ -885,11 +1028,14 @@ impl Vocab {
                     best = tk;
                 }
             }
-            v.npm[id] = best;
+            // a starting symbol is never cut: a character in the vocab never
+            // comes out as its bytes
+            v.npm[id] = if base(id) { RANK_MAX } else { best };
         }
         // split_table + pair_lookup (ids in rank order)
         let mut pcap = 1usize;
-        while pcap < n_us * 2 {
+        let npairs = prk.map_or(0, |x| x.len() / 4);
+        while pcap < n_us.max(npairs) * 2 {
             pcap <<= 1;
         }
         v.plk = vec![0u64; pcap];
@@ -909,7 +1055,7 @@ impl Vocab {
             let t = tb[id];
             if let Some(h) = hsplit {
                 let l1 = h[id] as usize;
-                let (a, b) = if l1 == 0 || l1 >= t.len() {
+                let (a, b) = if l1 == 0 || l1 >= t.len() || base(id) {
                     (id as u32, id as u32)
                 } else {
                     (v.find_id(&t[..l1]), v.find_id(&t[l1..]))
@@ -917,7 +1063,7 @@ impl Vocab {
                 if a == RANK_MAX || b == RANK_MAX {
                     return Err(fail("bad merge"));
                 }
-                if a != id as u32 {
+                if a != id as u32 && prk.is_none() {
                     v.pl_put(((a as u64) << 18) | b as u64, id as u32);
                 }
                 v.split.push((a, b));
@@ -944,7 +1090,74 @@ impl Vocab {
                 v.split.push((id as u32, id as u32));
             }
         }
-        if hsplit.is_some() {
+        if let Some(prk) = prk {
+            let m = prk.len() / 4;
+            let mut pairs = Vec::with_capacity(m);
+            let mut mout = Vec::with_capacity(m);
+            for (r, c) in prk.chunks_exact(4).enumerate() {
+                let w = u32::from_le_bytes(c.try_into().unwrap());
+                let (out, l) = ((w & 0xFF_FFFF) as usize, (w >> 24) as usize);
+                if out >= n_us || l == 0 || l >= tb[out].len() {
+                    return Err(fail("bad merge"));
+                }
+                let (a, b) = (v.find_id(&tb[out][..l]), v.find_id(&tb[out][l..]));
+                if a == RANK_MAX || b == RANK_MAX {
+                    return Err(fail("bad merge"));
+                }
+                let key = ((a as u64) << 18) | b as u64;
+                if v.pl_get(key) != RANK_MAX {
+                    return Err(fail("repeated merge"));
+                }
+                v.pl_put(key, r as u32);
+                pairs.push((a, b));
+                mout.push(out as u32);
+            }
+            // starting symbols rank first, then the merges as they fire
+            v.order = vec![RANK_MAX; n_us];
+            v.byte_tok = vec![RANK_MAX; 256];
+            let mut next = 0u32;
+            for id in 0..n_us {
+                if base(id) {
+                    v.order[id] = next;
+                    next += 1;
+                    if tb[id].len() == 1 {
+                        v.byte_tok[tb[id][0] as usize] = id as u32;
+                    }
+                }
+            }
+            // a byte its character token covers falls back to that token
+            for b in 0..128usize {
+                if v.byte_tok[b] == RANK_MAX {
+                    v.byte_tok[b] = v.find_id(&[b as u8]);
+                }
+            }
+            v.nbase = next;
+            let mut built = vec![RANK_MAX; m]; // merge -> the token it builds, if canonical
+            for id in 0..n_us {
+                let (a, b) = v.split[id];
+                if a != id as u32 {
+                    let r = v.pl_get(((a as u64) << 18) | b as u64);
+                    if r == RANK_MAX {
+                        return Err(fail("token built by a merge not in the list"));
+                    }
+                    built[r as usize] = id as u32;
+                }
+            }
+            let fire = fire_order(&pairs, &built, &v.order, next);
+            (v.fraw, v.fout) = (vec![0; m], vec![0; m]);
+            for (r, &(a, b)) in pairs.iter().enumerate() {
+                let f = fire[r];
+                v.pl_put(((a as u64) << 18) | b as u64, f);
+                v.fraw[(f - next) as usize] = r as u32;
+                v.fout[(f - next) as usize] = mout[r];
+            }
+            for id in 0..n_us {
+                let (a, b) = v.split[id];
+                if a != id as u32 {
+                    v.order[id] = v.pl_get(((a as u64) << 18) | b as u64);
+                }
+            }
+        } else if hsplit.is_some() {
             v.order = merge_order(&v.split);
         }
         // is_valid_token_pair is only PURE once split/pair_lookup are complete;
@@ -1007,6 +1220,51 @@ impl Vocab {
     }
 }
 
+/// When each merge fires, as a rank after the `first` starting symbols
+/// (`order[id] != RANK_MAX` marks those). A merge listed before one of its
+/// parts exists fires right after that part forms, ahead of anything listed
+/// later. `built[r]` is the token merge `r` builds as that token's own last
+/// merge. A merge whose parts never form never fires; those rank last.
+fn fire_order(pairs: &[(u32, u32)], built: &[u32], order: &[u32], first: u32) -> Vec<u32> {
+    use std::cmp::Reverse;
+    use std::collections::BinaryHeap;
+    let m = pairs.len();
+    let mut fire = vec![RANK_MAX; m];
+    let mut made: Vec<bool> = order.iter().map(|&o| o != RANK_MAX).collect();
+    let mut done = vec![false; m];
+    let mut waiting: HashMap<u32, Vec<u32>> = HashMap::new();
+    let mut ready = BinaryHeap::new();
+    let mut next = first;
+    for r in 0..m as u32 {
+        ready.push(Reverse(r));
+        while let Some(Reverse(q)) = ready.pop() {
+            if done[q as usize] {
+                continue;
+            }
+            let (a, b) = pairs[q as usize];
+            if let Some(p) = [a, b].into_iter().find(|&p| !made[p as usize]) {
+                waiting.entry(p).or_default().push(q);
+                continue;
+            }
+            done[q as usize] = true;
+            fire[q as usize] = next;
+            next += 1;
+            let t = built[q as usize];
+            if t != RANK_MAX && !made[t as usize] {
+                made[t as usize] = true;
+                if let Some(w) = waiting.remove(&t) {
+                    ready.extend(w.into_iter().map(Reverse));
+                }
+            }
+        }
+    }
+    for f in fire.iter_mut().filter(|f| **f == RANK_MAX) {
+        *f = next;
+        next += 1;
+    }
+    fire
+}
+
 /// Each token's merge priority, as a BPE that applies the lowest-ranked merge
 /// first sees it. A merge ranked below one of its parts can only fire once that
 /// part exists, and then fires straight away, ahead of anything ranked higher —
@@ -1045,4 +1303,23 @@ fn merge_order(split: &[(u32, u32)]) -> Vec<u32> {
         }
     }
     order
+}
+
+/// Byte length of the UTF-8 character `t` starts with; 1 for a byte that
+/// doesn't start a well-formed one (it then falls back to its byte token).
+fn utf8_len(t: &[u8]) -> usize {
+    let l = match t[0] {
+        0xC2..=0xDF => 2,
+        0xE0..=0xEF => 3,
+        0xF0..=0xF4 => 4,
+        _ => 1,
+    };
+    if l > t.len()
+        || t[1..l].iter().any(|&b| b & 0xC0 != 0x80)
+        || std::str::from_utf8(&t[..l]).is_err()
+    {
+        1
+    } else {
+        l
+    }
 }

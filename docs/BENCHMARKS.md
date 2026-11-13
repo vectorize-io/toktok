@@ -149,6 +149,28 @@ two reasons: Qwen's larger vocabulary makes non-Latin pieces cost more (o200k
 shows the same), and about 1 text in 20 there really needs NFC, which Python's
 `unicodedata` does.
 
+## `embeddinggemma-2`
+
+Against Hugging Face `tokenizers`, the reference it matches; ids are checked
+identical before timing. From the **Benchmarks** workflow (GitHub's
+`ubuntu-latest` runner, Python 3.14, `batch_count` over 20 000-character texts,
+best of 5):
+
+| corpus | threads | embeddinggemma-2 | tokenizers | cl100k_base |
+|---|---:|---:|---:|---:|
+| pile | 1 | 176 MB/s | 4.1 MB/s | 218 MB/s |
+| pile | all | 255 MB/s | 11.3 MB/s | 344 MB/s |
+| code | 1 | 135 MB/s | 4.4 MB/s | 225 MB/s |
+| code | all | 305 MB/s | 11.7 MB/s | 415 MB/s |
+| commoncrawl | 1 | 61 MB/s | 5.4 MB/s | 94 MB/s |
+| commoncrawl | all | 168 MB/s | 15.0 MB/s | 238 MB/s |
+
+Gemma has no split pattern, so the core cuts text wherever no token can cross:
+between two bytes no token holds side by side. Pieces come out about as short as
+cl100k's, and the pretoken cache works. A run of 24 or more spaces, newlines or
+tabs goes through an exact merge-by-merge encoder instead. That costs code
+some speed, since its deep indentation is such a run.
+
 ## Reproducing
 
 The **Benchmarks** workflow runs the whole set on a runner — manual dispatch,
@@ -177,6 +199,9 @@ uv run python bench/jev.py
 
 # qwen3.5 against tokenizers (needs bigpickle's tokenizer.json)
 uv run --with tokenizers python bench/qwen.py path/to/tokenizer.json
+
+# embeddinggemma-2 against tokenizers (google/embeddinggemma-2's tokenizer.json)
+uv run --with tokenizers python bench/embeddinggemma.py path/to/tokenizer.json
 ```
 
 The corpora are The Pile (diverse English), GitHub code, and Common Crawl

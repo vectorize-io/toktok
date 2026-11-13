@@ -64,9 +64,9 @@ jobs:
           key: corpus-v1-${{ hashFiles('bench/fetch_corpus.py') }}
       - name: Fetch corpora
         if: steps.corpus-cache.outputs.cache-hit != 'true'
-        run: |
-          uv sync --group bench
-          uv run python bench/fetch_corpus.py
+        # only what the fetcher imports: syncing the whole bench group pulls
+        # quicktok-v1, which has no wheel for the runner's Python
+        run: uv run --no-project --with datasets --with zstandard python bench/fetch_corpus.py
 
       - name: toktok vs bpe-openai vs tiktoken-rs
         run: |
@@ -126,9 +126,9 @@ jobs:
           key: corpus-v1-${{ hashFiles('bench/fetch_corpus.py') }}
       - name: Fetch corpora
         if: steps.corpus-cache.outputs.cache-hit != 'true'
-        run: |
-          uv sync --group bench
-          uv run python bench/fetch_corpus.py
+        # only what the fetcher imports: syncing the whole bench group pulls
+        # quicktok-v1, which has no wheel for the runner's Python
+        run: uv run --no-project --with datasets --with zstandard python bench/fetch_corpus.py
 
       - name: Build
         # Both comparison groups are best-effort and independent: quicktok-v1 has
@@ -156,6 +156,16 @@ jobs:
         env:
           CORPORA: ${{ inputs.corpora || 'pile' }}
 
+      - name: embeddinggemma-2 vs Hugging Face tokenizers
+        # one interpreter is enough: this compares encodings, not Pythons
+        if: matrix.python == '3.14'
+        run: |
+          curl -sfL -o "$RUNNER_TEMP/eg2.json" \
+            https://huggingface.co/google/embeddinggemma-2/resolve/main/tokenizer.json
+          uv run --python ${{ matrix.python }} --with tokenizers \
+            python bench/embeddinggemma.py "$RUNNER_TEMP/eg2.json" \
+            | tee "python-bench-eg2-${{ matrix.python }}.txt"
+
       - name: Memory, CPU and latency percentiles
         run: |
           uv run --python ${{ matrix.python }} \
@@ -167,7 +177,7 @@ jobs:
       - name: Summarize
         if: always()
         run: |
-          for f in python-bench-${{ matrix.python }}.txt profile-${{ matrix.python }}.txt; do
+          for f in python-bench-${{ matrix.python }}.txt python-bench-eg2-${{ matrix.python }}.txt profile-${{ matrix.python }}.txt; do
             [ -s "$f" ] || continue
             {
               echo "<details><summary>Python ${{ matrix.python }} — $f</summary>"
@@ -181,4 +191,5 @@ jobs:
           name: bench-python-${{ matrix.python }}
           path: |
             python-bench-${{ matrix.python }}.txt
+            python-bench-eg2-${{ matrix.python }}.txt
             profile-${{ matrix.python }}.txt
