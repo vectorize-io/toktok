@@ -64,8 +64,9 @@ jobs:
           key: corpus-v1-${{ hashFiles('bench/fetch_corpus.py') }}
       - name: Fetch corpora
         if: steps.corpus-cache.outputs.cache-hit != 'true'
-        # stdlib only: no sync, so a bench extra without a wheel can't block it
-        run: python3 bench/fetch_corpus.py
+        # only what the fetcher imports: syncing the whole bench group pulls
+        # quicktok-v1, which has no wheel for the runner's Python
+        run: uv run --no-project --with datasets --with zstandard python bench/fetch_corpus.py
 
       - name: toktok vs bpe-openai vs tiktoken-rs
         run: |
@@ -125,8 +126,9 @@ jobs:
           key: corpus-v1-${{ hashFiles('bench/fetch_corpus.py') }}
       - name: Fetch corpora
         if: steps.corpus-cache.outputs.cache-hit != 'true'
-        # stdlib only: no sync, so a bench extra without a wheel can't block it
-        run: python3 bench/fetch_corpus.py
+        # only what the fetcher imports: syncing the whole bench group pulls
+        # quicktok-v1, which has no wheel for the runner's Python
+        run: uv run --no-project --with datasets --with zstandard python bench/fetch_corpus.py
 
       - name: Build
         # Both comparison groups are best-effort and independent: quicktok-v1 has
