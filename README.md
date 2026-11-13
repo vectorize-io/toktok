@@ -50,6 +50,7 @@ into the binary, so there are no data files, downloads or runtime dependencies.
 | `o200k_base` | GPT-4o, GPT-4o mini, GPT-4.1, GPT-5, o1 / o3 / o4-mini |
 | `o200k_harmony` | GPT-OSS (o200k_base's merge ranks plus the harmony special tokens) |
 | `qwen3.5` | Qwen3.5's vocabulary, split the way bigpickle does — exact ids; see below |
+| `embeddinggemma-2` | Google's EmbeddingGemma 2 (Gemma 4's vocabulary) — exact ids; see below |
 | `jev` | TypeSafe's Jev — an **upper-bound estimate**, not exact ids; see below |
 
 An unknown name raises `KeyError` listing the valid ones.
@@ -73,6 +74,28 @@ and against a bigpickle server's own counts (202 texts, 145k tokens).
 - Speed: within 10–25% of `cl100k_base` on English and code, about half on
   multilingual web text, and 70–250× faster than `tokenizers`
   ([numbers](docs/BENCHMARKS.md#qwen35)).
+
+### `embeddinggemma-2`
+
+Exact ids, checked token for token against Hugging Face `tokenizers` on every
+vocab token, every Unicode character, 400k random token sequences and the three
+25 MB benchmark corpora, and against the tokenizer inside Hindsight's
+EmbeddingGemma 2 server (311 texts, 290k tokens).
+
+- What the model reads is more than your text. The server wraps plain text as
+  `<bos>title: none | text: {text}<eos>`, which is **8 + `count(" " + text)`**
+  tokens; text that already starts with `title: ` or `task: ` goes in as is,
+  `2 + count(text)`. The model is trained on 8,192 tokens and the server
+  doesn't cut longer input, so size against that.
+- The server's `usage.prompt_tokens` counts words, not tokens. Don't size
+  requests with it.
+- Special strings such as `<bos>` or `<|turn>` are always read as specials by
+  the model; pass `with_special=True` to count them that way.
+- `▁` (U+2581) counts as a space, because that's how Gemma reads it.
+  `truncate` still returns a prefix of the text you passed.
+- Speed: 0.65–0.85× of `cl100k_base`, and 16–54× faster than `tokenizers`
+  ([numbers](docs/BENCHMARKS.md#embeddinggemma-2)). `tools/gen_embeddinggemma2.py`
+  builds the data from the model's tokenizer.json.
 
 ### `jev` — an upper bound, not an exact count
 
@@ -214,7 +237,7 @@ Every batch method takes the same two knobs as the Python API:
 
 | feature | default | what it does |
 |---|---|---|
-| `embedded-data` | on | compiles the vocabularies into the binary (~4 MB of `.rodata`), so `Tokenizer::builtin()` needs no files at runtime. Turn it off (`default-features = false`) to drop them and load from a directory with `Tokenizer::load_dir(dir, name)` instead. |
+| `embedded-data` | on | compiles the vocabularies into the binary (~13 MB of `.rodata`), so `Tokenizer::builtin()` needs no files at runtime. Turn it off (`default-features = false`) to drop them and load from a directory with `Tokenizer::load_dir(dir, name)` instead. |
 
 ## More
 

@@ -9,7 +9,8 @@ encoding, get back a token count per text. Ids are never materialized.
     # [2, 4]
 
 `encoding` is one of the bundled encodings: cl100k_base, o200k_base,
-o200k_harmony, qwen3.5 — or 'jev', an upper-bound estimate for TypeSafe's Jev.
+o200k_harmony, qwen3.5, embeddinggemma-2 — or 'jev', an upper-bound estimate
+for TypeSafe's Jev.
 
 Encodings are loaded once and cached, and counting releases the GIL and runs
 across threads, so calling this per request is fine.
@@ -70,8 +71,10 @@ def batch_count(
         texts: the strings to count.
         encoding: one of 'cl100k_base' (GPT-3.5, GPT-4, text-embedding-3),
             'o200k_base' (GPT-4o, o-series, GPT-4.1, GPT-5), 'o200k_harmony'
-            (GPT-OSS) or 'qwen3.5' (Qwen3.5's vocab as bigpickle uses it;
-            text is NFC-normalized first). An unknown name raises
+            (GPT-OSS), 'qwen3.5' (Qwen3.5's vocab as bigpickle uses it;
+            text is NFC-normalized first) or 'embeddinggemma-2' (Google's
+            EmbeddingGemma 2; a server adds its prompt and <bos>/<eos>, see
+            the README). An unknown name raises
             KeyError. 'jev' (TypeSafe's
             Jev) is an upper-bound estimate, ~12-19% over on average: safe for
             splitting a payload under Jev's limits, not an exact count.

@@ -1,4 +1,5 @@
-//! Byte-exactness against tiktoken (and Hugging Face `tokenizers` for qwen3.5),
+//! Byte-exactness against tiktoken (and Hugging Face `tokenizers` for qwen3.5
+//! and embeddinggemma-2),
 //! via the fixtures in tests/vectors_*.bin (regenerate with
 //! `python tools/gen_vectors.py`).
 
@@ -41,7 +42,18 @@ fn check(encoding: &str) {
             "{encoding} case {case}: {:?}",
             String::from_utf8_lossy(text)
         );
-        assert_eq!(tok.decode(&got), text, "{encoding} roundtrip case {case}");
+        // Gemma reads U+2581 as the space it decodes to
+        let back = String::from_utf8_lossy(text).replace('\u{2581}', " ");
+        let want_back = if encoding == "embeddinggemma-2" {
+            back.as_bytes()
+        } else {
+            text
+        };
+        assert_eq!(
+            tok.decode(&got),
+            want_back,
+            "{encoding} roundtrip case {case}"
+        );
     }
 }
 
@@ -73,6 +85,35 @@ fn qwen35_specials_and_unmergeable_tokens() {
     let own = tok.token_bytes(104328).unwrap().to_vec();
     assert!(!tok.encode(&own).contains(&104328));
     assert_eq!(tok.decode(&tok.encode(&own)), own);
+}
+
+#[test]
+fn embeddinggemma2_matches_hf_tokenizers() {
+    check("embeddinggemma-2");
+}
+
+#[test]
+fn embeddinggemma2_specials_runs_and_offsets() {
+    let tok = load("embeddinggemma-2");
+    assert_eq!(tok.n_vocab(), 262144);
+    assert_eq!(tok.encode(b"hello world"), [23391, 1902]);
+    // the server's own prompt, as it sends it: <bos> ... <eos> around the text
+    assert_eq!(tok.encode_with_special("<bos>a<eos>"), [2, 236746, 1]);
+    // a 31-space token, then what's left over (the exact path)
+    assert_eq!(tok.encode(&[b' '; 32]), [167, 236743]);
+    // the exact encoder agrees with the fast path wherever both run
+    let doc = "fn main() {\n    let x = 1; // tokens \u{e9}\u{4e2d} \u{1f600}\n}\n".repeat(20);
+    let mut exact = Vec::new();
+    tok.vocab().encode_exact(doc.as_bytes(), &mut exact);
+    assert_eq!(exact, tok.encode(doc.as_bytes()));
+    // U+2581 counts as a space; offsets and cuts land in the original text
+    let t = "a\u{2581}b c\u{2581}\u{2581}d";
+    assert_eq!(tok.encode(t.as_bytes()), tok.encode(b"a b c  d"));
+    let (_, bounds) = tok.encode_with_offsets(t.as_bytes());
+    assert_eq!(*bounds.last().unwrap() as usize, t.len());
+    let cut = tok.truncate(t.as_bytes(), 2);
+    assert_eq!(&t[..cut.bytes], "a\u{2581}b");
+    assert_eq!(cut.total_tokens, tok.encode(b"a b c  d").len());
 }
 
 #[test]
