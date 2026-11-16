@@ -1,15 +1,47 @@
 //! Python bindings for toktok. tiktoken-shaped API; data files ship inside the
 //! wheel (`toktok/data/`) and are resolved by the package at import.
 
-use pyo3::exceptions::{PyKeyError, PyRuntimeError, PyValueError};
+use pyo3::exceptions::{PyKeyError, PyRuntimeError, PyUnicodeEncodeError, PyValueError};
 use pyo3::prelude::*;
 use pyo3::types::{PyBytes, PyList, PySet, PyString, PyTuple};
+use std::borrow::Cow;
 use std::collections::BTreeSet;
 
 use toktok::Tokenizer as Core;
 
 /// Token ids plus one `(start, end)` span per token.
 type IdsAndSpans = (Vec<u32>, Vec<(u32, u32)>);
+
+/// A Python str as UTF-8. A lone surrogate (legal in Python and JSON, not in
+/// UTF-8) becomes U+FFFD the way tiktoken does it, instead of raising. Only a
+/// string that fails the plain conversion pays for the fallback.
+fn utf8<'a>(s: &'a Bound<'_, PyString>) -> PyResult<Cow<'a, str>> {
+    match s.to_cow() {
+        Err(e) if e.is_instance_of::<PyUnicodeEncodeError>(s.py()) => Ok(Cow::Owned(
+            s.call_method1("encode", ("utf-16", "surrogatepass"))?
+                .call_method1("decode", ("utf-16", "replace"))?
+                .extract::<String>()?,
+        )),
+        r => r,
+    }
+}
+
+/// An owned text argument, extracted through `utf8`.
+struct Text(String);
+
+impl std::ops::Deref for Text {
+    type Target = str;
+    fn deref(&self) -> &str {
+        &self.0
+    }
+}
+
+impl FromPyObject<'_, '_> for Text {
+    type Error = PyErr;
+    fn extract(ob: Borrowed<'_, '_, PyAny>) -> PyResult<Self> {
+        Ok(Text(utf8(&*ob.cast::<PyString>()?)?.into_owned()))
+    }
+}
 
 #[pyclass(name = "Tokenizer", module = "toktok._toktok", frozen)]
 struct PyTokenizer {
@@ -78,7 +110,7 @@ impl PyTokenizer {
     fn encode(
         &self,
         py: Python<'_>,
-        text: &str,
+        text: Text,
         allowed_special: Option<&Bound<'_, PyAny>>,
         disallowed_special: Option<&Bound<'_, PyAny>>,
     ) -> PyResult<Vec<u32>> {
@@ -104,13 +136,13 @@ impl PyTokenizer {
             if allow.is_empty() {
                 self.inner.encode(text.as_bytes())
             } else {
-                self.inner.encode_allowed(text, |s| allow.contains(s))
+                self.inner.encode_allowed(&text, |s| allow.contains(s))
             }
         }))
     }
 
     /// Encode ignoring special tokens entirely (tiktoken's `encode_ordinary`).
-    fn encode_ordinary(&self, py: Python<'_>, text: &str) -> Vec<u32> {
+    fn encode_ordinary(&self, py: Python<'_>, text: Text) -> Vec<u32> {
         py.detach(|| self.inner.encode(text.as_bytes()))
     }
 
@@ -120,8 +152,8 @@ impl PyTokenizer {
     }
 
     /// Every special-token string is turned into its id.
-    fn encode_with_special(&self, py: Python<'_>, text: &str) -> Vec<u32> {
-        py.detach(|| self.inner.encode_with_special(text))
+    fn encode_with_special(&self, py: Python<'_>, text: Text) -> Vec<u32> {
+        py.detach(|| self.inner.encode_with_special(&text))
     }
 
     /// Same as `encode`, but returns the ids as a little-endian uint32 buffer —
@@ -131,7 +163,7 @@ impl PyTokenizer {
     fn encode_to_buffer(
         &self,
         py: Python<'_>,
-        text: &str,
+        text: Text,
         allowed_special: Option<&Bound<'_, PyAny>>,
         disallowed_special: Option<&Bound<'_, PyAny>>,
     ) -> PyResult<Py<PyBytes>> {
@@ -145,7 +177,7 @@ impl PyTokenizer {
     fn encode_to_numpy<'py>(
         &self,
         py: Python<'py>,
-        text: &str,
+        text: Text,
         allowed_special: Option<&Bound<'py, PyAny>>,
         disallowed_special: Option<&Bound<'py, PyAny>>,
     ) -> PyResult<Bound<'py, PyAny>> {
@@ -159,7 +191,7 @@ impl PyTokenizer {
     fn encode_batch_to_numpy<'py>(
         &self,
         py: Python<'py>,
-        texts: Vec<String>,
+        texts: Vec<Text>,
         threads: usize,
         with_special: bool,
     ) -> PyResult<(Bound<'py, PyAny>, Bound<'py, PyAny>)> {
@@ -174,7 +206,7 @@ impl PyTokenizer {
     /// offsets (they tile the input); `unit="char"` gives code-point offsets
     /// (HF `offset_mapping` shape).
     #[pyo3(signature = (text, unit = "byte"))]
-    fn encode_with_offsets(&self, py: Python<'_>, text: &str, unit: &str) -> PyResult<IdsAndSpans> {
+    fn encode_with_offsets(&self, py: Python<'_>, text: Text, unit: &str) -> PyResult<IdsAndSpans> {
         if unit != "byte" && unit != "char" {
             return Err(PyValueError::new_err("unit must be 'byte' or 'char'"));
         }
@@ -230,7 +262,7 @@ impl PyTokenizer {
         text: &Bound<'py, PyString>,
         max_tokens: usize,
     ) -> PyResult<(Bound<'py, PyString>, usize)> {
-        let s = text.extract::<std::borrow::Cow<'_, str>>()?;
+        let s = utf8(text)?;
         let t = py.detach(|| self.inner.truncate(s.as_bytes(), max_tokens));
         if t.bytes == s.len() {
             // nothing to cut: hand back the same object rather than a copy
@@ -244,18 +276,18 @@ impl PyTokenizer {
     fn truncate_batch<'py>(
         &self,
         py: Python<'py>,
-        texts: Vec<String>,
+        texts: Vec<Text>,
         max_tokens: usize,
         threads: usize,
     ) -> Vec<(String, usize)> {
         let cuts = py.detach(|| {
-            let refs: Vec<&[u8]> = texts.iter().map(|s| s.as_bytes()).collect();
+            let refs: Vec<&[u8]> = texts.iter().map(|s| s.0.as_bytes()).collect();
             self.inner.truncate_batch(&refs, max_tokens, threads)
         });
         texts
             .into_iter()
             .zip(cuts)
-            .map(|(mut s, t)| {
+            .map(|(Text(mut s), t)| {
                 if t.bytes < s.len() {
                     s.truncate(t.bytes);
                 }
@@ -275,13 +307,13 @@ impl PyTokenizer {
     ) -> PyResult<Vec<usize>> {
         let strs = texts
             .iter()
-            .map(|t| t.to_str())
-            .collect::<PyResult<Vec<&str>>>()?;
+            .map(utf8)
+            .collect::<PyResult<Vec<_>>>()?;
         let refs: Vec<&[u8]> = strs.iter().map(|s| s.as_bytes()).collect();
         Ok(py.detach(|| self.inner.unnormalized(&refs, threads)))
     }
 
-    fn count(&self, py: Python<'_>, text: &str) -> usize {
+    fn count(&self, py: Python<'_>, text: Text) -> usize {
         py.detach(|| self.inner.count(text.as_bytes()))
     }
 
@@ -291,12 +323,12 @@ impl PyTokenizer {
     fn encode_batch(
         &self,
         py: Python<'_>,
-        texts: Vec<String>,
+        texts: Vec<Text>,
         threads: usize,
         with_special: bool,
     ) -> (Py<PyBytes>, Py<PyBytes>) {
         let (flat, offsets) = py.detach(|| {
-            let refs: Vec<&[u8]> = texts.iter().map(|s| s.as_bytes()).collect();
+            let refs: Vec<&[u8]> = texts.iter().map(|s| s.0.as_bytes()).collect();
             let per = self.inner.encode_batch(&refs, threads, with_special);
             let total: usize = per.iter().map(|v| v.len()).sum();
             let mut flat = Vec::with_capacity(total);
@@ -323,12 +355,12 @@ impl PyTokenizer {
     fn count_batch(
         &self,
         py: Python<'_>,
-        texts: Vec<String>,
+        texts: Vec<Text>,
         threads: usize,
         with_special: bool,
     ) -> Vec<u32> {
         py.detach(|| {
-            let refs: Vec<&[u8]> = texts.iter().map(|s| s.as_bytes()).collect();
+            let refs: Vec<&[u8]> = texts.iter().map(|s| s.0.as_bytes()).collect();
             self.inner.count_batch(&refs, threads, with_special)
         })
     }
@@ -463,9 +495,9 @@ fn frombuffer<'py>(
 /// Upper bound on Jev's token count for each text (see `toktok::jev`).
 #[pyfunction]
 #[pyo3(signature = (texts, threads = 0))]
-fn jev_count_batch(py: Python<'_>, texts: Vec<String>, threads: usize) -> Vec<u32> {
+fn jev_count_batch(py: Python<'_>, texts: Vec<Text>, threads: usize) -> Vec<u32> {
     py.detach(|| {
-        let refs: Vec<&[u8]> = texts.iter().map(|s| s.as_bytes()).collect();
+        let refs: Vec<&[u8]> = texts.iter().map(|s| s.0.as_bytes()).collect();
         toktok::jev::count_batch(&refs, threads)
     })
 }
@@ -477,7 +509,7 @@ fn jev_truncate<'py>(
     text: &Bound<'py, PyString>,
     max_tokens: usize,
 ) -> PyResult<(Bound<'py, PyString>, usize)> {
-    let s = text.extract::<std::borrow::Cow<'_, str>>()?;
+    let s = utf8(text)?;
     let t = py.detach(|| toktok::jev::truncate(s.as_bytes(), max_tokens));
     if t.bytes == s.len() {
         return Ok((text.clone(), t.total_tokens));
@@ -490,18 +522,18 @@ fn jev_truncate<'py>(
 #[pyo3(signature = (texts, max_tokens, threads = 0))]
 fn jev_truncate_batch(
     py: Python<'_>,
-    texts: Vec<String>,
+    texts: Vec<Text>,
     max_tokens: usize,
     threads: usize,
 ) -> Vec<(String, usize)> {
     let cuts = py.detach(|| {
-        let refs: Vec<&[u8]> = texts.iter().map(|s| s.as_bytes()).collect();
+        let refs: Vec<&[u8]> = texts.iter().map(|s| s.0.as_bytes()).collect();
         toktok::jev::truncate_batch(&refs, max_tokens, threads)
     });
     texts
         .into_iter()
         .zip(cuts)
-        .map(|(mut s, t)| {
+        .map(|(Text(mut s), t)| {
             s.truncate(t.bytes);
             (s, t.total_tokens)
         })
@@ -510,7 +542,7 @@ fn jev_truncate_batch(
 
 /// Per-class sizes behind the Jev estimate, in `JEV_CLASSES` order: for refitting.
 #[pyfunction]
-fn jev_features(text: &str) -> Vec<u32> {
+fn jev_features(text: Text) -> Vec<u32> {
     toktok::jev::features(text.as_bytes()).to_vec()
 }
 
