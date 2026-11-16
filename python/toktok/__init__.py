@@ -9,7 +9,7 @@ encoding, get back a token count per text. Ids are never materialized.
     # [2, 4]
 
 `encoding` is one of the bundled encodings: cl100k_base, o200k_base,
-o200k_harmony, qwen3.5, embeddinggemma-2 — or 'jev', an upper-bound estimate
+o200k_harmony, qwen3.5, hs-decide-1-flash, embeddinggemma-2 — or 'jev', an upper-bound estimate
 for TypeSafe's Jev.
 
 Encodings are loaded once and cached, and counting releases the GIL and runs
@@ -29,6 +29,8 @@ from ._toktok import jev_truncate_batch as _jev_truncate_batch
 # The vocabularies are compiled into the extension module, so there are no data
 # files to find, ship or download.
 _CACHE = {}
+# NFC-normalize first, as their Hugging Face tokenizers do; the Rust core doesn't
+_NFC = ("qwen3.5", "hs-decide-1-flash")
 
 
 def _encoding(name: str, data_dir: str = "") -> _Tokenizer:
@@ -47,7 +49,6 @@ def _encoding(name: str, data_dir: str = "") -> _Tokenizer:
 
 
 def _nfc(text: str) -> str:
-    # Qwen's tokenizer NFC-normalizes first; the Rust core doesn't, so do it here
     return text if is_normalized("NFC", text) else normalize("NFC", text)
 
 
@@ -72,7 +73,8 @@ def batch_count(
         encoding: one of 'cl100k_base' (GPT-3.5, GPT-4, text-embedding-3),
             'o200k_base' (GPT-4o, o-series, GPT-4.1, GPT-5), 'o200k_harmony'
             (GPT-OSS), 'qwen3.5' (Qwen3.5's vocab as bigpickle uses it;
-            text is NFC-normalized first) or 'embeddinggemma-2' (Google's
+            text is NFC-normalized first), 'hs-decide-1-flash' (Hindsight's
+            decision model; NFC-normalized first too) or 'embeddinggemma-2' (Google's
             EmbeddingGemma 2; a server adds its prompt and <bos>/<eos>, see
             the README). An unknown name raises
             KeyError. 'jev' (TypeSafe's
@@ -92,7 +94,7 @@ def batch_count(
     """
     if encoding == "jev":
         return _jev_count_batch(list(texts), threads)
-    if encoding == "qwen3.5":
+    if encoding in _NFC:
         texts = _nfc_batch(texts, threads)
     return _encoding(encoding).count_batch(list(texts), threads, with_special)
 
@@ -122,11 +124,12 @@ def truncate(
 
     With 'jev' the counts are the upper-bound estimate, and the cut lands where
     the kept text's estimate fits `max_tokens`. With 'qwen3.5' the text is
-    NFC-normalized first, so the kept text is a prefix of its NFC form.
+    NFC-normalized first (also 'hs-decide-1-flash'), so the kept text is a prefix
+    of its NFC form.
     """
     if encoding == "jev":
         return _jev_truncate(text, max_tokens)
-    if encoding == "qwen3.5":
+    if encoding in _NFC:
         text = _nfc(text)
     return _encoding(encoding).truncate(text, max_tokens)
 
@@ -140,7 +143,7 @@ def batch_truncate(
     """`truncate` over many texts, in parallel. See `truncate` and `batch_count`."""
     if encoding == "jev":
         return _jev_truncate_batch(list(texts), max_tokens, threads)
-    if encoding == "qwen3.5":
+    if encoding in _NFC:
         texts = _nfc_batch(texts, threads)
     return _encoding(encoding).truncate_batch(list(texts), max_tokens, threads)
 

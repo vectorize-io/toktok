@@ -102,7 +102,8 @@ impl Tokenizer {
     /// data directory, no download, no network.
     ///
     /// Names: `cl100k_base` (GPT-3.5/GPT-4), `o200k_base` (GPT-4o),
-    /// `o200k_harmony` (GPT-OSS), `qwen3.5` and `embeddinggemma-2`. Requires the
+    /// `o200k_harmony` (GPT-OSS), `qwen3.5`, `hs-decide-1-flash` and
+    /// `embeddinggemma-2`. Requires the
     /// default `embedded-data` feature.
     ///
     /// ```
@@ -123,12 +124,20 @@ impl Tokenizer {
                 Scanner::O200k,
             ),
             "qwen3.5" => (data::QWEN35_VOCAB, data::QWEN35_SPECIAL, Scanner::Qwen),
+            // Hindsight's decision model. Its vocab is byte-identical to
+            // qwen3.5's, so the table is shared; its split classes (marks join
+            // letters) and specials are its own.
+            "hs-decide-1-flash" => (data::QWEN35_VOCAB, data::HSD1_SPECIAL, Scanner::Qwen),
             "embeddinggemma-2" => (data::EG2_VOCAB, data::EG2_SPECIAL, Scanner::Gemma),
             _ => return Err(unknown_encoding(encoding)),
         };
         let (u, uo) = match scanner {
             Scanner::Cl100k => (
                 UClass::from_bytes(data::UNICLASS, "uniclass.bin")?,
+                UClassO::empty(),
+            ),
+            Scanner::Qwen if encoding == "hs-decide-1-flash" => (
+                UClass::from_bytes(data::UNICLASS_HSD1, "uniclass_hsd1.bin")?,
                 UClassO::empty(),
             ),
             Scanner::Qwen => (
@@ -161,7 +170,7 @@ impl Tokenizer {
     /// Load a bundled encoding from a data directory.
     ///
     /// Built-in: `cl100k_base`, `o200k_base`, `o200k_harmony`, `qwen3.5`,
-    /// `embeddinggemma-2`.
+    /// `hs-decide-1-flash`, `embeddinggemma-2`.
     pub fn load_dir(dir: impl AsRef<Path>, encoding: &str) -> Result<Tokenizer, VocabError> {
         let dir: PathBuf = dir.as_ref().to_path_buf();
         let (vocab_file, specials_file, scanner) = match encoding {
@@ -171,6 +180,7 @@ impl Tokenizer {
             // reuses o200k.vocab and the o200k scanner) — only the specials differ.
             "o200k_harmony" => ("o200k.vocab", "o200k_harmony.special", Scanner::O200k),
             "qwen3.5" => ("qwen35.vocab", "qwen35.special", Scanner::Qwen),
+            "hs-decide-1-flash" => ("qwen35.vocab", "hsd1.special", Scanner::Qwen),
             "embeddinggemma-2" => ("eg2.vocab", "eg2.special", Scanner::Gemma),
             _ => return Err(unknown_encoding(encoding)),
         };
@@ -180,6 +190,10 @@ impl Tokenizer {
             Scanner::O200k => (
                 UClass::empty(),
                 UClassO::load(&dir.join("uniclass_o200k.bin"))?,
+            ),
+            Scanner::Qwen if encoding == "hs-decide-1-flash" => (
+                UClass::load(&dir.join("uniclass_hsd1.bin"))?,
+                UClassO::empty(),
             ),
             Scanner::Qwen => (
                 UClass::load(&dir.join("uniclass_qwen35.bin"))?,

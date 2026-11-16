@@ -25,8 +25,8 @@ SERVER = [
 ]
 
 
-def vectors():
-    with open(os.path.join(HERE, "vectors_qwen3.5.bin"), "rb") as f:
+def vectors(encoding="qwen3.5"):
+    with open(os.path.join(HERE, f"vectors_{encoding}.bin"), "rb") as f:
         blob = f.read()
     (n,), p = struct.unpack_from("<I", blob), 4
     for _ in range(n):

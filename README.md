@@ -50,6 +50,7 @@ into the binary, so there are no data files, downloads or runtime dependencies.
 | `o200k_base` | GPT-4o, GPT-4o mini, GPT-4.1, GPT-5, o1 / o3 / o4-mini |
 | `o200k_harmony` | GPT-OSS (o200k_base's merge ranks plus the harmony special tokens) |
 | `qwen3.5` | Qwen3.5's vocabulary, split the way bigpickle does — exact ids; see below |
+| `hs-decide-1-flash` | Hindsight's decision model, [hs-decide-1-flash](https://huggingface.co/hindsight-ai/hs-decide-1-flash) — exact ids; see below |
 | `embeddinggemma-2` | Google's EmbeddingGemma 2 (Gemma 4's vocabulary) — exact ids; see below |
 | `jev` | TypeSafe's Jev — an **upper-bound estimate**, not exact ids; see below |
 
@@ -74,6 +75,23 @@ and against a bigpickle server's own counts (202 texts, 145k tokens).
 - Speed: within 10–25% of `cl100k_base` on English and code, about half on
   multilingual web text, and 70–250× faster than `tokenizers`
   ([numbers](docs/BENCHMARKS.md#qwen35)).
+
+### `hs-decide-1-flash`
+
+Hindsight's decision model. Exact ids, checked token for token against Hugging
+Face `tokenizers` with the model's own tokenizer.json.
+
+- Text is NFC-normalized first, as the model's tokenizer does. Python does it
+  for you; `truncate` then returns a prefix of the NFC text. From Rust, pass NFC
+  text: `Tokenizer::unnormalized` finds the few texts in a batch that aren't.
+- A server that renders special tokens counts `<|im_start|>` or `<think>` as
+  one token. Pass `with_special=True` to match it; the default counts them as
+  text, which only ever counts more.
+- Its vocabulary is byte-identical to `qwen3.5`'s, so the build shares that
+  table and adds only ~7 KB. Counts still differ: it keeps combining marks with
+  their letters, so Hindi, Tamil, Thai and similar text count fewer tokens.
+  `tools/gen_qwen35.py <tokenizer.json> hsd1` rebuilds its tables and stops if
+  a new version's vocabulary ever stops matching.
 
 ### `embeddinggemma-2`
 
