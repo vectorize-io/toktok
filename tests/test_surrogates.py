@@ -2,7 +2,7 @@
 
 They become U+FFFD the way tiktoken does it, so counts match tiktoken."""
 
-import tiktoken
+import pytest
 import toktok
 
 LONE = "hi \ud83e there"
@@ -10,6 +10,7 @@ FIXED = LONE.encode("utf-16", "surrogatepass").decode("utf-16", "replace")
 
 
 def test_lone_surrogate_counts_like_tiktoken():
+    tiktoken = pytest.importorskip("tiktoken")
     want = len(tiktoken.get_encoding("o200k_base").encode(LONE))
     assert toktok.batch_count([LONE], "o200k_base", threads=1) == [want]
 
