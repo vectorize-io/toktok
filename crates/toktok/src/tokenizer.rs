@@ -124,8 +124,9 @@ impl Tokenizer {
                 Scanner::O200k,
             ),
             "qwen3.5" => (data::QWEN35_VOCAB, data::QWEN35_SPECIAL, Scanner::Qwen),
-            // Hindsight's decision model: Qwen3.5's vocab, Qwen's own split
-            // pattern (marks join letters) and fewer specials than bigpickle
+            // Hindsight's decision model. Its vocab is byte-identical to
+            // qwen3.5's, so the table is shared; its split classes (marks join
+            // letters) and specials are its own.
             "hs-decide-1-flash" => (data::QWEN35_VOCAB, data::HSD1_SPECIAL, Scanner::Qwen),
             "embeddinggemma-2" => (data::EG2_VOCAB, data::EG2_SPECIAL, Scanner::Gemma),
             _ => return Err(unknown_encoding(encoding)),

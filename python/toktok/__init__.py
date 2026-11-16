@@ -74,8 +74,7 @@ def batch_count(
             'o200k_base' (GPT-4o, o-series, GPT-4.1, GPT-5), 'o200k_harmony'
             (GPT-OSS), 'qwen3.5' (Qwen3.5's vocab as bigpickle uses it;
             text is NFC-normalized first), 'hs-decide-1-flash' (Hindsight's
-            decision model: Qwen3.5's vocab with Qwen's own splitting; NFC
-            first too) or 'embeddinggemma-2' (Google's
+            decision model; NFC-normalized first too) or 'embeddinggemma-2' (Google's
             EmbeddingGemma 2; a server adds its prompt and <bos>/<eos>, see
             the README). An unknown name raises
             KeyError. 'jev' (TypeSafe's
