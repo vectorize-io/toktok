@@ -73,6 +73,11 @@ fn qwen35_matches_hf_tokenizers() {
 }
 
 #[test]
+fn hs_decide_1_flash_matches_hf_tokenizers() {
+    check("hs-decide-1-flash");
+}
+
+#[test]
 fn qwen35_specials_and_unmergeable_tokens() {
     let tok = load("qwen3.5");
     assert_eq!(tok.n_vocab(), 248077);

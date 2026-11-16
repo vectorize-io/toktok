@@ -50,6 +50,7 @@ into the binary, so there are no data files, downloads or runtime dependencies.
 | `o200k_base` | GPT-4o, GPT-4o mini, GPT-4.1, GPT-5, o1 / o3 / o4-mini |
 | `o200k_harmony` | GPT-OSS (o200k_base's merge ranks plus the harmony special tokens) |
 | `qwen3.5` | Qwen3.5's vocabulary, split the way bigpickle does — exact ids; see below |
+| `hs-decide-1-flash` | Hindsight's [decision model](https://huggingface.co/hindsight-ai/hs-decide-1-flash) — Qwen3.5's vocabulary, split Qwen's way — exact ids; see below |
 | `embeddinggemma-2` | Google's EmbeddingGemma 2 (Gemma 4's vocabulary) — exact ids; see below |
 | `jev` | TypeSafe's Jev — an **upper-bound estimate**, not exact ids; see below |
 
@@ -74,6 +75,17 @@ and against a bigpickle server's own counts (202 texts, 145k tokens).
 - Speed: within 10–25% of `cl100k_base` on English and code, about half on
   multilingual web text, and 70–250× faster than `tokenizers`
   ([numbers](docs/BENCHMARKS.md#qwen35)).
+
+### `hs-decide-1-flash`
+
+Hindsight's decision model, a Qwen3.5-0.8B fine-tune. Exact ids, checked token
+for token against Hugging Face `tokenizers` with the model's own tokenizer.json.
+
+- Same vocabulary and merges as `qwen3.5`, so it adds only ~7 KB to the build.
+  It splits text Qwen's own way, keeping combining marks with their letters, so
+  Hindi, Tamil, Thai and similar text counts a few percent lower than
+  `qwen3.5`. It has 26 special tokens, without the audio/TTS ones.
+- NFC and `with_special` work as for `qwen3.5`.
 
 ### `embeddinggemma-2`
 

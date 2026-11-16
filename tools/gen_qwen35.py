@@ -13,6 +13,12 @@ root, with `tokenizers` installed:
 Writes crates/toktok/data/{qwen35.vocab, qwen35.special, uniclass_qwen35.bin,
 nfc_unsafe.bin}.
 
+hs-decide-1-flash (huggingface.co/hindsight-ai/hs-decide-1-flash) has the same
+vocab and merges but Qwen's own split pattern and fewer specials. Pass a name to
+write just its specials and classes; it checks the vocab is qwen35.vocab:
+
+    python tools/gen_qwen35.py path/to/tokenizer.json hsd1
+
 The vocab's ids follow its merge order, so merge priority is rank order. The
 merges themselves ride along after the tokens (one left-part length per id),
 because for some newer tokens they aren't the ones rank order implies.
@@ -101,7 +107,7 @@ def ranges(cps):
     return struct.pack("<I", len(out)) + b"".join(struct.pack("<II", a, b) for a, b in out)
 
 
-def main(path):
+def main(path, name="qwen35"):
     with open(path, encoding="utf-8") as f:
         t = json.load(f)
     m = t["model"]
@@ -113,29 +119,35 @@ def main(path):
     ids = [m["vocab"][a + b] for a, b in merges]
     assert ids == sorted(ids), "merge order must follow ids for rank merging"
 
-    with open(OUT + "qwen35.vocab", "wb") as f:
-        f.write(struct.pack("<I", len(vocab)))
-        for b, i in sorted(vocab.items(), key=lambda kv: kv[1]):
-            f.write(struct.pack("<H", len(b)) + b + struct.pack("<I", i))
-        # rank order alone picks other merges for some newer tokens, and 201
-        # tokens have none: ship each token's left-part length (0 = no merge)
-        left = bytearray(len(vocab))
-        for a, _ in merges:
-            left[m["vocab"][a + _]] = len(bytes(dec[c] for c in a))
-        f.write(b"SPL1" + bytes(left))
+    blob = bytearray(struct.pack("<I", len(vocab)))
+    for b, i in sorted(vocab.items(), key=lambda kv: kv[1]):
+        blob += struct.pack("<H", len(b)) + b + struct.pack("<I", i)
+    # rank order alone picks other merges for some newer tokens, and 201
+    # tokens have none: ship each token's left-part length (0 = no merge)
+    left = bytearray(len(vocab))
+    for a, _ in merges:
+        left[m["vocab"][a + _]] = len(bytes(dec[c] for c in a))
+    blob += b"SPL1" + bytes(left)
+    if name == "qwen35":
+        with open(OUT + "qwen35.vocab", "wb") as f:
+            f.write(blob)
+    else:
+        with open(OUT + "qwen35.vocab", "rb") as f:
+            assert f.read() == blob, "vocab differs from qwen35.vocab: needs its own"
 
     added = sorted((a["id"], a["content"].encode()) for a in t["added_tokens"])
-    with open(OUT + "qwen35.special", "wb") as f:
+    with open(OUT + name + ".special", "wb") as f:
         f.write(struct.pack("<I", len(added)))
         for i, s in added:
             f.write(struct.pack("<IH", i, len(s)) + s)
 
-    with open(OUT + "uniclass_qwen35.bin", "wb") as f:
+    with open(OUT + "uniclass_" + name + ".bin", "wb") as f:
         f.write(b"".join(ranges(c) for c in classes(path)))
-    with open(OUT + "nfc_unsafe.bin", "wb") as f:
-        f.write(ranges(nfc_unsafe()))
+    if name == "qwen35":
+        with open(OUT + "nfc_unsafe.bin", "wb") as f:
+            f.write(ranges(nfc_unsafe()))
     print(f"{len(vocab)} tokens, {len(added)} added tokens")
 
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    main(*sys.argv[1:3])

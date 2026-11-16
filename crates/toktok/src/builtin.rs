@@ -15,6 +15,7 @@ pub const BUILTIN_ENCODINGS: &[&str] = &[
     "o200k_base",
     "o200k_harmony",
     "qwen3.5",
+    "hs-decide-1-flash",
     "embeddinggemma-2",
 ];
 
@@ -28,6 +29,8 @@ pub(crate) mod data {
     pub const QWEN35_VOCAB: &[u8] = include_bytes!("../data/qwen35.vocab");
     pub const QWEN35_SPECIAL: &[u8] = include_bytes!("../data/qwen35.special");
     pub const UNICLASS_QWEN35: &[u8] = include_bytes!("../data/uniclass_qwen35.bin");
+    pub const HSD1_SPECIAL: &[u8] = include_bytes!("../data/hsd1.special");
+    pub const UNICLASS_HSD1: &[u8] = include_bytes!("../data/uniclass_hsd1.bin");
     pub const EG2_VOCAB: &[u8] = include_bytes!("../data/eg2.vocab");
     pub const EG2_SPECIAL: &[u8] = include_bytes!("../data/eg2.special");
     pub const UNICLASS: &[u8] = include_bytes!("../data/uniclass.bin");

@@ -11,6 +11,10 @@ tokenizer.json; pass its path:
 
     python tools/gen_vectors.py path/to/tokenizer.json
 
+hs-decide-1-flash's is `tokenizers` with hindsight-ai/hs-decide-1-flash's file:
+
+    python tools/gen_vectors.py --hs-decide-1-flash path/to/tokenizer.json
+
 embeddinggemma-2's is `tokenizers` too, with google/embeddinggemma-2's file:
 
     python tools/gen_vectors.py --embeddinggemma-2 path/to/tokenizer.json
@@ -170,6 +174,9 @@ def main():
     if len(sys.argv) > 1:
         from tokenizers import Tokenizer
 
+        name = "qwen3.5"
+        if sys.argv[1] == "--hs-decide-1-flash":
+            name = sys.argv.pop(1)[2:]
         hf = Tokenizer.from_file(sys.argv[1])
         rng = random.Random(35)
         fuzz = ["".join(rng.choice(FUZZ) for _ in range(rng.randint(1, 60))) for _ in range(2000)]
@@ -177,7 +184,7 @@ def main():
         cases = [unicodedata.normalize("NFC", s) for s in CASES + QWEN_CASES + fuzz]
         cases = [s for s in cases if "<|" not in s]
         write(
-            os.path.join(out_dir, "vectors_qwen3.5.bin"),
+            os.path.join(out_dir, f"vectors_{name}.bin"),
             cases,
             lambda s: hf.encode(s, add_special_tokens=False).ids,
         )
