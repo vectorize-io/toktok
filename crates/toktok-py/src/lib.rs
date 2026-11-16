@@ -305,10 +305,7 @@ impl PyTokenizer {
         texts: Vec<Bound<'_, PyString>>,
         threads: usize,
     ) -> PyResult<Vec<usize>> {
-        let strs = texts
-            .iter()
-            .map(utf8)
-            .collect::<PyResult<Vec<_>>>()?;
+        let strs = texts.iter().map(utf8).collect::<PyResult<Vec<_>>>()?;
         let refs: Vec<&[u8]> = strs.iter().map(|s| s.as_bytes()).collect();
         Ok(py.detach(|| self.inner.unnormalized(&refs, threads)))
     }
